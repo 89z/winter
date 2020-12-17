@@ -2,9 +2,9 @@ package main
 
 import (
    "log"
-   "musicdb/youtube"
    "net/url"
    "os"
+   "winter/youtube"
 )
 
 func main() {
@@ -18,7 +18,13 @@ func main() {
       log.Fatal(e)
    }
    id_s := o.Query().Get("v")
-   m := youtube.Info(id_s)
-   view_s := youtube.Views(m)
+   m, e := youtube.Info(id_s)
+   if e != nil {
+      log.Fatal(e)
+   }
+   view_s, e := youtube.Views(m)
+   if e != nil {
+      log.Fatal(e)
+   }
    println(view_s)
 }
