@@ -17,6 +17,7 @@ func floatVal(s string) (float64, error) {
 }
 
 func getContents(s string) (string, error) {
+   println(s)
    o, e := http.Get(s)
    if e != nil {
       return "", e
@@ -45,7 +46,6 @@ func timeHours(value string) (float64, error) {
 
 func Info(id_s string) (json.Map, error) {
    info_s := "https://www.youtube.com/get_video_info?video_id=" + id_s
-   println(info_s)
    query_s, e := getContents(info_s)
    if e != nil {
       return nil, e
