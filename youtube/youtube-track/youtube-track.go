@@ -1,28 +1,37 @@
 package main
 
+import (
+   "log"
+   "net/url"
+   "os"
+   "winter/youtube"
+)
+
 func main() {
-   if ($argc != 2) {
-      echo "youtube-track.php <URL>\n";
-      exit(1);
+   if len(os.Args) != 2 {
+      println("youtube-track <URL>")
+      os.Exit(1)
    }
-   $url_s = $argv[1];
-   $query_s = parse_url($url_s, PHP_URL_QUERY);
-   parse_str($query_s, $query_m);
-   $id_s = $query_m['v'];
-   # year
-   $info_o = youtube_info($id_s);
-   if (! property_exists($info_o, 'description')) {
-      echo "Clapham Junction\n";
-      exit(1);
+   url_s := os.Args[1]
+   o, e := url.Parse(url_s)
+   if e != nil {
+      log.Fatal(e)
    }
-   $year_s = $info_o->publishDate;
-   $reg_a = [
-      '/ (\d{4})/',
-      '/(\d{4,}) /',
-      '/Released on: (\d{4})/',
-      '/℗ (\d{4})/'
-   ];
-   foreach ($reg_a as $reg_s) {
+   id_s := o.Query().Get("v")
+   // year
+   m, e := youtube.Info(id_s)
+   if e != nil {
+      log.Fatal(e)
+   }
+   if m["description"] == nil {
+      log.Fatal("Clapham Junction")
+   }
+   desc_s := m.M("description").S("simpleText")
+   year_s := m.S("publishDate")
+   reg_a := []string{
+      ` (\d{4})`, `(\d{4,}) `, `Released on: (\d{4})`, `℗ (\d{4})`,
+   }
+   for _, reg_s := range reg_a {
       $mat_n = preg_match($reg_s, $info_o->description->simpleText, $mat_a);
       if ($mat_n === 0) {
          continue;
