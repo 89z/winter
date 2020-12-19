@@ -29,7 +29,6 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
       album_n int
       album_s string
       date_s string
-      date_prev_s string
       url_s string
       song_n int
       song_s string
@@ -39,6 +38,7 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
       pop_b bool
       should_b bool
    )
+   date_prev_s := "9999-12-31"
    for query_o.Next() {
       e = query_o.Scan(
          &album_n,
@@ -56,11 +56,17 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
          return e
       }
       if date_s != date_prev_s {
-         if date_prev_s != "" {
+         if date_prev_s != "9999-12-31" {
             fmt.Println()
          }
-         // print album date, title
-         fmt.Println(date_s, "|", album_s)
+         // print album date
+         if date_s != "" {
+            fmt.Print(date_s)
+         } else {
+            fmt.Print("\x1b[30;43mdate ", album_n, "\x1b[m")
+         }
+         // print album title
+         fmt.Println(" |", album_s)
          // print URL
          if pop_b {
             if url_s != "" {
@@ -107,6 +113,18 @@ func CheckUpdate(open_o *sql.DB, artist_s, check_s string) error {
    WHERE artist_n = ?
    `
    exec_o, e := open_o.Exec(query_s, check_s, artist_s)
+   if e != nil {
+      return fmt.Errorf("%v %v", exec_o, e)
+   }
+   return nil
+}
+
+func DateUpdate(open_o *sql.DB, album_s, date_s string) error {
+   query_s := `
+   UPDATE album_t SET date_s = ?
+   WHERE album_n = ?
+   `
+   exec_o, e := open_o.Exec(query_s, date_s, album_s)
    if e != nil {
       return fmt.Errorf("%v %v", exec_o, e)
    }

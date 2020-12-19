@@ -11,17 +11,18 @@ import (
 func main() {
    if len(os.Args) == 1 {
       fmt.Println(`Synopsis:
-   musicdb <target> <flags>
+   winter <target> <flags>
 
 Examples:
-   musicdb 'Kate Bush'
-   musicdb check 999 2019-12-31
-   musicdb note 999 good
-   musicdb pop 999 0
-   musicdb url 999 youtube.com/watch?v=HQmmM_qwG4k`)
+   winter 'Kate Bush'
+   winter check 999 2019-12-31
+   winter date 999 2019-12-31
+   winter note 999 good
+   winter pop 999 0
+   winter url 999 youtube.com/watch?v=HQmmM_qwG4k`)
       os.Exit(1)
    }
-   db_s := os.Getenv("MUSICDB")
+   db_s := os.Getenv("WINTER")
    open_o, e := sql.Open("sqlite3", db_s)
    if e != nil {
       log.Fatal(e)
@@ -31,6 +32,9 @@ Examples:
    case "check":
       artist_s, check_s := os.Args[2], os.Args[3]
       e = CheckUpdate(open_o, artist_s, check_s)
+   case "date":
+      album_s, date_s := os.Args[2], os.Args[3]
+      e = DateUpdate(open_o, album_s, date_s)
    case "note":
       song_s, note_s := os.Args[2], os.Args[3]
       e = NoteUpdate(open_o, song_s, note_s)
