@@ -38,8 +38,8 @@ select * from song_artist_t;
 ## Primary key
 
 ~~~
-create table artist_t(artist_n integer primary key, artist_s);
-insert into artist_t(artist_s) values('Cocteau Twins');
+create table artist_t (artist_n int primary key, artist_s);
+insert into artist_t (artist_s) values ('Cocteau Twins');
 select * from artist_t;
 ~~~
 

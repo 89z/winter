@@ -7,6 +7,20 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
+var (
+   album_n int
+   album_s string
+   date_s string
+   url_s string
+   song_n int
+   song_s string
+   note_s string
+   artist_n int
+   check_s string
+   pop_b bool
+   should_b bool
+)
+
 func ArtistSelect(open_o *sql.DB, artist_s string) error {
    query_s := `
    SELECT
@@ -25,19 +39,6 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
    if e != nil {
       return e
    }
-   var (
-      album_n int
-      album_s string
-      date_s string
-      url_s string
-      song_n int
-      song_s string
-      note_s string
-      artist_n int
-      check_s string
-      pop_b bool
-      should_b bool
-   )
    date_prev_s := "9999-12-31"
    for query_o.Next() {
       e = query_o.Scan(

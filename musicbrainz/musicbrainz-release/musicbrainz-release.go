@@ -1,6 +1,7 @@
 package main
 
 import (
+   "fmt"
    "log"
    "os"
    "path"
@@ -17,7 +18,7 @@ const (
 
 func main() {
    if len(os.Args) != 2 {
-      println(`Usage:
+      fmt.Println(`Usage:
 musicbrainz-release <URL>
 
 URL:
@@ -47,7 +48,19 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          log.Fatal(e)
       }
    }
-   album_m := map[string]string{"@date": rel_m.S("date")}
+   // ARTIST
+   artist_s := rel_m.A("artist-credit").M(0).S("name")
+   fmt.Println("artist_t:")
+   fmt.Printf("\tartist_s: %q\n", artist_s)
+   fmt.Println("\tartist_n: ?")
+   // ALBUM
+   album_s := rel_m.S("title")
+   date_s := rel_m.S("date")
+   fmt.Println("album_t:")
+   fmt.Println("\talbum_n: ?")
+   fmt.Printf("\talbum_s: %q\n", album_s)
+   fmt.Printf("\tdate_s: %q\n", date_s)
+   fmt.Printf("\turl_s: %q\n", "")
    media_a := rel_m.A("media")
    for n := range media_a {
       track_a := media_a.M(n).A("tracks")
@@ -61,10 +74,17 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          if len_n > max_n {
             note_s = "long"
          }
-         album_m[track_m.S("title")] = note_s
+         fmt.Println("--------------------------------------------------------")
+         // SONG
+         title_s := track_m.S("title")
+         fmt.Println("song_t:")
+         fmt.Printf("\tsong_n: ?, song_s: %q, note_s: %q\n", title_s, note_s)
+         // SONG ALBUM
+         fmt.Println("song_album_t:")
+         fmt.Println("\tsong_n: ?, album_n: ?")
+         // SONG ARTIST
+         fmt.Println("song_artist_t:")
+         fmt.Println("\tsong_n: ?, artist_n: ?")
       }
-   }
-   for key_s, val_s := range album_m {
-      println(key_s, "|", val_s)
    }
 }
