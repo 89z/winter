@@ -32,11 +32,11 @@ func main() {
       log.Fatal("Clapham Junction")
    }
    desc_s := info_m.M("description").S("simpleText")
-   year_s := info_m.S("publishDate")
+   year_s := info_m.S("publishDate")[:4]
    /* the order doesnt matter here, as we will find the lowest date of all
    matches */
    reg_a := []string{
-      ` (\d{4})`, `(\d{4,}) `, `Released on: (\d{4})`, `℗ (\d{4})`,
+      ` (\d{4})`, `(\d{4}) `, `Released on: (\d{4})`, `℗ (\d{4})`,
    }
    for _, reg_s := range reg_a {
       mat_s := FindSubmatch(reg_s, desc_s)
@@ -48,7 +48,7 @@ func main() {
       }
       year_s = mat_s
    }
-   year_n, e := strconv.Atoi(year_s[:4])
+   year_n, e := strconv.Atoi(year_s)
    if e != nil {
       log.Fatal(e)
    }
@@ -67,7 +67,7 @@ func main() {
    image_s := GetImage(id_s)
    // print
    rec_a := json.Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
-   json_s, e := json.Encode(rec_a)
+   json_s, e := rec_a.Encode()
    if e != nil {
       log.Fatal(e)
    }
