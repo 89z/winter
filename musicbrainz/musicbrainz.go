@@ -6,14 +6,14 @@ import (
    "net/url"
 )
 
-type Decode struct {
+type MB struct {
    API string
-   MBID string
+   ID string
    Query url.Values
 }
 
-func NewDecode(mbid_s string) Decode {
-   return Decode{
+func NewDecode(mbid_s string) MB {
+   return MB{
       "https://musicbrainz.org/ws/2/release",
       mbid_s,
       url.Values{
@@ -23,9 +23,9 @@ func NewDecode(mbid_s string) Decode {
    }
 }
 
-func (dec_o Decode) Group() (Slice, error) {
-   dec_o.Query["release-group"] = []string{dec_o.MBID}
-   url_s := dec_o.API + "?" + dec_o.Query.Encode()
+func (mb_o MB) Group() (Slice, error) {
+   mb_o.Query["release-group"] = []string{mb_o.ID}
+   url_s := mb_o.API + "?" + mb_o.Query.Encode()
    println(url_s)
    get_o, e := http.Get(url_s)
    if e != nil {
@@ -39,8 +39,8 @@ func (dec_o Decode) Group() (Slice, error) {
    return m.A("releases"), nil
 }
 
-func (dec_o Decode) Release() (Map, error) {
-   url_s := dec_o.API + "/" + dec_o.MBID + "?" + dec_o.Query.Encode()
+func (mb_o MB) Release() (Map, error) {
+   url_s := mb_o.API + "/" + mb_o.ID + "?" + mb_o.Query.Encode()
    println(url_s)
    get_o, e := http.Get(url_s)
    if e != nil {

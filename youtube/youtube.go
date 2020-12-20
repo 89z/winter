@@ -8,8 +8,8 @@ import (
    "net/url"
    "strconv"
    "time"
+   "winter/assert"
    "winter/color"
-   "winter/json"
 )
 
 func floatVal(s string) (float64, error) {
@@ -44,7 +44,7 @@ func timeHours(value string) (float64, error) {
    return time.Since(o).Hours(), nil
 }
 
-func Info(id_s string) (json.Map, error) {
+func Info(id_s string) (assert.Map, error) {
    info_s := "https://www.youtube.com/get_video_info?video_id=" + id_s
    query_s, e := getContents(info_s)
    if e != nil {
@@ -55,14 +55,15 @@ func Info(id_s string) (json.Map, error) {
       return nil, e
    }
    resp_s := o.Get("player_response")
-   json_m, e := json.Decode(resp_s)
+   json_m := Map{}
+   e = json.Unmarshal([]byte(resp_s), &json_m)
    if e != nil {
       return nil, e
    }
    return json_m.M("microformat").M("playerMicroformatRenderer"), nil
 }
 
-func Views(info_m json.Map) (string, error) {
+func Views(info_m assert.Map) (string, error) {
    view_s := info_m.S("viewCount")
    view_n, e := floatVal(view_s)
    if e != nil {

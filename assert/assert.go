@@ -1,5 +1,4 @@
-package json
-import "encoding/json"
+package assert
 type Map map[string]interface{}
 type Slice []interface{}
 
@@ -19,20 +18,6 @@ func (m Map) S(s string) string {
    return m[s].(string)
 }
 
-func (a Slice) Encode() (string, error) {
-   y, e := json.Marshal(a)
-   if e != nil {
-      return "", e
-   }
-   return string(y), nil
-}
-
 func (a Slice) M(n int) Map {
    return a[n].(map[string]interface{})
-}
-
-func Decode(s string) (Map, error) {
-   y := []byte(s)
-   m := Map{}
-   return m, json.Unmarshal(y, &m)
 }

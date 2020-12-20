@@ -8,7 +8,7 @@ import (
    "strconv"
    "strings"
    "time"
-   "winter/json"
+   "winter/assert"
    "winter/youtube"
 )
 
@@ -66,10 +66,11 @@ func main() {
    // image
    image_s := GetImage(id_s)
    // print
-   rec_a := json.Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
-   json_s, e := rec_a.Encode()
+   rec_a := assert.Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
+   json_y, e := json.Marshal(rec_a)
    if e != nil {
       log.Fatal(e)
    }
-   print(json_s, ",\n")
+   json_y = append(json_y, ',', '\n')
+   os.Stdout.Write(json_y)
 }
