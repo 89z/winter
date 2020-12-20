@@ -1,10 +1,8 @@
 package main
 
 import (
-   "log"
-   "net/url"
-   "os"
-   "winter/youtube"
+   "net/http"
+   "regexp"
 )
 
 func FindSubmatch(pat, sub string) string {
@@ -16,7 +14,7 @@ func FindSubmatch(pat, sub string) string {
 }
 
 func GetImage(id_s string) string {
-   url_s := "http://i.ytimg.com/vi/"
+   url_s := "https://i.ytimg.com/vi/"
    if HttpHead(url_s + id_s + "/sddefault.jpg") {
       return ""
    }

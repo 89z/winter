@@ -4,6 +4,11 @@ import (
    "log"
    "net/url"
    "os"
+   "regexp"
+   "strconv"
+   "strings"
+   "time"
+   "winter/json"
    "winter/youtube"
 )
 
@@ -28,6 +33,8 @@ func main() {
    }
    desc_s := info_m.M("description").S("simpleText")
    year_s := info_m.S("publishDate")
+   /* the order doesnt matter here, as we will find the lowest date of all
+   matches */
    reg_a := []string{
       ` (\d{4})`, `(\d{4,}) `, `Released on: (\d{4})`, `℗ (\d{4})`,
    }
@@ -41,7 +48,7 @@ func main() {
       }
       year_s = mat_s
    }
-   year_n, e := strconv.Atoi(year_s)
+   year_n, e := strconv.Atoi(year_s[:4])
    if e != nil {
       log.Fatal(e)
    }
@@ -59,10 +66,10 @@ func main() {
    // image
    image_s := GetImage(id_s)
    // print
-   rec_a := Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
-   json_y, e := json.Marshal(rec_a)
+   rec_a := json.Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
+   json_s, e := json.Encode(rec_a)
    if e != nil {
       log.Fatal(e)
    }
-   fmt.Printf("%s,\n", y)
+   print(json_s, ",\n")
 }

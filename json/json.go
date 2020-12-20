@@ -26,9 +26,13 @@ func (a Slice) M(n int) Map {
 func Decode(s string) (Map, error) {
    y := []byte(s)
    m := Map{}
-   e := json.Unmarshal(y, &m)
+   return m, json.Unmarshal(y, &m)
+}
+
+func Encode(a Slice) (string, error) {
+   y, e := json.Marshal(a)
    if e != nil {
-      return nil, e
+      return "", e
    }
-   return m, nil
+   return string(y), nil
 }
