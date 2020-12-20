@@ -1,6 +1,7 @@
 package youtube
 
 import (
+   "encoding/json"
    "fmt"
    "io/ioutil"
    "math"
@@ -55,7 +56,7 @@ func Info(id_s string) (assert.Map, error) {
       return nil, e
    }
    resp_s := o.Get("player_response")
-   json_m := Map{}
+   json_m := assert.Map{}
    e = json.Unmarshal([]byte(resp_s), &json_m)
    if e != nil {
       return nil, e

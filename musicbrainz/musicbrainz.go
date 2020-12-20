@@ -48,11 +48,7 @@ func (this MB) Release() (assert.Map, error) {
       return nil, e
    }
    m := assert.Map{}
-   e = json.NewDecoder(o.Body).Decode(&m)
-   if e != nil {
-      return nil, e
-   }
-   return m, nil
+   return m, json.NewDecoder(o.Body).Decode(&m)
 }
 
 func Date(m assert.Map) string {
