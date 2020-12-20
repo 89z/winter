@@ -48,43 +48,76 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          log.Fatal(e)
       }
    }
-   // ARTIST
-   artist_s := rel_m.A("artist-credit").M(0).S("name")
-   fmt.Println("artist_t:")
-   fmt.Printf("\tartist_s: %q\n", artist_s)
-   fmt.Println("\tartist_n: ?")
+   open_o, e := sql.Open("sqlite3", "winter.db")
+   if e != nil {
+      log.Fatal(e)
+   }
    // ALBUM
    album_s := rel_m.S("title")
    date_s := rel_m.S("date")
-   fmt.Println("album_t:")
-   fmt.Println("\talbum_n: ?")
-   fmt.Printf("\talbum_s: %q\n", album_s)
-   fmt.Printf("\tdate_s: %q\n", date_s)
-   fmt.Printf("\turl_s: %q\n", "")
+   exec_o, e := open_o.Exec(
+      "insert into album_t (album_s, date_s) values (?, ?)", album_s, date_s,
+   )
+   if e != nil {
+      log.Fatal(e)
+   }
+   album_n, e := exec_o.LastInsertId()
+   if e != nil {
+      log.Fatal(e)
+   }
+   // ARTIST
+   query_o := open_o.QueryRow(
+      "select artist_n from artist_t where artist_s = ?",
+      rel_m.A("artist-credit").M(0).S("name"),
+   )
+   var artist_n int
+   e = query_o.Scan(&artist_n)
+   if e != nil {
+      log.Fatal(e)
+   }
+   // SONGS
+   song_m := map[string]string{}
    media_a := rel_m.A("media")
    for n := range media_a {
       track_a := media_a.M(n).A("tracks")
       for n := range track_a {
          track_m := track_a.M(n)
+         song_s := track_m.S("title")
          len_n := time.Duration(track_m.N("length")) * time.Millisecond
-         note_s := ""
          if len_n < min_n {
-            note_s = "short"
+            song_m[song_s] = "short"
+         } else if len_n > max_n {
+            song_m[song_s] = "long"
+         } else {
+            song_m[song_s] = ""
          }
-         if len_n > max_n {
-            note_s = "long"
-         }
-         fmt.Println("--------------------------------------------------------")
-         // SONG
-         title_s := track_m.S("title")
-         fmt.Println("song_t:")
-         fmt.Printf("\tsong_n: ?, song_s: %q, note_s: %q\n", title_s, note_s)
-         // SONG ALBUM
-         fmt.Println("song_album_t:")
-         fmt.Println("\tsong_n: ?, album_n: ?")
-         // SONG ARTIST
-         fmt.Println("song_artist_t:")
-         fmt.Println("\tsong_n: ?, artist_n: ?")
+      }
+   }
+   for song_s, note_s := range song_m {
+      // SONG
+      exec_o, e := open_o.Exec(
+         "insert into song_t (song_s, note_s) values (?, ?)", song_s, note_s
+      )
+      if e != nil {
+         log.Fatal(e)
+      }
+      song_n, e := exec_o.LastInsertId()
+      if e != nil {
+         log.Fatal(e)
+      }
+      // SONG ALBUM
+      _, e := open_o.Exec(
+         "insert into song_album_t values (?, ?)", song_n, album_n
+      )
+      if e != nil {
+         log.Fatal(e)
+      }
+      // SONG ARTIST
+      _, e := open_o.Exec(
+         "insert into song_artist_t values (?, ?)", song_n, artist_n
+      )
+      if e != nil {
+         log.Fatal(e)
       }
    }
 }
