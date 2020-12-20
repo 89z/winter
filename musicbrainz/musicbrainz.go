@@ -8,25 +8,22 @@ import (
 )
 
 type MB struct {
-   API string
    ID string
    Query url.Values
 }
 
+const API = "https://musicbrainz.org/ws/2/release"
+
 func New(mbid_s string) MB {
-   return MB{
-      "https://musicbrainz.org/ws/2/release",
-      mbid_s,
-      url.Values{
-         "fmt": []string{"json"},
-         "inc": []string{"artist-credits recordings"},
-      },
-   }
+   m := url.Values{}
+   m.Set("fmt", "json")
+   m.Set("inc", "artist-credits recordings")
+   return MB{mbid_s, m}
 }
 
 func (this MB) Group() (assert.Slice, error) {
-   this.Query["release-group"] = []string{this.ID}
-   url_s := this.API + "?" + this.Query.Encode()
+   this.Query.Set("release-group", this.ID)
+   url_s := API + "?" + this.Query.Encode()
    println(url_s)
    o, e := http.Get(url_s)
    if e != nil {
@@ -41,7 +38,7 @@ func (this MB) Group() (assert.Slice, error) {
 }
 
 func (this MB) Release() (assert.Map, error) {
-   url_s := this.API + "/" + this.ID + "?" + this.Query.Encode()
+   url_s := API + "/" + this.ID + "?" + this.Query.Encode()
    println(url_s)
    o, e := http.Get(url_s)
    if e != nil {
@@ -49,20 +46,6 @@ func (this MB) Release() (assert.Map, error) {
    }
    m := assert.Map{}
    return m, json.NewDecoder(o.Body).Decode(&m)
-}
-
-func Date(m assert.Map) string {
-   s := m.S("date")
-   switch len(s) {
-   case 0:
-      return "9999-12-31"
-   case 4:
-      return s + "-12-31"
-   case 6:
-      return s + "-31"
-   default:
-      return s
-   }
 }
 
 func IsOfficial(m assert.Map) bool {
@@ -76,6 +59,12 @@ func TrackLen(m assert.Map) float64 {
       track_n += a.M(n).N("track-count")
    }
    return track_n
+}
+
+func Date(m assert.Map) string {
+   s := m.S("date")
+   n := len(s)
+   return s + "9999-12-31"[n:]
 }
 
 func Reduce(old_n int, new_m assert.Map, new_n int, old_a assert.Slice) int {
