@@ -19,63 +19,50 @@ func main() {
    }
    id_s := o.Query().Get("v")
    // year
-   m, e := youtube.Info(id_s)
+   info_m, e := youtube.Info(id_s)
    if e != nil {
       log.Fatal(e)
    }
-   if m["description"] == nil {
+   if info_m["description"] == nil {
       log.Fatal("Clapham Junction")
    }
-   desc_s := m.M("description").S("simpleText")
-   year_s := m.S("publishDate")
+   desc_s := info_m.M("description").S("simpleText")
+   year_s := info_m.S("publishDate")
    reg_a := []string{
       ` (\d{4})`, `(\d{4,}) `, `Released on: (\d{4})`, `℗ (\d{4})`,
    }
    for _, reg_s := range reg_a {
-      $mat_n = preg_match($reg_s, $info_o->description->simpleText, $mat_a);
-      if ($mat_n === 0) {
-         continue;
+      mat_s := FindSubmatch(reg_s, desc_s)
+      if mat_s == "" {
+         continue
       }
-      $mat_s = $mat_a[1];
-      if ($mat_s >= $year_s) {
-         continue;
+      if mat_s >= year_s {
+         continue
       }
-      $year_s = $mat_s;
+      year_s = mat_s
    }
-   $year_n = (int)($year_s);
-   # song, artist
-   $mat_n = preg_match('/.* · .*/', $info_o->description->simpleText, $line_a);
-   if ($mat_n !== 0) {
-      $line_s = $line_a[0];
-      $title_a = explode(' · ', $line_s);
-      $artist_a = array_slice($title_a, 1);
-      $title_s = implode(', ', $artist_a) . ' - ' . $title_a[0];
-   } else {
-      $title_s = $info_o->title->simpleText;
+   year_n, e := strconv.Atoi(year_s)
+   if e != nil {
+      log.Fatal(e)
    }
-   # time
-   function encode36(int $n): string {
-      $s = (string) $n;
-      return base_convert($s, 10, 36);
+   // song, artist
+   title_s := info_m.M("title").S("simpleText")
+   line_s := regexp.MustCompile(".* · .*").FindString(desc_s)
+   if line_s != "" {
+      title_a := strings.Split(line_s, " · ")
+      artist_a := title_a[1:]
+      title_s = strings.Join(artist_a, ", ") + " - " + title_a[0]
    }
-   $date_n = time();
-   $date_s = encode36($date_n);
-   # image
-   $jpg_a = ['/sddefault','/sd1', '/hqdefault'];
-   foreach ($jpg_a as $jpg_s) {
-      $url_s = 'https://i.ytimg.com/vi/' . $id_s . $jpg_s . '.jpg';
-      echo $url_s, "\n";
-      $head_a = get_headers($url_s);
-      $code_s = $head_a[0];
-      if (str_contains($code_s, '200 OK')) {
-         break;
-      }
+   // time
+   date_n := time.Now().Unix()
+   date_s := strconv.FormatInt(date_n, 36)
+   // image
+   image_s := GetImage(id_s)
+   // print
+   rec_a := Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
+   json_y, e := json.Marshal(rec_a)
+   if e != nil {
+      log.Fatal(e)
    }
-   if ($jpg_s == '/sddefault') {
-      $jpg_s = '';
-   }
-   # print
-   $rec_a = [$date_s, $year_n, 'y/' . $id_s . $jpg_s, $title_s];
-   $json_s = json_encode($rec_a, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-   echo $json_s, ",\n";
+   fmt.Printf("%s,\n", y)
 }
