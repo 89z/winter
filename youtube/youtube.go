@@ -64,13 +64,13 @@ func Info(id_s string) (assert.Map, error) {
    return json_m.M("microformat").M("playerMicroformatRenderer"), nil
 }
 
-func Views(info_m assert.Map) (string, error) {
-   view_s := info_m.S("viewCount")
+func Views(m assert.Map) (string, error) {
+   view_s := m.S("viewCount")
    view_n, e := floatVal(view_s)
    if e != nil {
       return "", e
    }
-   date_s := info_m.S("publishDate")
+   date_s := m.S("publishDate")
    hour_n, e := timeHours(date_s)
    if e != nil {
       return "", e

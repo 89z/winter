@@ -1,12 +1,14 @@
 package main
 
 import (
-   "net/http"
-   "net/url"
+   "log"
    "os"
    "path"
    "strings"
+   "time"
+   "winter/assert"
    "winter/musicbrainz"
+   "winter/youtube"
 )
 
 func main() {
@@ -24,7 +26,10 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
    mb_o := musicbrainz.New(mbid_s)
    rel_m := assert.Map{}
    if strings.Contains(url_s, "release-group") {
-      rel_a := mb_o.Group()
+      rel_a, e := mb_o.Group()
+      if e != nil {
+         log.Fatal(e)
+      }
       rel_n := 0
       for idx_n := range rel_a {
          cur_m := rel_a.M(idx_n)
@@ -33,9 +38,13 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
       rel_m = rel_a.M(rel_n)
       print("musicbrainz.org/release/", rel_m.S("id"), "\n")
    } else {
-      rel_m = mb_o.Release()
+      var e error
+      rel_m, e = mb_o.Release()
+      if e != nil {
+         log.Fatal(e)
+      }
    }
-   out_a := assert.Slice{}
+   out_a := []string{}
    artist_a := rel_m.A("artist-credit")
    for n := range artist_a {
       artist_s := artist_a.M(n).S("name")
@@ -51,9 +60,16 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
          if e != nil {
             log.Fatal(e)
          }
-         $info_o = youtube_info($id_s);
-         echo youtube_views($info_o), "\n\n";
-         usleep(500_000);
+         info_m, e := youtube.Info(id_s)
+         if e != nil {
+            log.Fatal(e)
+         }
+         view_s, e := youtube.Views(info_m)
+         if e != nil {
+            log.Fatal(e)
+         }
+         print(view_s, "\n\n")
+         time.Sleep(500 * time.Millisecond)
       }
    }
 }

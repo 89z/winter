@@ -66,7 +66,7 @@ func Date(m assert.Map) string {
 }
 
 func IsOfficial(m assert.Map) bool {
-   return m.S("status") == "Official"
+   return m["status"] != nil && m.S("status") == "Official"
 }
 
 func TrackLen(m assert.Map) float64 {

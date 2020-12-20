@@ -1,12 +1,10 @@
 package main
 
 import (
+   "io/ioutil"
    "net/http"
    "net/url"
-   "os"
-   "path"
-   "strings"
-   "winter/musicbrainz"
+   "regexp"
 )
 
 func GetContents(s string) ([]byte, error) {
