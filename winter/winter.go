@@ -51,20 +51,40 @@ Update song note:
       artist_s := os.Args[2]
       e = InsertArtist(open_o, artist_s)
    case "check":
-      artist_s, check_s := os.Args[2], os.Args[3]
-      e = UpdateCheck(open_o, artist_s, check_s)
+      e = Update(
+         open_o,
+         "artist_t set check_s = ? where artist_n = ?",
+         os.Args[3],
+         os.Args[2],
+      )
    case "date":
-      album_s, date_s := os.Args[2], os.Args[3]
-      e = UpdateDate(open_o, album_s, date_s)
+      e = Update(
+         open_o,
+         "album_t set date_s = ? where album_n = ?",
+         os.Args[3],
+         os.Args[2],
+      )
    case "note":
-      song_s, note_s := os.Args[2], os.Args[3]
-      e = UpdateNote(open_o, song_s, note_s)
+      e = Update(
+         open_o,
+         "song_t set note_s = ? where song_n = ?",
+         os.Args[3],
+         os.Args[2],
+      )
    case "pop":
-      artist_s, pop_s := os.Args[2], os.Args[3]
-      e = UpdatePop(open_o, artist_s, pop_s)
+      e = Update(
+         open_o,
+         "artist_t set pop_n = ? where artist_n = ?",
+         os.Args[3],
+         os.Args[2],
+      )
    case "url":
-      album_s, url_s := os.Args[2], os.Args[3]
-      e = UpdateURL(open_o, album_s, url_s)
+      e = Update(
+         open_o,
+         "album_t set url_s = ? where album_n = ?",
+         os.Args[3],
+         os.Args[2],
+      )
    default:
       e = SelectArtist(open_o, key_s)
    }

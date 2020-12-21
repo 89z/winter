@@ -80,9 +80,9 @@ flags:`)
       log.Fatal(e)
    }
    // ALBUM
-   album_n, e := Exec(
+   album_n, e := Insert(
       open_o,
-      "insert into album_t (album_s, date_s, url_s) values (?, ?, '')",
+      "album_t (album_s, date_s, url_s) values (?, ?, '')",
       album_s,
       date_s,
    )
@@ -101,26 +101,19 @@ flags:`)
    // SONGS
    for _, song_a := range songs_a {
       // SONG
-      song_n, e := Exec(
-         open_o,
-         "insert into song_t (song_s, note_s) values (?, ?)",
-         song_a[0],
-         song_a[1],
+      song_n, e := Insert(
+         open_o, "song_t (song_s, note_s) values (?, ?)", song_a[0], song_a[1],
       )
       if e != nil {
          log.Fatal(e)
       }
       // SONG ALBUM
-      _, e = Exec(
-         open_o, "insert into song_album_t values (?, ?)", song_n, album_n,
-      )
+      _, e = Insert(open_o, "song_album_t values (?, ?)", song_n, album_n)
       if e != nil {
          log.Fatal(e)
       }
       // SONG ARTIST
-      _, e = Exec(
-         open_o, "insert into song_artist_t values (?, ?)", song_n, artist_n,
-      )
+      _, e = Insert(open_o, "song_artist_t values (?, ?)", song_n, artist_n)
       if e != nil {
          log.Fatal(e)
       }
