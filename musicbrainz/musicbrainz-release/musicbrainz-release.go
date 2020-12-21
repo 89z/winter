@@ -1,6 +1,8 @@
 package main
 
 import (
+   "database/sql"
+   "flag"
    "fmt"
    "log"
    "os"
@@ -9,6 +11,7 @@ import (
    "time"
    "winter/assert"
    "winter/musicbrainz"
+   _ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -17,16 +20,21 @@ const (
 )
 
 func main() {
-   if len(os.Args) != 2 {
-      fmt.Println(`Usage:
-musicbrainz-release <URL>
+   var confirm_b bool
+   flag.BoolVar(&confirm_b, "c", false, "confirm")
+   flag.Parse()
+   if flag.NArg() != 1 {
+      fmt.Println(`musicbrainz-release [flags] <URL>
 
 URL:
 https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
-https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
+https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872
+
+flags:`)
+      flag.PrintDefaults()
       os.Exit(1)
    }
-   url_s := os.Args[1]
+   url_s := flag.Arg(0)
    mbid_s := path.Base(url_s)
    mb_o := musicbrainz.New(mbid_s)
    rel_m := assert.Map{}
@@ -48,34 +56,10 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          log.Fatal(e)
       }
    }
-   open_o, e := sql.Open("sqlite3", "winter.db")
-   if e != nil {
-      log.Fatal(e)
-   }
-   // ALBUM
+   // Chicago, Chicago Transit Authority
+   artist_s := rel_m.A("artist-credit").M(0).M("artist").S("name")
    album_s := rel_m.S("title")
    date_s := rel_m.S("date")
-   exec_o, e := open_o.Exec(
-      "insert into album_t (album_s, date_s) values (?, ?)", album_s, date_s,
-   )
-   if e != nil {
-      log.Fatal(e)
-   }
-   album_n, e := exec_o.LastInsertId()
-   if e != nil {
-      log.Fatal(e)
-   }
-   // ARTIST
-   query_o := open_o.QueryRow(
-      "select artist_n from artist_t where artist_s = ?",
-      rel_m.A("artist-credit").M(0).S("name"),
-   )
-   var artist_n int
-   e = query_o.Scan(&artist_n)
-   if e != nil {
-      log.Fatal(e)
-   }
-   // SONGS
    song_m := map[string]string{}
    media_a := rel_m.A("media")
    for n := range media_a {
@@ -93,28 +77,61 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          }
       }
    }
+   if ! confirm_b {
+      fmt.Println("artist_s:", artist_s)
+      fmt.Println("album_s:", album_s)
+      fmt.Println("date_s:", date_s)
+      for song_s, note_s := range song_m {
+         fmt.Print("song_s: ", song_s, ", note_s: ", note_s, "\n")
+      }
+      return
+   }
+   db_s := os.Getenv("WINTER")
+   open_o, e := sql.Open("sqlite3", db_s)
+   if e != nil {
+      log.Fatal(e)
+   }
+   // ALBUM
+   album_n, e := Exec(
+      open_o,
+      "insert into album_t (album_s, date_s, url_s) values (?, ?, '')",
+      album_s,
+      date_s,
+   )
+   if e != nil {
+      log.Fatal(e)
+   }
+   // ARTIST
+   query_o := open_o.QueryRow(
+      "select artist_n from artist_t where artist_s = ?", artist_s,
+   )
+   var artist_n int
+   e = query_o.Scan(&artist_n)
+   if e != nil {
+      log.Fatal(e)
+   }
+   // SONGS
    for song_s, note_s := range song_m {
       // SONG
-      exec_o, e := open_o.Exec(
-         "insert into song_t (song_s, note_s) values (?, ?)", song_s, note_s
+      song_n, e := Exec(
+         open_o,
+         "insert into song_t (song_s, note_s) values (?, ?)",
+         song_s,
+         note_s,
       )
       if e != nil {
          log.Fatal(e)
       }
-      song_n, e := exec_o.LastInsertId()
-      if e != nil {
-         log.Fatal(e)
-      }
       // SONG ALBUM
-      _, e := open_o.Exec(
-         "insert into song_album_t values (?, ?)", song_n, album_n
+      _, e = Exec(
+         open_o, "insert into song_album_t values (?, ?)", song_n, album_n,
       )
       if e != nil {
          log.Fatal(e)
       }
       // SONG ARTIST
-      _, e := open_o.Exec(
-         "insert into song_artist_t values (?, ?)", song_n, artist_n
+      _, e = Exec(
+         open_o, "insert into song_artist_t values (?, ?)", song_n, artist_n,
       )
       if e != nil {
          log.Fatal(e)

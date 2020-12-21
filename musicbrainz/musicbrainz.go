@@ -62,7 +62,10 @@ func TrackLen(m assert.Map) float64 {
 }
 
 func Date(m assert.Map) string {
-   s := m.S("date")
+   s := ""
+   if m["date"] != nil {
+      s = m.S("date")
+   }
    n := len(s)
    return s + "9999-12-31"[n:]
 }

@@ -2,8 +2,6 @@ package main
 
 import (
    "database/sql"
-   "fmt"
-   "strings"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -37,7 +35,7 @@ func PopUpdate(open_o *sql.DB, artist_s, pop_s string) error {
 
 func UrlUpdate(open_o *sql.DB, album_s, url_s string) error {
    _, e := open_o.Exec(
-      "update album_t set url_s = ? where album_n = ?", query_s, url_s, album_s,
+      "update album_t set url_s = ? where album_n = ?", url_s, album_s,
    )
    return e
 }
