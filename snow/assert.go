@@ -1,4 +1,4 @@
-package assert
+package snow
 type Map map[string]interface{}
 type Slice []interface{}
 

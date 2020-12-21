@@ -1,9 +1,5 @@
 package main
-
-import (
-   "database/sql"
-   _ "github.com/mattn/go-sqlite3"
-)
+import "database/sql"
 
 func InsertArtist(open_o *sql.DB, artist_s string) error {
    _, e := open_o.Exec(

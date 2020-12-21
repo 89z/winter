@@ -12,6 +12,9 @@ func main() {
    if len(os.Args) == 1 {
       fmt.Println(`winter <target> <arguments>
 
+Delete album:
+   winter album 999
+
 Select artist:
    winter 'Kate Bush'
 
@@ -41,6 +44,9 @@ Update song note:
    }
    key_s := os.Args[1]
    switch key_s {
+   case "album":
+      album_s := os.Args[2]
+      e = DeleteAlbum(open_o, album_s)
    case "artist":
       artist_s := os.Args[2]
       e = InsertArtist(open_o, artist_s)

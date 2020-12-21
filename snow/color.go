@@ -1,4 +1,4 @@
-package color
+package snow
 
 func Cyan(s string) string {
    return "\x1b[1;36m" + s + "\x1b[m"
