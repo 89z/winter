@@ -1,10 +1,5 @@
 package main
-
-import (
-   "database/sql"
-   "fmt"
-   "time"
-)
+import "time"
 
 func Note(f float64) string {
    d := time.Duration(f) * time.Millisecond

@@ -8,8 +8,8 @@ import (
    "os"
    "path"
    "strings"
-   "winter/assert"
    "winter/musicbrainz"
+   "winter/snow"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -31,7 +31,7 @@ flags:`)
    url_s := flag.Arg(0)
    mbid_s := path.Base(url_s)
    mb_o := musicbrainz.New(mbid_s)
-   rel_m := assert.Map{}
+   rel_m := snow.Map{}
    if strings.Contains(url_s, "release-group") {
       rel_a, e := mb_o.Group()
       if e != nil {
@@ -80,7 +80,7 @@ flags:`)
       log.Fatal(e)
    }
    // ALBUM
-   album_n, e := Insert(
+   album_n, e := snow.Insert(
       open_o,
       "album_t (album_s, date_s, url_s) values (?, ?, '')",
       album_s,
@@ -101,19 +101,23 @@ flags:`)
    // SONGS
    for _, song_a := range songs_a {
       // SONG
-      song_n, e := Insert(
+      song_n, e := snow.Insert(
          open_o, "song_t (song_s, note_s) values (?, ?)", song_a[0], song_a[1],
       )
       if e != nil {
          log.Fatal(e)
       }
       // SONG ALBUM
-      _, e = Insert(open_o, "song_album_t values (?, ?)", song_n, album_n)
+      _, e = snow.Insert(
+         open_o, "song_album_t values (?, ?)", song_n, album_n,
+      )
       if e != nil {
          log.Fatal(e)
       }
       // SONG ARTIST
-      _, e = Insert(open_o, "song_artist_t values (?, ?)", song_n, artist_n)
+      _, e = snow.Insert(
+         open_o, "song_artist_t values (?, ?)", song_n, artist_n,
+      )
       if e != nil {
          log.Fatal(e)
       }

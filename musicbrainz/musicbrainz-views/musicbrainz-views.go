@@ -6,8 +6,8 @@ import (
    "path"
    "strings"
    "time"
-   "winter/assert"
    "winter/musicbrainz"
+   "winter/snow"
    "winter/youtube"
 )
 
@@ -24,7 +24,7 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
    url_s := os.Args[1]
    mbid_s := path.Base(url_s)
    mb_o := musicbrainz.New(mbid_s)
-   rel_m := assert.Map{}
+   rel_m := snow.Map{}
    if strings.Contains(url_s, "release-group") {
       rel_a, e := mb_o.Group()
       if e != nil {

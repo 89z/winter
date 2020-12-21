@@ -9,7 +9,7 @@ import (
    "strconv"
    "strings"
    "time"
-   "winter/assert"
+   "winter/snow"
    "winter/youtube"
 )
 
@@ -67,7 +67,7 @@ func main() {
    // image
    image_s := GetImage(id_s)
    // print
-   rec_a := assert.Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
+   rec_a := snow.Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
    json_y, e := json.Marshal(rec_a)
    if e != nil {
       log.Fatal(e)

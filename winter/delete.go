@@ -6,33 +6,37 @@ import (
 )
 
 func DeleteAlbum(open_o *sql.DB, album_s string) error {
-   e := snow.Delete("album_t where album_n = ?", album_s)
-   if e != nil {
-      return e
-   }
    query_o, e := open_o.Query(
-      "SELECT song_n FROM song_album_t WHERE album_n = ?", album_s,
+      "select song_n from song_album_t where album_n = ?", album_s,
    )
    if e != nil {
       return e
    }
-   var song_n int
+   song_n, song_a := 0, []int{}
    for query_o.Next() {
       e = query_o.Scan(&song_n)
       if e != nil {
          return e
       }
-      e = snow.Delete("song_t where song_n = ?", song_n)
+      song_a = append(song_a, song_n)
+   }
+   for _, song_n := range song_a {
+      e = snow.Delete(open_o, "song_t where song_n = ?", song_n)
       if e != nil {
          return e
       }
-      e = snow.Delete("song_album_t where song_n = ?", song_n)
+      e = snow.Delete(open_o, "song_album_t where song_n = ?", song_n)
       if e != nil {
          return e
       }
-      e = snow.Delete("song_artist_t where song_n = ?", song_n)
+      e = snow.Delete(open_o, "song_artist_t where song_n = ?", song_n)
       if e != nil {
          return e
       }
    }
+   e = snow.Delete(open_o, "album_t where album_n = ?", album_s)
+   if e != nil {
+      return e
+   }
+   return nil
 }

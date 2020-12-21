@@ -5,6 +5,7 @@ import (
    "fmt"
    "log"
    "os"
+   "winter/snow"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -48,38 +49,41 @@ Update song note:
       album_s := os.Args[2]
       e = DeleteAlbum(open_o, album_s)
    case "artist":
-      artist_s := os.Args[2]
-      e = InsertArtist(open_o, artist_s)
+      _, e = snow.Insert(
+         open_o,
+         "artist_t (artist_s, check_s, pop_n) values (?, '', 1)",
+         os.Args[2],
+      )
    case "check":
-      e = Update(
+      e = snow.Update(
          open_o,
          "artist_t set check_s = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "date":
-      e = Update(
+      e = snow.Update(
          open_o,
          "album_t set date_s = ? where album_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "note":
-      e = Update(
+      e = snow.Update(
          open_o,
          "song_t set note_s = ? where song_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "pop":
-      e = Update(
+      e = snow.Update(
          open_o,
          "artist_t set pop_n = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "url":
-      e = Update(
+      e = snow.Update(
          open_o,
          "album_t set url_s = ? where album_n = ?",
          os.Args[3],

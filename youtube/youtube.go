@@ -9,8 +9,7 @@ import (
    "net/url"
    "strconv"
    "time"
-   "winter/assert"
-   "winter/color"
+   "winter/snow"
 )
 
 func floatVal(s string) (float64, error) {
@@ -45,7 +44,7 @@ func timeHours(value string) (float64, error) {
    return time.Since(o).Hours(), nil
 }
 
-func Info(id_s string) (assert.Map, error) {
+func Info(id_s string) (snow.Map, error) {
    info_s := "https://www.youtube.com/get_video_info?video_id=" + id_s
    query_s, e := getContents(info_s)
    if e != nil {
@@ -56,7 +55,7 @@ func Info(id_s string) (assert.Map, error) {
       return nil, e
    }
    resp_s := o.Get("player_response")
-   json_m := assert.Map{}
+   json_m := snow.Map{}
    e = json.Unmarshal([]byte(resp_s), &json_m)
    if e != nil {
       return nil, e
@@ -64,7 +63,7 @@ func Info(id_s string) (assert.Map, error) {
    return json_m.M("microformat").M("playerMicroformatRenderer"), nil
 }
 
-func Views(m assert.Map) (string, error) {
+func Views(m snow.Map) (string, error) {
    view_s := m.S("viewCount")
    view_n, e := floatVal(view_s)
    if e != nil {
@@ -78,7 +77,7 @@ func Views(m assert.Map) (string, error) {
    rate_n := view_n / (hour_n / 24 / 365)
    rate_s := numberFormat(rate_n)
    if rate_n > 8_000_000 {
-      return color.Red(rate_s), nil
+      return snow.Red(rate_s), nil
    }
-   return color.Green(rate_s), nil
+   return snow.Green(rate_s), nil
 }

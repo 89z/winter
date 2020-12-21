@@ -4,7 +4,7 @@ import (
    "encoding/json"
    "net/http"
    "net/url"
-   "winter/assert"
+   "winter/snow"
 )
 
 type MB struct {
@@ -21,7 +21,7 @@ func New(mbid_s string) MB {
    return MB{mbid_s, m}
 }
 
-func (this MB) Group() (assert.Slice, error) {
+func (this MB) Group() (snow.Slice, error) {
    this.Query.Set("release-group", this.ID)
    url_s := API + "?" + this.Query.Encode()
    println(url_s)
@@ -29,7 +29,7 @@ func (this MB) Group() (assert.Slice, error) {
    if e != nil {
       return nil, e
    }
-   m := assert.Map{}
+   m := snow.Map{}
    e = json.NewDecoder(o.Body).Decode(&m)
    if e != nil {
       return nil, e
@@ -37,22 +37,22 @@ func (this MB) Group() (assert.Slice, error) {
    return m.A("releases"), nil
 }
 
-func (this MB) Release() (assert.Map, error) {
+func (this MB) Release() (snow.Map, error) {
    url_s := API + "/" + this.ID + "?" + this.Query.Encode()
    println(url_s)
    o, e := http.Get(url_s)
    if e != nil {
       return nil, e
    }
-   m := assert.Map{}
+   m := snow.Map{}
    return m, json.NewDecoder(o.Body).Decode(&m)
 }
 
-func IsOfficial(m assert.Map) bool {
+func IsOfficial(m snow.Map) bool {
    return m["status"] != nil && m.S("status") == "Official"
 }
 
-func TrackLen(m assert.Map) float64 {
+func TrackLen(m snow.Map) float64 {
    var track_n float64
    a := m.A("media")
    for n := range a {
@@ -61,7 +61,7 @@ func TrackLen(m assert.Map) float64 {
    return track_n
 }
 
-func Date(m assert.Map) string {
+func Date(m snow.Map) string {
    s := ""
    if m["date"] != nil {
       s = m.S("date")
@@ -70,22 +70,26 @@ func Date(m assert.Map) string {
    return s + "9999-12-31"[n:]
 }
 
-func Reduce(old_n int, new_m assert.Map, new_n int, old_a assert.Slice) int {
-   if new_n == 0 {
+func Reduce(acc_n int, cur_m snow.Map, cur_n int, src_a snow.Slice) int {
+   if cur_n == 0 {
       return 0
    }
-   old_m := old_a.M(old_n)
-   if ! IsOfficial(new_m) {
-      return old_n
+   old_m := src_a.M(acc_n)
+   if ! IsOfficial(cur_m) {
+      return acc_n
    }
-   if Date(new_m) > Date(old_m) {
-      return old_n
+   /*
+   if two albums have the same year, forget the full date and go with the one
+   that has less tracks
+   */
+   if Date(cur_m) > Date(old_m) {
+      return acc_n
    }
-   if Date(new_m) < Date(old_m) {
-      return new_n
+   if Date(cur_m) < Date(old_m) {
+      return cur_n
    }
-   if TrackLen(new_m) >= TrackLen(old_m) {
-      return old_n
+   if TrackLen(cur_m) >= TrackLen(old_m) {
+      return acc_n
    }
-   return new_n
+   return cur_n
 }
