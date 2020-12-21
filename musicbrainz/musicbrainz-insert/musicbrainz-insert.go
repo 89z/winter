@@ -8,15 +8,9 @@ import (
    "os"
    "path"
    "strings"
-   "time"
    "winter/assert"
    "winter/musicbrainz"
    _ "github.com/mattn/go-sqlite3"
-)
-
-const (
-   max_n = 15 * time.Minute
-   min_n = 179_500 * time.Millisecond
 )
 
 func main() {
@@ -24,7 +18,7 @@ func main() {
    flag.BoolVar(&confirm_b, "c", false, "confirm")
    flag.Parse()
    if flag.NArg() != 1 {
-      fmt.Println(`musicbrainz-release [flags] <URL>
+      fmt.Println(`musicbrainz-insert [flags] <URL>
 
 URL:
 https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
@@ -60,29 +54,23 @@ flags:`)
    artist_s := rel_m.A("artist-credit").M(0).M("artist").S("name")
    album_s := rel_m.S("title")
    date_s := rel_m.S("date")
-   song_m := map[string]string{}
+   songs_a := [][]string{}
    media_a := rel_m.A("media")
    for n := range media_a {
       track_a := media_a.M(n).A("tracks")
       for n := range track_a {
          track_m := track_a.M(n)
          song_s := track_m.S("title")
-         len_n := time.Duration(track_m.N("length")) * time.Millisecond
-         if len_n < min_n {
-            song_m[song_s] = "short"
-         } else if len_n > max_n {
-            song_m[song_s] = "long"
-         } else {
-            song_m[song_s] = ""
-         }
+         note_s := Note(track_m.N("length"))
+         songs_a = append(songs_a, []string{song_s, note_s})
       }
    }
    if ! confirm_b {
       fmt.Printf("artist: %q\n", artist_s)
       fmt.Printf("album: %q\n", album_s)
       fmt.Printf("date: %q\n", date_s)
-      for song_s, note_s := range song_m {
-         fmt.Printf("song: %q, note: %q\n", song_s, note_s)
+      for _, song_a := range songs_a {
+         fmt.Printf("song: %q, note: %q\n", song_a[0], song_a[1])
       }
       return
    }
@@ -111,13 +99,13 @@ flags:`)
       log.Fatal(e)
    }
    // SONGS
-   for song_s, note_s := range song_m {
+   for _, song_a := range songs_a {
       // SONG
       song_n, e := Exec(
          open_o,
          "insert into song_t (song_s, note_s) values (?, ?)",
-         song_s,
-         note_s,
+         song_a[0],
+         song_a[1],
       )
       if e != nil {
          log.Fatal(e)

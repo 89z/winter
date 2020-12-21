@@ -10,16 +10,28 @@ import (
 
 func main() {
    if len(os.Args) == 1 {
-      fmt.Println(`Synopsis:
-   winter <target> <flags>
+      fmt.Println(`winter <target> <arguments>
 
-Examples:
+Select artist:
    winter 'Kate Bush'
+
+Insert artist:
+   winter artist 'Kate Bush'
+
+Update artist date:
    winter check 999 2019-12-31
-   winter date 999 2019-12-31
-   winter note 999 good
+
+Update artist pop:
    winter pop 999 0
-   winter url 999 youtube.com/watch?v=HQmmM_qwG4k`)
+
+Update album date:
+   winter date 999 2019-12-31
+
+Update album URL:
+   winter url 999 youtube.com/watch?v=HQmmM_qwG4k
+
+Update song note:
+   winter note 999 good`)
       os.Exit(1)
    }
    db_s := os.Getenv("WINTER")
@@ -29,23 +41,26 @@ Examples:
    }
    key_s := os.Args[1]
    switch key_s {
+   case "artist":
+      artist_s := os.Args[2]
+      e = InsertArtist(open_o, artist_s)
    case "check":
       artist_s, check_s := os.Args[2], os.Args[3]
-      e = CheckUpdate(open_o, artist_s, check_s)
+      e = UpdateCheck(open_o, artist_s, check_s)
    case "date":
       album_s, date_s := os.Args[2], os.Args[3]
-      e = DateUpdate(open_o, album_s, date_s)
+      e = UpdateDate(open_o, album_s, date_s)
    case "note":
       song_s, note_s := os.Args[2], os.Args[3]
-      e = NoteUpdate(open_o, song_s, note_s)
+      e = UpdateNote(open_o, song_s, note_s)
    case "pop":
       artist_s, pop_s := os.Args[2], os.Args[3]
-      e = PopUpdate(open_o, artist_s, pop_s)
+      e = UpdatePop(open_o, artist_s, pop_s)
    case "url":
       album_s, url_s := os.Args[2], os.Args[3]
-      e = UrlUpdate(open_o, album_s, url_s)
+      e = UpdateURL(open_o, album_s, url_s)
    default:
-      e = ArtistSelect(open_o, key_s)
+      e = SelectArtist(open_o, key_s)
    }
    if e != nil {
       log.Fatal(e)

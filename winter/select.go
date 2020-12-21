@@ -18,13 +18,12 @@ var (
    artist_n int
    check_s string
    pop_n int
-   should_b bool
 )
 
 const YELLOW = "\x1b[43m   \x1b[m"
 const WIDTH = 48
 
-func ArtistSelect(open_o *sql.DB, artist_s string) error {
+func SelectArtist(open_o *sql.DB, artist_s string) error {
    query_s := `
    SELECT
       album_n, album_s, date_s, url_s,
@@ -74,10 +73,9 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
             fmt.Println("date_s  |", YELLOW)
          }
          // print URL
-         if pop_n != 0 {
+         if pop_n > 0 {
             if url_s != "" {
                fmt.Println("url_s   |", url_s)
-               should_b = true
             } else {
                fmt.Println("url_s   |", YELLOW)
             }
@@ -103,13 +101,7 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
    // print artist number
    fmt.Println("artist_n |", artist_n)
    // print artist pop
-   if pop_n == 0 {
-      fmt.Println("pop_n    | 0")
-   } else if should_b {
-      fmt.Println("pop_n    | 1")
-   } else {
-      fmt.Println("pop_n    |", YELLOW)
-   }
+   fmt.Println("pop_n    |", pop_n)
    // print artist check
    if check_s != "" {
       fmt.Println("check_s  |", check_s)

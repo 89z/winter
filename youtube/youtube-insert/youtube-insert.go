@@ -15,7 +15,7 @@ import (
 
 func main() {
    if len(os.Args) != 2 {
-      println("youtube-track <URL>")
+      println("youtube-insert <URL>")
       os.Exit(1)
    }
    url_s := os.Args[1]
