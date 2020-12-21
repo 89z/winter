@@ -78,11 +78,11 @@ flags:`)
       }
    }
    if ! confirm_b {
-      fmt.Println("artist_s:", artist_s)
-      fmt.Println("album_s:", album_s)
-      fmt.Println("date_s:", date_s)
+      fmt.Printf("artist: %q\n", artist_s)
+      fmt.Printf("album: %q\n", album_s)
+      fmt.Printf("date: %q\n", date_s)
       for song_s, note_s := range song_m {
-         fmt.Print("song_s: ", song_s, ", note_s: ", note_s, "\n")
+         fmt.Printf("song: %q, note: %q\n", song_s, note_s)
       }
       return
    }

@@ -17,9 +17,12 @@ var (
    note_s string
    artist_n int
    check_s string
-   pop_b bool
+   pop_n int
    should_b bool
 )
+
+const YELLOW = "\x1b[43m   \x1b[m"
+const WIDTH = 48
 
 func ArtistSelect(open_o *sql.DB, artist_s string) error {
    query_s := `
@@ -39,7 +42,7 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
    if e != nil {
       return e
    }
-   date_prev_s := "9999-12-31"
+   album_prev_n := 0
    for query_o.Next() {
       e = query_o.Scan(
          &album_n,
@@ -51,59 +54,67 @@ func ArtistSelect(open_o *sql.DB, artist_s string) error {
          &note_s,
          &artist_n,
          &check_s,
-         &pop_b,
+         &pop_n,
       )
       if e != nil {
          return e
       }
-      if date_s != date_prev_s {
-         if date_prev_s != "9999-12-31" {
+      if album_n != album_prev_n {
+         if album_prev_n > 0 {
             fmt.Println()
          }
+         // print album number
+         fmt.Println("album_n |", album_n)
+         // print album title
+         fmt.Println("album_s |", album_s)
          // print album date
          if date_s != "" {
-            fmt.Print(date_s)
+            fmt.Println("date_s  |", date_s)
          } else {
-            fmt.Print("\x1b[30;43mdate ", album_n, "\x1b[m")
+            fmt.Println("date_s  |", YELLOW)
          }
-         // print album title
-         fmt.Println(" |", album_s)
          // print URL
-         if pop_b {
+         if pop_n != 0 {
             if url_s != "" {
-               fmt.Println(url_s)
+               fmt.Println("url_s   |", url_s)
                should_b = true
             } else {
-               fmt.Print("\x1b[30;43murl ", album_n, "\x1b[m\n")
+               fmt.Println("url_s   |", YELLOW)
             }
          }
          // print rule
-         fmt.Println(strings.Repeat("-", 52))
-         date_prev_s = date_s
+         fmt.Print("--------+", strings.Repeat("-", WIDTH), "+-------\n")
+         fmt.Print(
+            "song_n  | song_s", strings.Repeat(" ", WIDTH - 7), "| note_s\n",
+         )
+         fmt.Print("--------+", strings.Repeat("-", WIDTH), "+-------\n")
+         album_prev_n = album_n
       }
-      // print song title
-      fmt.Printf("%40.40v | ", song_s)
+      // print song number, title
+      fmt.Printf("%7v | %-*.*v | ", song_n, WIDTH - 2, WIDTH - 2, song_s)
       // print song note
       if note_s == "" && ! strings.HasPrefix(url_s, "youtube.com/watch?") {
-         fmt.Print("\x1b[30;43mnote ", song_n, "\x1b[m\n")
+         fmt.Println(YELLOW)
       } else {
          fmt.Println(note_s)
       }
    }
    fmt.Println()
+   // print artist number
+   fmt.Println("artist_n |", artist_n)
+   // print artist pop
+   if pop_n == 0 {
+      fmt.Println("pop_n    | 0")
+   } else if should_b {
+      fmt.Println("pop_n    | 1")
+   } else {
+      fmt.Println("pop_n    |", YELLOW)
+   }
    // print artist check
    if check_s != "" {
-      fmt.Println("check:", check_s)
+      fmt.Println("check_s  |", check_s)
    } else {
-      fmt.Print("\x1b[30;43mcheck ", artist_n, "\x1b[m\n")
-   }
-   // print artist pop
-   if ! pop_b {
-      fmt.Println("pop: false")
-   } else if should_b {
-      fmt.Println("pop: true")
-   } else {
-      fmt.Print("\x1b[30;43mpop ", artist_n, "\x1b[m\n")
+      fmt.Println("check_s  |", YELLOW)
    }
    return nil
 }
