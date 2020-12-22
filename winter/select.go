@@ -33,7 +33,7 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
    NATURAL JOIN song_t
    NATURAL JOIN song_artist_t
    NATURAL JOIN artist_t
-   WHERE artist_s = ?
+   WHERE artist_s LIKE ?
    ORDER BY date_s
    `
    query_o, e := open_o.Query(query_s, artist_s)

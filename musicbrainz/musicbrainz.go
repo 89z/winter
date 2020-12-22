@@ -61,34 +61,40 @@ func TrackLen(m snow.Map) float64 {
    return track_n
 }
 
-func Date(m snow.Map) string {
-   s := ""
+func Date(m snow.Map, width int) string {
+   left := ""
    if m["date"] != nil {
-      s = m.S("date")
+      left = m.S("date")
    }
-   n := len(s)
-   return s + "9999-12-31"[n:]
+   start := len(left)
+   right := "9999-12-31"[start:]
+   return (left + right)[:width]
 }
 
 func Reduce(acc_n int, cur_m snow.Map, cur_n int, src_a snow.Slice) int {
    if cur_n == 0 {
       return 0
    }
-   old_m := src_a.M(acc_n)
+   acc_m := src_a.M(acc_n)
    if ! IsOfficial(cur_m) {
       return acc_n
    }
-   /*
-   if two albums have the same year, forget the full date and go with the one
-   that has less tracks
-   */
-   if Date(cur_m) > Date(old_m) {
+   // 1. YEAR
+   if Date(cur_m, 4) > Date(acc_m, 4) {
       return acc_n
    }
-   if Date(cur_m) < Date(old_m) {
+   if Date(cur_m, 4) < Date(acc_m, 4) {
       return cur_n
    }
-   if TrackLen(cur_m) >= TrackLen(old_m) {
+   // 2. TRACKS
+   if TrackLen(cur_m) > TrackLen(acc_m) {
+      return acc_n
+   }
+   if TrackLen(cur_m) < TrackLen(acc_m) {
+      return cur_n
+   }
+   // 3. DATE
+   if Date(cur_m, 10) >= Date(acc_m, 10) {
       return acc_n
    }
    return cur_n

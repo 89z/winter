@@ -61,7 +61,7 @@ flags:`)
       for n := range track_a {
          track_m := track_a.M(n)
          song_s := track_m.S("title")
-         note_s := Note(track_m.N("length"))
+         note_s := Note(track_m)
          songs_a = append(songs_a, []string{song_s, note_s})
       }
    }
