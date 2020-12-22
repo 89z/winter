@@ -77,7 +77,7 @@ func Views(m snow.Map) (string, error) {
    rate_n := view_n / (hour_n / 24 / 365)
    rate_s := numberFormat(rate_n)
    if rate_n > 8_000_000 {
-      return snow.Red(rate_s), nil
+      return "\x1b[1;31m" + rate_s + "\x1b[m", nil
    }
-   return snow.Green(rate_s), nil
+   return "\x1b[1;32m" + rate_s + "\x1b[m", nil
 }

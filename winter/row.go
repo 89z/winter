@@ -1,4 +1,5 @@
 package main
+import "strings"
 
 const DASH = "-----------------------------------------------------------------"
 const SPACE = "                                                                "
@@ -16,5 +17,5 @@ type Row struct {
 }
 
 func Pop(s string) bool {
-   return s[:18] == "youtube.com/watch?"
+   return strings.HasPrefix(s, "youtube.com/watch?")
 }

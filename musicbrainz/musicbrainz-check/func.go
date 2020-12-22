@@ -1,10 +1,7 @@
 package main
 
-function si_color(object $artist_o): array {
+func LocalAlbum() {
    foreach ($artist_o as $album_s => $o_album) {
-      if ($album_s[0] == '@') {
-         continue;
-      }
       $good_b = false;
       $done_b = true;
       foreach ($o_album as $track_s => $rate_s) {

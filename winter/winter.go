@@ -25,6 +25,9 @@ Insert artist:
 Update artist date:
    winter check 999 2019-12-31
 
+Update artist id:
+   winter mb 999 3f5be744-e867-42fb-8913-5fd69e4099b5
+
 Update album date:
    winter date 999 2019-12-31
 
@@ -48,7 +51,7 @@ Update song note:
    case "artist":
       _, e = snow.Insert(
          open_o,
-         "artist_t (artist_s, check_s) values (?, '')",
+         "artist_t (artist_s, check_s, mb_s) values (?, '', '')",
          os.Args[2],
       )
    case "check":
@@ -62,6 +65,13 @@ Update song note:
       e = snow.Update(
          open_o,
          "album_t set date_s = ? where album_n = ?",
+         os.Args[3],
+         os.Args[2],
+      )
+   case "mb":
+      e = snow.Update(
+         open_o,
+         "artist_t set mb_s = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )
