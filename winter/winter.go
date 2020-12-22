@@ -25,9 +25,6 @@ Insert artist:
 Update artist date:
    winter check 999 2019-12-31
 
-Update artist pop:
-   winter pop 999 0
-
 Update album date:
    winter date 999 2019-12-31
 
@@ -51,7 +48,7 @@ Update song note:
    case "artist":
       _, e = snow.Insert(
          open_o,
-         "artist_t (artist_s, check_s, pop_n) values (?, '', 1)",
+         "artist_t (artist_s, check_s) values (?, '')",
          os.Args[2],
       )
    case "check":
@@ -72,13 +69,6 @@ Update song note:
       e = snow.Update(
          open_o,
          "song_t set note_s = ? where song_n = ?",
-         os.Args[3],
-         os.Args[2],
-      )
-   case "pop":
-      e = snow.Update(
-         open_o,
-         "artist_t set pop_n = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )

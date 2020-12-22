@@ -1,21 +1,4 @@
-<?php
-declare(strict_types = 1);
-extension_loaded('curl') or die('curl');
-extension_loaded('openssl') or die('openssl');
-
-if ($argc != 3) {
-   echo "musicbrainz-check.php <artist> <file>\n";
-   exit(1);
-}
-
-$artist_s = $argv[1];
-$file_s = $argv[2];
-
-# local albums
-$json_s = file_get_contents($file_s);
-$local_o = json_decode($json_s);
-$arid_s = $local_o->$artist_s->{'@mb'};
-$local_m = si_color($local_o->$artist_s);
+package main
 
 function si_color(object $artist_o): array {
    foreach ($artist_o as $album_s => $o_album) {
@@ -92,16 +75,4 @@ function mb_albums(string $arid_s): array {
       }
    }
    return $remote_m;
-}
-
-$remote_m = mb_albums($arid_s);
-arsort($remote_m);
-foreach ($remote_m as $title_s => $date_s) {
-   echo $date_s, "\t";
-   if (array_key_exists($title_s, $local_m)) {
-      $class_s = $local_m[$title_s];
-      printf('<td style="background:%s">%s', $class_s, $title_s);
-   } else {
-      printf('<td>%s', $title_s);
-   }
 }
