@@ -2,8 +2,18 @@ package main
 
 import (
    "database/sql"
+   "encoding/json"
+   "fmt"
+   "net/http"
    "net/url"
    "winter/snow"
+)
+
+const (
+   GREEN_10 = "\x1b[102m          \x1b[m"
+   GREEN_5 = "\x1b[102m     \x1b[m"
+   RED_10 = "\x1b[101m          \x1b[m"
+   RED_5 = "\x1b[101m     \x1b[m"
 )
 
 func LocalAlbum(open_o *sql.DB, artist_s string) (map[string]string, error) {
@@ -37,70 +47,65 @@ func LocalAlbum(open_o *sql.DB, artist_s string) (map[string]string, error) {
          return nil, e
       }
       if snow.Pop(url_s) {
-         local_m[album_s] = "green"
+         local_m[album_s] = GREEN_10
          continue
       }
-      /*
-      unrated tracks | good tracks | color
-      ---------------|-------------|------
-      0              | 0           | red
-      0              | 1           | green
-      1              | 0           | light red
-      1              | 1           | light green
-      */
       if unrated_n == 0 && good_n == 0 {
-         local_m[album_s] = "red"
+         local_m[album_s] = RED_10
          continue
       }
       if unrated_n == 0 {
-         local_m[album_s] = "green"
+         local_m[album_s] = GREEN_10
          continue
       }
       if good_n == 0 {
-         local_m[album_s] = "light red"
+         local_m[album_s] = RED_5
          continue
       }
-      local_m[album_s] = "light green"
+      local_m[album_s] = GREEN_5
    }
    return local_m, nil
 }
 
-function RemoteAlbum(mb_s string) map[string]string {
+func RemoteAlbum(mb_s string) ([][]string, error) {
    q := url.Values{}
    q.Set("artist", mb_s)
    q.Set("fmt", "json")
    q.Set("inc", "release-groups")
    q.Set("limit", "100")
-   q.Set("offset", "0")
    q.Set("status", "official")
    q.Set("type", "album")
-   remote_m := map[string]string{}
-   curl_setopt($url_r, CURLOPT_USERAGENT, 'anonymous');
-   while (true) {
-      # part 1
-      $query_s = http_build_query($query_m);
-      $url_s = 'https://musicbrainz.org/ws/2/release?' . $query_s;
-      curl_setopt($url_r, CURLOPT_URL, $url_s);
-      echo $url_s, "\n";
-      # part 2
-      $json_s = curl_exec($url_r);
-      # part 3
-      $remote_o = json_decode($json_s);
-      foreach ($remote_o->releases as $o_re) {
-         $o_rg = $o_re->{'release-group'};
-         $a_sec = $o_rg->{'secondary-types'};
-         if (count($a_sec) > 0) {
-            continue;
-         }
-         if (array_key_exists($o_rg->title, $remote_m)) {
-            continue;
-         }
-         $remote_m[$o_rg->title] = $o_rg->{'first-release-date'};
+   var offset_n float64
+   remote_a := [][]string{}
+   for {
+      url_s := "https://musicbrainz.org/ws/2/release?" + q.Encode()
+      fmt.Println(url_s)
+      o, e := http.Get(url_s)
+      if e != nil {
+         return nil, e
       }
-      $query_m['offset'] += $query_m['limit'];
-      if ($query_m['offset'] >= $remote_o->{'release-count'}) {
-         break;
+      json_m := snow.Map{}
+      e = json.NewDecoder(o.Body).Decode(&json_m)
+      if e != nil {
+         return nil, e
       }
+      release_a := json_m.A("releases")
+      for n := range release_a {
+         group_m := release_a.M(n).M("release-group")
+         second_a := group_m.A("secondary-types")
+         if len(second_a) > 0 {
+            continue
+         }
+         title_s := group_m.S("title")
+         remote_a = append(remote_a, []string{
+            group_m.S("first-release-date"), title_s,
+         })
+      }
+      offset_n += 100
+      if offset_n >= json_m.N("release-count") {
+         break
+      }
+      q.Set("offset", fmt.Sprint(offset_n))
    }
-   return $remote_m;
+   return remote_a, nil
 }
