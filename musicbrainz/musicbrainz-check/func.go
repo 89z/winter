@@ -1,6 +1,14 @@
 package main
 
 func LocalAlbum() {
+   /*
+   unrated tracks | good tracks | color
+   ---------------|-------------|------
+   0              | 0           | red
+   0              | 1           | green
+   1              | 0           | light red
+   1              | 1           | light green
+   */
    foreach ($artist_o as $album_s => $o_album) {
       $good_b = false;
       $done_b = true;
