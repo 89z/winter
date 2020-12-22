@@ -15,7 +15,3 @@ type Row struct {
    SongStr string
    UrlStr string
 }
-
-func Pop(s string) bool {
-   return strings.HasPrefix(s, "youtube.com/watch?")
-}

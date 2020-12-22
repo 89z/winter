@@ -1,69 +1,80 @@
 package main
 
-func LocalAlbum() {
-   /*
+import (
+   "database/sql"
+   "net/url"
+   "winter/snow"
+)
+
+func LocalAlbum(open_o *sql.DB, artist_s string) (map[string]string, error) {
+   query_o, e := open_o.Query(`
    select
       album_s,
-      count(1) filter (where note_s = 'good') as good_n,
-      count(1) filter (where note_s = '') as unrated_n
+      url_s,
+      count(1) filter (where note_s = '') as unrated_n,
+      count(1) filter (where note_s = 'good') as good_n
    from album_t
    natural join song_album_t
    natural join song_t
    natural join song_artist_t
    natural join artist_t
-   where artist_s = 'Harold Budd'
-   group by album_n;
-
-   unrated tracks | good tracks | color
-   ---------------|-------------|------
-   0              | 0           | red
-   0              | 1           | green
-   1              | 0           | light red
-   1              | 1           | light green
-   */
-   foreach ($artist_o as $album_s => $o_album) {
-      $good_b = false;
-      $done_b = true;
-      foreach ($o_album as $track_s => $rate_s) {
-         if ($track_s == '@id') {
-            $local_m[$album_s] = 'black';
-            continue 2;
-         }
-         if ($rate_s == 'good') {
-            $good_b = true;
-         }
-         if ($rate_s == '') {
-            $done_b = false;
-         }
-      }
-      if ($good_b && $done_b) {
-         $local_m[$album_s] = 'green';
-      }
-      if ($good_b && ! $done_b) {
-         $local_m[$album_s] = 'lightgreen';
-      }
-      if (! $good_b && $done_b) {
-         $local_m[$album_s] = 'red';
-      }
-      if (! $good_b && ! $done_b) {
-         $local_m[$album_s] = 'lightred';
-      }
+   where artist_s = ?
+   group by album_n
+   `, artist_s)
+   if e != nil {
+      return nil, e
    }
-   return $local_m;
+   var (
+      album_s string
+      url_s string
+      unrated_n int
+      good_n int
+   )
+   local_m := map[string]string{}
+   for query_o.Next() {
+      e = query_o.Scan(&album_s, &url_s, &unrated_n, &good_n)
+      if e != nil {
+         return nil, e
+      }
+      if snow.Pop(url_s) {
+         local_m[album_s] = "green"
+         continue
+      }
+      /*
+      unrated tracks | good tracks | color
+      ---------------|-------------|------
+      0              | 0           | red
+      0              | 1           | green
+      1              | 0           | light red
+      1              | 1           | light green
+      */
+      if unrated_n == 0 && good_n == 0 {
+         local_m[album_s] = "red"
+         continue
+      }
+      if unrated_n == 0 {
+         local_m[album_s] = "green"
+         continue
+      }
+      if good_n == 0 {
+         local_m[album_s] = "light red"
+         continue
+      }
+      local_m[album_s] = "light green"
+   }
+   return local_m, nil
 }
 
-# remote albums
-function mb_albums(string $arid_s): array {
-   $query_m['artist'] = $arid_s;
-   $query_m['fmt'] = 'json';
-   $query_m['inc'] = 'release-groups';
-   $query_m['limit'] = 100;
-   $query_m['offset'] = 0;
-   $query_m['status'] = 'official';
-   $query_m['type'] = 'album';
-   $remote_m = [];
-   $url_r = curl_init();
-   curl_setopt($url_r, CURLOPT_RETURNTRANSFER, true);
+function RemoteAlbum(mb_s string) map[string]string {
+   q := url.Values{}
+   q.Set("artist", mb_s)
+   q.Set("fmt", "json")
+   q.Set("inc", "release-groups")
+   q.Set("limit", "100")
+   q.Set("offset", "0")
+   q.Set("status", "official")
+   q.Set("type", "album")
+   remote_m := map[string]string{}
    curl_setopt($url_r, CURLOPT_USERAGENT, 'anonymous');
    while (true) {
       # part 1

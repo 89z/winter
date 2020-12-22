@@ -13,12 +13,14 @@ func main() {
       os.Exit(1)
    }
    artist_s := os.Args[1]
-   // local albums
    db_s := os.Getenv("WINTER")
    open_o, e := sql.Open("sqlite3", db_s)
    if e != nil {
       log.Fatal(e)
    }
+   // local albums
+   local_m := LocalAlbum(open_o, artist_s)
+   // remote albums
    var mb_s string
    e = open_o.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", artist_s,
@@ -26,7 +28,6 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
-   $local_m = si_color($local_o->$artist_s);
    $remote_m = mb_albums($mb_s);
    arsort($remote_m);
    foreach ($remote_m as $title_s => $date_s) {
