@@ -1,7 +1,8 @@
 create table artist_t (
    artist_n integer primary key,
    artist_s text,
-   check_s text
+   check_s text,
+   mb_s text
 );
 create table album_t (
    album_n integer primary key,
