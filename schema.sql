@@ -13,10 +13,7 @@ create table album_t (
 create table song_t (
    song_n integer primary key,
    song_s text,
-   note_s text
-);
-create table song_album_t (
-   song_n integer,
+   note_s text,
    album_n integer
 );
 create table song_artist_t (

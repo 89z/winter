@@ -25,7 +25,6 @@ func LocalAlbum(open_o *sql.DB, artist_s string) (map[string]string, error) {
       count(1) filter (where note_s = '') as unrated_n,
       count(1) filter (where note_s = 'good') as good_n
    from album_t
-   natural join song_album_t
    natural join song_t
    natural join song_artist_t
    natural join artist_t

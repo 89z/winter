@@ -33,7 +33,6 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
          song_s,
          url_s
       FROM album_t
-      NATURAL JOIN song_album_t
       NATURAL JOIN song_t
       NATURAL JOIN song_artist_t
       NATURAL JOIN artist_t
@@ -45,7 +44,6 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       return e
    }
    row_a := []Row{}
-   pop_b := false
    for query_o.Next() {
       r := Row{}
       e = query_o.Scan(
@@ -59,9 +57,6 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       )
       if e != nil {
          return e
-      }
-      if snow.Pop(r.UrlStr) {
-         pop_b = true
       }
       row_a = append(row_a, r)
    }
@@ -102,12 +97,10 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
             fmt.Fprintln(pipe, "date_s  |", YELLOW)
          }
          // print URL
-         if pop_b {
-            if r.UrlStr != "" {
-               fmt.Fprintln(pipe, "url_s   |", r.UrlStr)
-            } else {
-               fmt.Fprintln(pipe, "url_s   |", YELLOW)
-            }
+         if r.UrlStr != "" {
+            fmt.Fprintln(pipe, "url_s   |", r.UrlStr)
+         } else {
+            fmt.Fprintln(pipe, "url_s   |", YELLOW)
          }
          // print rule
          fmt.Fprint(pipe, "--------+", DASH[:WIDTH], "+-------\n")
