@@ -10,10 +10,11 @@ import (
 )
 
 const (
-   GREEN_10 = "\x1b[102m          \x1b[m"
-   GREEN_5 = "\x1b[102m     \x1b[m"
-   RED_10 = "\x1b[101m          \x1b[m"
-   RED_5 = "\x1b[101m     \x1b[m"
+   U2587 = "\u2587\u2587\u2587\u2587\u2587"
+   GREEN_10 = "\x1b[92m" + U2587 + U2587 + "\x1b[m"
+   GREEN_5 = "\x1b[92m" + U2587 + "\x1b[90m" + U2587 + "\x1b[m"
+   RED_10 = "\x1b[91m" + U2587 + U2587 + "\x1b[m"
+   RED_5 = "\x1b[91m" + U2587 + "\x1b[90m" + U2587 + "\x1b[m"
 )
 
 func LocalAlbum(open_o *sql.DB, artist_s string) (map[string]string, error) {

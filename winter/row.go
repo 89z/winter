@@ -1,9 +1,8 @@
 package main
-import "strings"
 
 const DASH = "-----------------------------------------------------------------"
 const SPACE = "                                                                "
-const WIDTH = 48
+const WIDTH = 46
 const YELLOW = "\x1b[43m   \x1b[m"
 
 type Row struct {

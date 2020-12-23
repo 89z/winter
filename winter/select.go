@@ -3,6 +3,7 @@ package main
 import (
    "database/sql"
    "fmt"
+   "winter/snow"
 )
 
 func SelectArtist(open_o *sql.DB, artist_s string) error {
@@ -71,7 +72,7 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       if e != nil {
          return e
       }
-      if Pop(r.UrlStr) {
+      if snow.Pop(r.UrlStr) {
          pop_b = true
       }
       row_a = append(row_a, r)
@@ -107,7 +108,7 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       // print song number, title
       fmt.Printf("%7v | %-*.*v | ", r.SongInt, WIDTH - 2, WIDTH - 2, r.SongStr)
       // print song note
-      if r.NoteStr == "" && ! Pop(r.UrlStr) {
+      if r.NoteStr == "" && ! snow.Pop(r.UrlStr) {
          fmt.Println(YELLOW)
       } else {
          fmt.Println(r.NoteStr)

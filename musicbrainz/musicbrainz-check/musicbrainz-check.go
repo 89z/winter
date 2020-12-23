@@ -33,6 +33,9 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
+   if mb_s == "" {
+      log.Fatal("mb_s missing")
+   }
    remote_a, e := RemoteAlbum(mb_s)
    if e != nil {
       log.Fatal(e)
