@@ -115,10 +115,10 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
          fmt.Fprint(pipe, "--------+", DASH[:WIDTH], "+-------\n")
          album_prev_n = r.AlbumInt
       }
-      // print song number, title
-      fmt.Fprintf(
-         pipe, "%7v | %-*.*v | ", r.SongInt, WIDTH - 2, WIDTH - 2, r.SongStr,
-      )
+      // print song number
+      fmt.Fprintf(pipe, "%7v | ", r.SongInt)
+      // print song title
+      fmt.Fprintf(pipe, "%-*.*v | ",  WIDTH - 2, WIDTH - 2, r.SongStr)
       // print song note
       if r.NoteStr == "" && ! snow.Pop(r.UrlStr) {
          fmt.Fprintln(pipe, YELLOW)
