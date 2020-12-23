@@ -3,6 +3,8 @@ package main
 import (
    "database/sql"
    "fmt"
+   "os"
+   "os/exec"
    "winter/snow"
 )
 
@@ -19,20 +21,6 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
    ).Scan(&artist_n, &check_s, &mb_s)
    if e != nil {
       return e
-   }
-   // print artist number
-   fmt.Println("artist_n |", artist_n)
-   // print artist check
-   if check_s != "" {
-      fmt.Println("check_s  |", check_s)
-   } else {
-      fmt.Println("check_s  |", YELLOW)
-   }
-   // print musicbrainz id
-   if mb_s != "" {
-      fmt.Println("mb_s     |", mb_s)
-   } else {
-      fmt.Println("mb_s     |", YELLOW)
    }
    // ALBUMS
    query_o, e := open_o.Query(`
@@ -78,41 +66,68 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       row_a = append(row_a, r)
    }
    album_prev_n := 0
+   less := exec.Command("less")
+   pipe, e := less.StdinPipe()
+   if e != nil {
+      return e
+   }
+   less.Stdout = os.Stdout
+   less.Start()
+   /////////////////////////////////////////////////////////////////////////////
+   // print artist number
+   fmt.Fprintln(pipe, "artist_n |", artist_n)
+   // print artist check
+   if check_s != "" {
+      fmt.Fprintln(pipe, "check_s  |", check_s)
+   } else {
+      fmt.Fprintln(pipe, "check_s  |", YELLOW)
+   }
+   // print musicbrainz id
+   if mb_s != "" {
+      fmt.Fprintln(pipe, "mb_s     |", mb_s)
+   } else {
+      fmt.Fprintln(pipe, "mb_s     |", YELLOW)
+   }
    for _, r := range row_a {
       if r.AlbumInt != album_prev_n {
-         fmt.Println()
+         fmt.Fprintln(pipe)
          // print album number
-         fmt.Println("album_n |", r.AlbumInt)
+         fmt.Fprintln(pipe, "album_n |", r.AlbumInt)
          // print album title
-         fmt.Println("album_s |", r.AlbumStr)
+         fmt.Fprintln(pipe, "album_s |", r.AlbumStr)
          // print album date
          if r.DateStr != "" {
-            fmt.Println("date_s  |", r.DateStr)
+            fmt.Fprintln(pipe, "date_s  |", r.DateStr)
          } else {
-            fmt.Println("date_s  |", YELLOW)
+            fmt.Fprintln(pipe, "date_s  |", YELLOW)
          }
          // print URL
          if pop_b {
             if r.UrlStr != "" {
-               fmt.Println("url_s   |", r.UrlStr)
+               fmt.Fprintln(pipe, "url_s   |", r.UrlStr)
             } else {
-               fmt.Println("url_s   |", YELLOW)
+               fmt.Fprintln(pipe, "url_s   |", YELLOW)
             }
          }
          // print rule
-         fmt.Print("--------+", DASH[:WIDTH], "+-------\n")
-         fmt.Print("song_n  | song_s", SPACE[:WIDTH - 7], "| note_s\n")
-         fmt.Print("--------+", DASH[:WIDTH], "+-------\n")
+         fmt.Fprint(pipe, "--------+", DASH[:WIDTH], "+-------\n")
+         fmt.Fprint(pipe, "song_n  | song_s", SPACE[:WIDTH - 7], "| note_s\n")
+         fmt.Fprint(pipe, "--------+", DASH[:WIDTH], "+-------\n")
          album_prev_n = r.AlbumInt
       }
       // print song number, title
-      fmt.Printf("%7v | %-*.*v | ", r.SongInt, WIDTH - 2, WIDTH - 2, r.SongStr)
+      fmt.Fprintf(
+         pipe, "%7v | %-*.*v | ", r.SongInt, WIDTH - 2, WIDTH - 2, r.SongStr,
+      )
       // print song note
       if r.NoteStr == "" && ! snow.Pop(r.UrlStr) {
-         fmt.Println(YELLOW)
+         fmt.Fprintln(pipe, YELLOW)
       } else {
-         fmt.Println(r.NoteStr)
+         fmt.Fprintln(pipe, r.NoteStr)
       }
    }
+   /////////////////////////////////////////////////////////////////////////////
+   pipe.Close()
+   less.Wait()
    return nil
 }
