@@ -13,6 +13,9 @@ func main() {
    if len(os.Args) == 1 {
       fmt.Println(`winter <target> <arguments>
 
+Copy album:
+   winter album 999 1000
+
 Delete album:
    winter album 999
 
@@ -46,8 +49,13 @@ Update song note:
    key_s := os.Args[1]
    switch key_s {
    case "album":
-      album_s := os.Args[2]
-      e = DeleteAlbum(open_o, album_s)
+      source := os.Args[2]
+      if len(os.Args) == 4 {
+         dest := os.Args[3]
+         e = CopyAlbum(open_o, source, dest)
+      } else {
+         e = DeleteAlbum(open_o, source)
+      }
    case "artist":
       _, e = snow.Insert(
          open_o,

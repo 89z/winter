@@ -5,6 +5,7 @@ import (
    "fmt"
    "os"
    "os/exec"
+   "strings"
    "winter/snow"
 )
 
@@ -60,10 +61,11 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
          return e
       }
       row_a = append(row_a, r)
-      if song_m[r.SongStr] == 0 {
-         song_m[r.SongStr] = 1
+      upper := strings.ToUpper(r.SongStr)
+      if song_m[upper] == 0 {
+         song_m[upper] = 1
       } else {
-         song_m[r.SongStr]++
+         song_m[upper]++
       }
    }
    album_prev_n := 0
@@ -119,7 +121,7 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       // print song title
       fmt.Fprintf(pipe, "%-*.*v | ",  WIDTH - 2, WIDTH - 2, r.SongStr)
       // print song note
-      if song_m[r.SongStr] > 1 && r.NoteStr == "" {
+      if song_m[strings.ToUpper(r.SongStr)] > 1 && r.NoteStr == "" {
          fmt.Fprintln(pipe, DUPLICATE)
          continue
       }
