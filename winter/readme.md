@@ -8,7 +8,6 @@ sqlite3 music.db
 .mode csv
 .import --skip 1 artist_t.csv artist_t
 .import --skip 1 album_t.csv album_t
-.import --skip 1 song_album_t.csv song_album_t
 .import --skip 1 song_artist_t.csv song_artist_t
 .import --skip 1 song_t.csv song_t
 .quit
@@ -27,8 +26,6 @@ select * from artist_t;
 select * from album_t;
 .once song_t.csv
 select * from song_t;
-.once song_album_t.csv
-select * from song_album_t;
 .once song_artist_t.csv
 select * from song_artist_t;
 ~~~

@@ -44,6 +44,7 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       return e
    }
    row_a := []Row{}
+   song_m := map[string]int{}
    for query_o.Next() {
       r := Row{}
       e = query_o.Scan(
@@ -59,6 +60,11 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
          return e
       }
       row_a = append(row_a, r)
+      if song_m[r.SongStr] == 0 {
+         song_m[r.SongStr] = 1
+      } else {
+         song_m[r.SongStr]++
+      }
    }
    album_prev_n := 0
    less := exec.Command("less")
@@ -113,11 +119,15 @@ func SelectArtist(open_o *sql.DB, artist_s string) error {
       // print song title
       fmt.Fprintf(pipe, "%-*.*v | ",  WIDTH - 2, WIDTH - 2, r.SongStr)
       // print song note
+      if song_m[r.SongStr] > 1 && r.NoteStr == "" {
+         fmt.Fprintln(pipe, DUPLICATE)
+         continue
+      }
       if r.NoteStr == "" && ! snow.Pop(r.UrlStr) {
          fmt.Fprintln(pipe, YELLOW)
-      } else {
-         fmt.Fprintln(pipe, r.NoteStr)
+         continue
       }
+      fmt.Fprintln(pipe, r.NoteStr)
    }
    /////////////////////////////////////////////////////////////////////////////
    pipe.Close()

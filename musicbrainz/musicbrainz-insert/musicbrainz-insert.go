@@ -2,7 +2,6 @@ package main
 
 import (
    "database/sql"
-   "flag"
    "fmt"
    "log"
    "os"
@@ -14,21 +13,15 @@ import (
 )
 
 func main() {
-   var confirm_b bool
-   flag.BoolVar(&confirm_b, "c", false, "confirm")
-   flag.Parse()
-   if flag.NArg() != 1 {
-      fmt.Println(`musicbrainz-insert [flags] <URL>
+   if len(os.Args) != 2 {
+      fmt.Println(`musicbrainz-insert <URL>
 
 URL:
 https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
-https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872
-
-flags:`)
-      flag.PrintDefaults()
+https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       os.Exit(1)
    }
-   url_s := flag.Arg(0)
+   url_s := os.Args[1]
    mbid_s := path.Base(url_s)
    mb_o := musicbrainz.New(mbid_s)
    rel_m := snow.Map{}
@@ -65,15 +58,6 @@ flags:`)
          songs_a = append(songs_a, []string{song_s, note_s})
       }
    }
-   if ! confirm_b {
-      fmt.Printf("artist: %q\n", artist_s)
-      fmt.Printf("album: %q\n", album_s)
-      fmt.Printf("date: %q\n", date_s)
-      for _, song_a := range songs_a {
-         fmt.Printf("song: %q, note: %q\n", song_a[0], song_a[1])
-      }
-      return
-   }
    db_s := os.Getenv("WINTER")
    open_o, e := sql.Open("sqlite3", db_s)
    if e != nil {
@@ -102,14 +86,11 @@ flags:`)
    for _, song_a := range songs_a {
       // SONG
       song_n, e := snow.Insert(
-         open_o, "song_t (song_s, note_s) values (?, ?)", song_a[0], song_a[1],
-      )
-      if e != nil {
-         log.Fatal(e)
-      }
-      // SONG ALBUM
-      _, e = snow.Insert(
-         open_o, "song_album_t values (?, ?)", song_n, album_n,
+         open_o,
+         "song_t (song_s, note_s, album_n) values (?, ?, ?)",
+         song_a[0],
+         song_a[1],
+         album_n,
       )
       if e != nil {
          log.Fatal(e)
