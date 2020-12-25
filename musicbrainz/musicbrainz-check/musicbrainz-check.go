@@ -41,17 +41,15 @@ func main() {
       log.Fatal(e)
    }
    sort.Slice(remote_a, func(n, n2 int) bool {
-      return remote_a[n][0] < remote_a[n2][0]
+      return remote_a[n].Date < remote_a[n2].Date
    })
    remote_m := map[string]bool{}
-   for _, album_a := range remote_a {
-      album_s := album_a[1]
-      if remote_m[album_s] {
+   for _, album_o := range remote_a {
+      if remote_m[album_o.Title] {
          continue
       }
-      remote_m[album_s] = true
-      date_s := album_a[0]
-      color_s := local_m[album_s]
-      fmt.Printf("%-10v | %40.40v | %v\n", date_s, album_s, color_s)
+      remote_m[album_o.Title] = true
+      color_s := local_m[album_o.Title]
+      fmt.Printf("%-10v | %40.40v | %v\n", album_o.Date, album_o.Title, color_s)
    }
 }
