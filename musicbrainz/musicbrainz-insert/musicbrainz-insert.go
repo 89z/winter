@@ -47,7 +47,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    artist_s := rel_m.A("artist-credit").M(0).M("artist").S("name")
    album_s := rel_m.S("title")
    date_s := rel_m.S("date")
-   songs_a := [][]string{}
+   songs_a := []Song{}
    media_a := rel_m.A("media")
    for n := range media_a {
       track_a := media_a.M(n).A("tracks")
@@ -55,7 +55,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          track_m := track_a.M(n)
          song_s := track_m.S("title")
          note_s := Note(track_m)
-         songs_a = append(songs_a, []string{song_s, note_s})
+         songs_a = append(songs_a, Song{song_s, note_s})
       }
    }
    db_s := os.Getenv("WINTER")
@@ -83,13 +83,13 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       log.Fatal(e)
    }
    // SONGS
-   for _, song_a := range songs_a {
+   for _, song_o := range songs_a {
       // SONG
       song_n, e := snow.Insert(
          open_o,
          "song_t (song_s, note_s, album_n) values (?, ?, ?)",
-         song_a[0],
-         song_a[1],
+         song_o.Title,
+         song_o.Note,
          album_n,
       )
       if e != nil {

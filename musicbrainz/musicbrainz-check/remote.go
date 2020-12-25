@@ -8,17 +8,17 @@ import (
    "winter/snow"
 )
 
-type Album struct {
+type Remote struct {
    Date string
    Title string
 }
 
 var (
    offset_n float64
-   remote_a []Album
+   remote_a []Remote
 )
 
-func RemoteAlbum(mb_s string) ([]Album, error) {
+func RemoteAlbum(mb_s string) ([]Remote, error) {
    q := url.Values{}
    q.Set("artist", mb_s)
    q.Set("fmt", "json")
@@ -46,7 +46,7 @@ func RemoteAlbum(mb_s string) ([]Album, error) {
             continue
          }
          album_s := group_m.S("title")
-         remote_a = append(remote_a, Album{
+         remote_a = append(remote_a, Remote{
             group_m.S("first-release-date"), album_s,
          })
       }

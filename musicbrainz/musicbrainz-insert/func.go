@@ -18,3 +18,8 @@ func Note(m snow.Map) string {
    }
    return ""
 }
+
+type Song struct {
+   Title string
+   Note string
+}
