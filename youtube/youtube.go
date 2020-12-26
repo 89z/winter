@@ -63,21 +63,24 @@ func Info(id_s string) (snow.Map, error) {
    return json_m.M("microformat").M("playerMicroformatRenderer"), nil
 }
 
-func Views(m snow.Map) (string, error) {
+func Views(m snow.Map) (float64, error) {
    view_s := m.S("viewCount")
    view_n, e := floatVal(view_s)
    if e != nil {
-      return "", e
+      return 0, e
    }
    date_s := m.S("publishDate")
    hour_n, e := timeHours(date_s)
    if e != nil {
-      return "", e
+      return 0, e
    }
-   rate_n := view_n / (hour_n / 24 / 365)
-   rate_s := numberFormat(rate_n)
-   if rate_n > 8_000_000 {
-      return "\x1b[1;31m" + rate_s + "\x1b[m", nil
+   return view_n / (hour_n / 24 / 365), nil
+}
+
+func Color(n float64) (string, bool) {
+   s := numberFormat(n)
+   if n > 8_000_000 {
+      return "\x1b[1;31m" + s + "\x1b[m", true
    }
-   return "\x1b[1;32m" + rate_s + "\x1b[m", nil
+   return "\x1b[1;32m" + s + "\x1b[m", false
 }

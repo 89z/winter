@@ -36,7 +36,6 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
          rel_n = musicbrainz.Reduce(rel_n, cur_m, idx_n, rel_a)
       }
       rel_m = rel_a.M(rel_n)
-      print("musicbrainz.org/release/", rel_m.S("id"), "\n")
    } else {
       var e error
       rel_m, e = mb_o.Release()
@@ -64,12 +63,20 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
          if e != nil {
             log.Fatal(e)
          }
-         view_s, e := youtube.Views(info_m)
+         view_n, e := youtube.Views(info_m)
          if e != nil {
             log.Fatal(e)
          }
-         print(view_s, "\n\n")
+         color_s, b := youtube.Color(view_n)
+         if b {
+            println(color_s)
+            print("youtube.com/watch?v=", id_s, "\n")
+            return
+         } else {
+            print(color_s, "\n\n")
+         }
          time.Sleep(500 * time.Millisecond)
       }
    }
+   print("musicbrainz.org/release/", rel_m.S("id"), "\n")
 }

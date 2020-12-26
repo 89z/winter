@@ -19,7 +19,10 @@ Copy album:
 Delete album:
    winter album 999
 
-Select artist:
+Select all artist:
+   winter artist
+
+Select one artist:
    winter 'Kate Bush'
 
 Insert artist:
@@ -57,11 +60,15 @@ Update song note:
          e = DeleteAlbum(open_o, source)
       }
    case "artist":
-      _, e = snow.Insert(
-         open_o,
-         "artist_t (artist_s, check_s, mb_s) values (?, '', '')",
-         os.Args[2],
-      )
+      if len(os.Args) == 2 {
+         e = SelectAll(open_o)
+      } else {
+         _, e = snow.Insert(
+            open_o,
+            "artist_t (artist_s, check_s, mb_s) values (?, '', '')",
+            os.Args[2],
+         )
+      }
    case "check":
       e = snow.Update(
          open_o,
@@ -98,7 +105,7 @@ Update song note:
          os.Args[2],
       )
    default:
-      e = SelectArtist(open_o, key_s)
+      e = SelectOne(open_o, key_s)
    }
    if e != nil {
       log.Fatal(e)

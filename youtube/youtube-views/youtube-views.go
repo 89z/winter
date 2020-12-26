@@ -22,9 +22,10 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
-   view_s, e := youtube.Views(m)
+   view_n, e := youtube.Views(m)
    if e != nil {
       log.Fatal(e)
    }
-   println(view_s)
+   color_s, _ := youtube.Color(view_n)
+   println(color_s)
 }
