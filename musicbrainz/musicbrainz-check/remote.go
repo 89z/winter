@@ -8,18 +8,9 @@ import (
    "winter/snow"
 )
 
-type Remote struct {
-   Date string
-   Group string
-   Title string
-}
+var offset_n float64
 
-var (
-   offset_n float64
-   remote_a []Remote
-)
-
-func RemoteAlbum(mb_s string) ([]Remote, error) {
+func RemoteAlbum(mb_s string) (map[string]Group, error) {
    q := url.Values{}
    q.Set("artist", mb_s)
    q.Set("fmt", "json")
@@ -27,6 +18,7 @@ func RemoteAlbum(mb_s string) ([]Remote, error) {
    q.Set("limit", "100")
    q.Set("status", "official")
    q.Set("type", "album")
+   remote_m := map[string]Group{}
    for {
       url_s := "https://musicbrainz.org/ws/2/release?" + q.Encode()
       fmt.Println(url_s)
@@ -54,9 +46,19 @@ func RemoteAlbum(mb_s string) ([]Remote, error) {
          if len(second_a) > 0 {
             continue
          }
-         remote_a = append(remote_a, Remote{
-            date_s, group_m.S("id"), release_m.S("title"),
-         })
+         id_s := group_m.S("id")
+         _, b := remote_m[id_s]
+         if b {
+            remote_m[id_s].Release = append(
+               remote_m[id_s].Release, release_m.S("title"),
+            )
+         } else {
+            remote_m[id_s] = Group{
+               group_m.S("first-release-date"), group_m.S("title"), {
+                  release_m.S("title")
+               }
+            }
+         }
       }
       offset_n += 100
       if offset_n >= json_m.N("release-count") {
@@ -64,5 +66,5 @@ func RemoteAlbum(mb_s string) ([]Remote, error) {
       }
       q.Set("offset", fmt.Sprint(offset_n))
    }
-   return remote_a, nil
+   return remote_m, nil
 }

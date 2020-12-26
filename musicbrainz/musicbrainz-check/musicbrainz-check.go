@@ -37,16 +37,22 @@ func main() {
    if mb_s == "" {
       log.Fatal("mb_s missing")
    }
-   remote_a, e := RemoteAlbum(mb_s)
+   remote_m, e := RemoteAlbum(mb_s)
    if e != nil {
       log.Fatal(e)
    }
-   for n, album_o := range remote_a {
-      local_o, b := local_m[strings.ToUpper(album_o.Title)]
-      if b {
-         remote_a[n].Date = local_o.Date
+   for group_s, group_o := range remote_m {
+      range _, release_s := group_o.Release {
+         local_o, b := local_m[strings.ToUpper(release_s)]
+         if b {
+            remote_m[group_s].Date = local_o.Date
+         }
       }
    }
+   /*
+   FIXME
+   how the fuck do we sort?
+   */
    sort.Slice(remote_a, func(n, n2 int) bool {
       return remote_a[n].Date < remote_a[n2].Date
    })

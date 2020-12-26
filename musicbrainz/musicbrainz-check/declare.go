@@ -24,3 +24,16 @@ func Color(url_s string, unrated_n, good_n int) string {
    }
    return GREEN_5
 }
+
+/* Regarding the title and date:
+
+For the title, we will display the remote Group title, but we also need to get
+the remote Release titles to match against the local Release titles.
+
+For the date, if we have a local match, use that date. Otherwise, use use the
+remote Group date */
+type Group struct {
+   Date string
+   Title string
+   Release []string
+}
