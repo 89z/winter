@@ -10,6 +10,7 @@ import (
 
 type Remote struct {
    Date string
+   Group string
    Title string
 }
 
@@ -40,29 +41,21 @@ func RemoteAlbum(mb_s string) ([]Remote, error) {
       }
       release_a := json_m.A("releases")
       for n := range release_a {
-         group_m := release_a.M(n).M("release-group")
+         release_m := release_a.M(n)
+         group_m := release_m.M("release-group")
+         if release_m["date"] == nil {
+            continue
+         }
+         date_s := release_m.S("date")
+         if date_s == "" {
+            continue
+         }
          second_a := group_m.A("secondary-types")
          if len(second_a) > 0 {
             continue
          }
-         /* right here we want to take the Release title, not the Release Group
-         title. Two reasons. First, some releases in the same group are quite
-         different, and we may want to get both of them:
-         musicbrainz.org/release-group/ec1842b2-9393-3779-aa80-280b90a55bef
-
-         second, some releases have slight name difference. For example, at this
-         time, under this release group:
-         musicbrainz.org/release-group/58d91845-3734-344b-ba10-fcae524f22c1
-
-         the group title is using U+2010 HYPHEN, while one of the releases is
-         using U+002D HYPHEN-MINUS. So in the case of different album content,
-         we will be made aware of the different release choices and can get both
-         and just mark duplicate songs as needed. In the case of spelling
-         differences, we can make edits to MusicBrainz website, then re run the
-         check */
-         album_s := group_m.S("title")
          remote_a = append(remote_a, Remote{
-            group_m.S("first-release-date"), album_s,
+            date_s, group_m.S("id"), release_m.S("title"),
          })
       }
       offset_n += 100

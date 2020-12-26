@@ -1,5 +1,9 @@
 package main
-import "database/sql"
+
+import (
+   "database/sql"
+   "strings"
+)
 
 type Local struct {
    Color string
@@ -37,7 +41,7 @@ func LocalAlbum(open_o *sql.DB, artist_s string) (map[string]Local, error) {
       if e != nil {
          return nil, e
       }
-      local_m[album_s] = Local{
+      local_m[strings.ToUpper(album_s)] = Local{
          Color(url_s, unrated_n, good_n), date_s,
       }
    }

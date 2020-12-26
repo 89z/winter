@@ -68,15 +68,12 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
             log.Fatal(e)
          }
          color_s, b := youtube.Color(view_n)
+         println(color_s)
          if b {
-            println(color_s)
             print("youtube.com/watch?v=", id_s, "\n")
             return
-         } else {
-            print(color_s, "\n\n")
          }
          time.Sleep(500 * time.Millisecond)
       }
    }
-   print("musicbrainz.org/release/", rel_m.S("id"), "\n")
 }

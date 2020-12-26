@@ -6,23 +6,7 @@ import (
    "os"
    "os/exec"
    "strings"
-   "winter/snow"
 )
-
-func SelectAll(open_o *sql.DB) error {
-   /*
-   select
-      count(1) filter (where note_s = 'good') as count_n,
-      artist_s
-   from artist_t
-   natural join song_artist_t
-   natural join song_t
-   where check_s < '2019-12-25'
-   group by artist_n
-   order by count_n desc
-   */
-   return nil
-}
 
 func SelectOne(open_o *sql.DB, artist_s string) error {
    // ARTIST
@@ -126,25 +110,18 @@ func SelectOne(open_o *sql.DB, artist_s string) error {
             fmt.Fprintln(pipe, "url_s   |", YELLOW)
          }
          // print rule
-         fmt.Fprint(pipe, "--------+", DASH[:WIDTH], "+-------\n")
-         fmt.Fprint(pipe, "song_n  | song_s", SPACE[:WIDTH - 7], "| note_s\n")
-         fmt.Fprint(pipe, "--------+", DASH[:WIDTH], "+-------\n")
+         fmt.Fprint(pipe, "--------+-----------+", DASH[:WIDTH], "\n")
+         fmt.Fprintln(pipe, "song_n  | note_s    | song_s")
+         fmt.Fprint(pipe, "--------+-----------+", DASH[:WIDTH], "\n")
          album_prev_n = r.AlbumInt
       }
       // print song number
       fmt.Fprintf(pipe, "%7v | ", r.SongInt)
-      // print song title
-      fmt.Fprintf(pipe, "%-*.*v | ",  WIDTH - 2, WIDTH - 2, r.SongStr)
       // print song note
-      if song_m[strings.ToUpper(r.SongStr)] > 1 && r.NoteStr == "" {
-         fmt.Fprintln(pipe, DUPLICATE)
-         continue
-      }
-      if r.NoteStr == "" && ! snow.Pop(r.UrlStr) {
-         fmt.Fprintln(pipe, YELLOW)
-         continue
-      }
-      fmt.Fprintln(pipe, r.NoteStr)
+      fmt_s, note_s := Note(r, song_m)
+      fmt.Fprintf(pipe, fmt_s + " | ", note_s)
+      // print song title
+      fmt.Fprintln(pipe, r.SongStr)
    }
    /////////////////////////////////////////////////////////////////////////////
    pipe.Close()

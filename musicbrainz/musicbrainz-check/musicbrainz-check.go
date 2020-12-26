@@ -6,6 +6,7 @@ import (
    "log"
    "os"
    "sort"
+   "strings"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -41,7 +42,7 @@ func main() {
       log.Fatal(e)
    }
    for n, album_o := range remote_a {
-      local_o, b := local_m[album_o.Title]
+      local_o, b := local_m[strings.ToUpper(album_o.Title)]
       if b {
          remote_a[n].Date = local_o.Date
       }
@@ -51,11 +52,11 @@ func main() {
    })
    remote_m := map[string]bool{}
    for _, album_o := range remote_a {
-      if remote_m[album_o.Title] {
+      if remote_m[album_o.Group] {
          continue
       }
-      remote_m[album_o.Title] = true
-      color_s := local_m[album_o.Title].Color
+      remote_m[album_o.Group] = true
+      color_s := local_m[strings.ToUpper(album_o.Title)].Color
       fmt.Printf("%-10v | %40.40v | %v\n", album_o.Date, album_o.Title, color_s)
    }
 }
