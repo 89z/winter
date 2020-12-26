@@ -68,14 +68,12 @@ func SelectOne(open_o *sql.DB, artist_s string) error {
       }
    }
    album_prev_n := 0
-   less := exec.Command("less")
-   pipe, e := less.StdinPipe()
+   less, pipe, e := Less()
    if e != nil {
       return e
    }
-   less.Stdout = os.Stdout
-   less.Start()
-   /////////////////////////////////////////////////////////////////////////////
+   defer pipe.Close()
+   defer less.Wait()
    // print artist number
    fmt.Fprintln(pipe, "artist_n |", artist_n)
    // print artist check
@@ -123,8 +121,5 @@ func SelectOne(open_o *sql.DB, artist_s string) error {
       // print song title
       fmt.Fprintln(pipe, r.SongStr)
    }
-   /////////////////////////////////////////////////////////////////////////////
-   pipe.Close()
-   less.Wait()
    return nil
 }

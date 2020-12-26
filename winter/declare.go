@@ -29,3 +29,13 @@ func Note(r Row, song_m map[string]int) (string, string) {
    }
    return "%-9v", r.NoteStr
 }
+
+func Less() (exec.Cmd, io.Writer, error) {
+   less := exec.Command("less")
+   pipe, e := less.StdinPipe()
+   if e != nil {
+      return nil, nil, e
+   }
+   less.Stdout = os.Stdout
+   return less, pipe, less.Start()
+}

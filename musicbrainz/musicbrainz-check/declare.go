@@ -33,7 +33,8 @@ the remote Release titles to match against the local Release titles.
 For the date, if we have a local match, use that date. Otherwise, use use the
 remote Group date */
 type Group struct {
+   Color string
    Date string
-   Title string
    Release []string
+   Title string
 }

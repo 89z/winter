@@ -10,7 +10,7 @@ import (
 
 var offset_n float64
 
-func RemoteAlbum(mb_s string) (map[string]Group, error) {
+func RemoteAlbum(mb_s string) ([]Group, error) {
    q := url.Values{}
    q.Set("artist", mb_s)
    q.Set("fmt", "json")
@@ -18,7 +18,7 @@ func RemoteAlbum(mb_s string) (map[string]Group, error) {
    q.Set("limit", "100")
    q.Set("status", "official")
    q.Set("type", "album")
-   remote_m := map[string]Group{}
+   remote_a, remote_m := []Group{}, map[string]int{}
    for {
       url_s := "https://musicbrainz.org/ws/2/release?" + q.Encode()
       fmt.Println(url_s)
@@ -47,17 +47,22 @@ func RemoteAlbum(mb_s string) (map[string]Group, error) {
             continue
          }
          id_s := group_m.S("id")
-         _, b := remote_m[id_s]
+         index_n, b := remote_m[id_s]
          if b {
-            remote_m[id_s].Release = append(
-               remote_m[id_s].Release, release_m.S("title"),
+            // add release to group
+            remote_a[index_n].Release = append(
+               remote_a[index_n].Release, release_m.S("title"),
             )
          } else {
-            remote_m[id_s] = Group{
-               group_m.S("first-release-date"), group_m.S("title"), {
-                  release_m.S("title")
-               }
-            }
+            // add group
+            remote_a = append(remote_a, Group{
+               Date: group_m.S("first-release-date"),
+               Release: []string{
+                  release_m.S("title"),
+               },
+               Title: group_m.S("title"),
+            })
+            remote_m[id_s] = len(remote_a) - 1
          }
       }
       offset_n += 100
@@ -66,5 +71,5 @@ func RemoteAlbum(mb_s string) (map[string]Group, error) {
       }
       q.Set("offset", fmt.Sprint(offset_n))
    }
-   return remote_m, nil
+   return remote_a, nil
 }
