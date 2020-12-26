@@ -32,14 +32,6 @@ select * from song_artist_t;
 
 <https://sqlite.org/cli.html#export_to_csv>
 
-## Primary key
-
-~~~
-create table artist_t (artist_n int primary key, artist_s);
-insert into artist_t (artist_s) values ('Cocteau Twins');
-select * from artist_t;
-~~~
-
 ~~~
 GREEN 7,506,058 Sade Lovers Rock
 GREEN 7,558,395 Pet Shop Boys Actually
