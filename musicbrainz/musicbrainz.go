@@ -29,12 +29,24 @@ func (this MB) Group() (snow.Slice, error) {
    if e != nil {
       return nil, e
    }
-   m := snow.Map{}
-   e = json.NewDecoder(o.Body).Decode(&m)
+   json_m := snow.Map{}
+   e = json.NewDecoder(o.Body).Decode(&json_m)
    if e != nil {
       return nil, e
    }
-   return m.A("releases"), nil
+   release_a := json_m.A("releases")
+   official_a := snow.Slice{}
+   for n := range release_a {
+      release_m := release_a.M(n)
+      if release_m["status"] == nil {
+         continue
+      }
+      if release_m.S("status") != "Official" {
+         continue
+      }
+      official_a = append(official_a, release_m)
+   }
+   return official_a, nil
 }
 
 func (this MB) Release() (snow.Map, error) {
@@ -46,10 +58,6 @@ func (this MB) Release() (snow.Map, error) {
    }
    m := snow.Map{}
    return m, json.NewDecoder(o.Body).Decode(&m)
-}
-
-func IsOfficial(m snow.Map) bool {
-   return m["status"] != nil && m.S("status") == "Official"
 }
 
 func TrackLen(m snow.Map) float64 {
@@ -76,9 +84,6 @@ func Reduce(acc_n int, cur_m snow.Map, cur_n int, src_a snow.Slice) int {
       return 0
    }
    acc_m := src_a.M(acc_n)
-   if ! IsOfficial(cur_m) {
-      return acc_n
-   }
    // 1. YEAR
    if Date(cur_m, 4) > Date(acc_m, 4) {
       return acc_n

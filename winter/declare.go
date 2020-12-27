@@ -1,6 +1,9 @@
 package main
 
 import (
+   "io"
+   "os"
+   "os/exec"
    "strings"
    "winter/snow"
 )
@@ -20,17 +23,7 @@ const SPACE = "                                                                "
 const WIDTH = 50
 const YELLOW = "\x1b[43m   \x1b[m"
 
-func Note(r Row, song_m map[string]int) (string, string) {
-   if song_m[strings.ToUpper(r.SongStr)] > 1 && r.NoteStr == "" {
-      return "\x1b[30;43m%v\x1b[m", "duplicate"
-   }
-   if r.NoteStr == "" && ! snow.Pop(r.UrlStr) {
-      return YELLOW + "%6v", ""
-   }
-   return "%-9v", r.NoteStr
-}
-
-func Less() (exec.Cmd, io.Writer, error) {
+func Less() (*exec.Cmd, io.WriteCloser, error) {
    less := exec.Command("less")
    pipe, e := less.StdinPipe()
    if e != nil {
@@ -38,4 +31,14 @@ func Less() (exec.Cmd, io.Writer, error) {
    }
    less.Stdout = os.Stdout
    return less, pipe, less.Start()
+}
+
+func Note(r Row, song_m map[string]int) (string, string) {
+   if r.NoteStr != "" || snow.Pop(r.UrlStr) {
+      return "%-9v", r.NoteStr
+   }
+   if song_m[strings.ToUpper(r.SongStr)] > 1 {
+      return "\x1b[30;43m%v\x1b[m", "duplicate"
+   }
+   return YELLOW + "%6v", ""
 }

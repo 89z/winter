@@ -3,8 +3,6 @@ package main
 import (
    "database/sql"
    "fmt"
-   "os"
-   "os/exec"
    "strings"
 )
 
@@ -72,8 +70,8 @@ func SelectOne(open_o *sql.DB, artist_s string) error {
    if e != nil {
       return e
    }
-   defer pipe.Close()
    defer less.Wait()
+   defer pipe.Close()
    // print artist number
    fmt.Fprintln(pipe, "artist_n |", artist_n)
    // print artist check

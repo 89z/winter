@@ -2,6 +2,7 @@ package main
 
 import (
    "database/sql"
+   "fmt"
    "time"
 )
 
@@ -25,12 +26,18 @@ func SelectAll(open_o *sql.DB) error {
       artist_s string
       count_n int
    )
+   less, pipe, e := Less()
+   if e != nil {
+      return e
+   }
+   defer less.Wait()
+   defer pipe.Close()
    for query_o.Next() {
       e = query_o.Scan(&count_n, &artist_s)
       if e != nil {
          return e
       }
-      println(count_n, "|", artist_s)
+      fmt.Fprintln(pipe, count_n, "|", artist_s)
    }
    return nil
 }
