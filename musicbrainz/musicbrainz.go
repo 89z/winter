@@ -8,12 +8,12 @@ import (
    "sort"
 )
 
+const API = "https://musicbrainz.org/ws/2/release"
+
 type MB struct {
    ID string
    Query url.Values
 }
-
-const API = "https://musicbrainz.org/ws/2/release"
 
 func New(mbid_s string) MB {
    m := url.Values{}
@@ -38,6 +38,17 @@ func (this MB) Group() (snow.Slice, error) {
    return json_m.A("releases"), nil
 }
 
+func (this MB) Release() (snow.Map, error) {
+   url_s := API + "/" + this.ID + "?" + this.Query.Encode()
+   println(url_s)
+   o, e := http.Get(url_s)
+   if e != nil {
+      return nil, e
+   }
+   m := snow.Map{}
+   return m, json.NewDecoder(o.Body).Decode(&m)
+}
+
 func Status(m snow.Map) int {
    if m["status"] == nil {
       return 0
@@ -46,6 +57,25 @@ func Status(m snow.Map) int {
       return 0
    }
    return 1
+}
+
+func Date(m snow.Map, width int) string {
+   left := ""
+   if m["date"] != nil {
+      left = m.S("date")
+   }
+   start := len(left)
+   right := "9999-12-31"[start:]
+   return (left + right)[:width]
+}
+
+func TrackLen(m snow.Map) float64 {
+   var track_n float64
+   a := m.A("media")
+   for n := range a {
+      track_n += a.M(n).N("track-count")
+   }
+   return track_n
 }
 
 func Sort(a snow.Slice) {
@@ -75,34 +105,4 @@ func Sort(a snow.Slice) {
       // 4. DATE
       return Date(first_m, 10) < Date(second_m, 10)
    })
-}
-
-func (this MB) Release() (snow.Map, error) {
-   url_s := API + "/" + this.ID + "?" + this.Query.Encode()
-   println(url_s)
-   o, e := http.Get(url_s)
-   if e != nil {
-      return nil, e
-   }
-   m := snow.Map{}
-   return m, json.NewDecoder(o.Body).Decode(&m)
-}
-
-func TrackLen(m snow.Map) float64 {
-   var track_n float64
-   a := m.A("media")
-   for n := range a {
-      track_n += a.M(n).N("track-count")
-   }
-   return track_n
-}
-
-func Date(m snow.Map, width int) string {
-   left := ""
-   if m["date"] != nil {
-      left = m.S("date")
-   }
-   start := len(left)
-   right := "9999-12-31"[start:]
-   return (left + right)[:width]
 }
