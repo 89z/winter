@@ -5,6 +5,7 @@ import (
    "net/http"
    "net/url"
    "winter/snow"
+   "sort"
 )
 
 type MB struct {
@@ -34,19 +35,46 @@ func (this MB) Group() (snow.Slice, error) {
    if e != nil {
       return nil, e
    }
-   release_a := json_m.A("releases")
-   official_a := snow.Slice{}
-   for n := range release_a {
-      release_m := release_a.M(n)
-      if release_m["status"] == nil {
-         continue
-      }
-      if release_m.S("status") != "Official" {
-         continue
-      }
-      official_a = append(official_a, release_m)
+   return json_m.A("releases"), nil
+}
+
+func Status(m snow.Map) int {
+   if m["status"] == nil {
+      return 0
    }
-   return official_a, nil
+   if m.S("status") != "Official" {
+      return 0
+   }
+   return 1
+}
+
+func Sort(a snow.Slice) {
+   sort.Slice(a, func(first, second int) bool {
+      first_m, second_m := a.M(first), a.M(second)
+      // 1. STATUS
+      if Status(first_m) > Status(second_m) {
+         return true
+      }
+      if Status(first_m) < Status(second_m) {
+         return false
+      }
+      // 2. YEAR
+      if Date(first_m, 4) < Date(second_m, 4) {
+         return true
+      }
+      if Date(first_m, 4) > Date(second_m, 4) {
+         return false
+      }
+      // 3. TRACKS
+      if TrackLen(first_m) < TrackLen(second_m) {
+         return true
+      }
+      if TrackLen(first_m) > TrackLen(second_m) {
+         return false
+      }
+      // 4. DATE
+      return Date(first_m, 10) < Date(second_m, 10)
+   })
 }
 
 func (this MB) Release() (snow.Map, error) {
@@ -77,30 +105,4 @@ func Date(m snow.Map, width int) string {
    start := len(left)
    right := "9999-12-31"[start:]
    return (left + right)[:width]
-}
-
-func Reduce(acc_n int, cur_m snow.Map, cur_n int, src_a snow.Slice) int {
-   if cur_n == 0 {
-      return 0
-   }
-   acc_m := src_a.M(acc_n)
-   // 1. YEAR
-   if Date(cur_m, 4) > Date(acc_m, 4) {
-      return acc_n
-   }
-   if Date(cur_m, 4) < Date(acc_m, 4) {
-      return cur_n
-   }
-   // 2. TRACKS
-   if TrackLen(cur_m) > TrackLen(acc_m) {
-      return acc_n
-   }
-   if TrackLen(cur_m) < TrackLen(acc_m) {
-      return cur_n
-   }
-   // 3. DATE
-   if Date(cur_m, 10) >= Date(acc_m, 10) {
-      return acc_n
-   }
-   return cur_n
 }

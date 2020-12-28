@@ -30,12 +30,8 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       if e != nil {
          log.Fatal(e)
       }
-      rel_n := 0
-      for idx_n := range rel_a {
-         cur_m := rel_a.M(idx_n)
-         rel_n = musicbrainz.Reduce(rel_n, cur_m, idx_n, rel_a)
-      }
-      rel_m = rel_a.M(rel_n)
+      musicbrainz.Sort(rel_a)
+      rel_m = rel_a.M(0)
    } else {
       var e error
       rel_m, e = mb_o.Release()
