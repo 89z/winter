@@ -44,6 +44,14 @@ func timeHours(value string) (float64, error) {
    return time.Since(o).Hours(), nil
 }
 
+func Color(n float64) (string, bool) {
+   s := numberFormat(n)
+   if n > 8_000_000 {
+      return "\x1b[1;31m" + s + "\x1b[m", true
+   }
+   return "\x1b[1;32m" + s + "\x1b[m", false
+}
+
 func Info(id_s string) (snow.Map, error) {
    info_s := "https://www.youtube.com/get_video_info?video_id=" + id_s
    query_s, e := getContents(info_s)
@@ -75,12 +83,4 @@ func Views(m snow.Map) (float64, error) {
       return 0, e
    }
    return view_n / (hour_n / 24 / 365), nil
-}
-
-func Color(n float64) (string, bool) {
-   s := numberFormat(n)
-   if n > 8_000_000 {
-      return "\x1b[1;31m" + s + "\x1b[m", true
-   }
-   return "\x1b[1;32m" + s + "\x1b[m", false
 }

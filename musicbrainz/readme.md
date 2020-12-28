@@ -15,10 +15,6 @@ to include:
 - track titles
 - track lengths
 
-## CURLOPT_USERAGENT
-
-<https://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting>
-
 ## Date
 
 Null:
