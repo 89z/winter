@@ -2,7 +2,6 @@ package main
 
 import (
    "database/sql"
-   "strings"
    "winter/snow"
 )
 
@@ -35,13 +34,13 @@ func CopyAlbum(open_o *sql.DB, source , dest string) error {
       if e != nil {
          return e
       }
-      song_m[strings.ToUpper(song_s)] = note_s
+      song_m[song_s] = note_s
    }
    // PASTE NOTES
    for song_s, note_s := range song_m {
       e = snow.Update(
          open_o,
-         "song_t set note_s = ? where album_n = ? and UPPER(song_s) = ?",
+         "song_t set note_s = ? where album_n = ? and song_s = ? COLLATE NOCASE",
          note_s,
          dest,
          song_s,

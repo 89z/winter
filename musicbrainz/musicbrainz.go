@@ -79,7 +79,7 @@ func TrackLen(m snow.Map) float64 {
 }
 
 func Sort(a snow.Slice) {
-   sort.Slice(a, func(first, second int) bool {
+   sort.Slice(a, func (first, second int) bool {
       first_m, second_m := a.M(first), a.M(second)
       // 1. STATUS
       if Status(first_m) > Status(second_m) {
