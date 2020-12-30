@@ -2,7 +2,6 @@ package main
 
 import (
    "database/sql"
-   "fmt"
    "log"
    "os"
    "winter/snow"
@@ -11,7 +10,7 @@ import (
 
 func main() {
    if len(os.Args) == 1 {
-      fmt.Println(`winter <target> <arguments>
+      println(`winter <target> <arguments>
 
 Copy album:
    winter album 999 1000

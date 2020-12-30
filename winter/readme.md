@@ -1,32 +1,21 @@
 # Database
 
-## CSV import
+## JSON export
 
 ~~~
-sqlite3 music.db
-.read music.sql
-.mode csv
-.import --skip 1 artist_t.csv artist_t
-.import --skip 1 album_t.csv album_t
-.import --skip 1 song_artist_t.csv song_artist_t
-.import --skip 1 song_t.csv song_t
-.quit
-~~~
+sqlite3 winter.db
+.mode json
 
-<https://sqlite.org/cli.html#importing_csv_files>
-
-## CSV export
-
-~~~
-sqlite3 music.db
-.mode csv
-.once artist_t.csv
+.once artist.json
 select * from artist_t;
-.once album_t.csv
+
+.once album.json
 select * from album_t;
-.once song_t.csv
+
+.once song.json
 select * from song_t;
-.once song_artist_t.csv
+
+.once song_artist.json
 select * from song_artist_t;
 ~~~
 
