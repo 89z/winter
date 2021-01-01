@@ -6,14 +6,14 @@ import (
    "strings"
 )
 
-func SelectOne(open_o *sql.DB, artist_s string) error {
+func SelectOne(db *sql.DB, artist_s string) error {
    // ARTIST
    var (
       artist_n int
       check_s string
       mb_s string
    )
-   e := open_o.QueryRow(
+   e := db.QueryRow(
       "select artist_n, check_s, mb_s from artist_t where artist_s LIKE ?",
       artist_s,
    ).Scan(&artist_n, &check_s, &mb_s)
@@ -21,7 +21,7 @@ func SelectOne(open_o *sql.DB, artist_s string) error {
       return e
    }
    // ALBUMS
-   query_o, e := open_o.Query(`
+   query_o, e := db.Query(`
       SELECT
          album_n,
          album_s,

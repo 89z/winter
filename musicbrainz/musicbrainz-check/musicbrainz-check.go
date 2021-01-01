@@ -16,19 +16,19 @@ func main() {
       os.Exit(1)
    }
    artist_s := os.Args[1]
-   db_s := os.Getenv("WINTER")
-   open_o, e := sql.Open("sqlite3", db_s)
+   winter_s := os.Getenv("WINTER")
+   db, e := sql.Open("sqlite3", winter_s)
    if e != nil {
       log.Fatal(e)
    }
    // local albums
-   local_m, e := LocalAlbum(open_o, artist_s)
+   local_m, e := LocalAlbum(db, artist_s)
    if e != nil {
       log.Fatal(e)
    }
    // remote albums
    var mb_s string
-   e = open_o.QueryRow(
+   e = db.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", artist_s,
    ).Scan(&mb_s)
    if e != nil {

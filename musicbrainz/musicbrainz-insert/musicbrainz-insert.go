@@ -41,14 +41,14 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    }
    album_s := rel_m.S("title")
    date_s := rel_m.S("date")
-   db_s := os.Getenv("WINTER")
-   open_o, e := sql.Open("sqlite3", db_s)
+   winter_s := os.Getenv("WINTER")
+   db, e := sql.Open("sqlite3", winter_s)
    if e != nil {
       log.Fatal(e)
    }
    // ALBUM
    album_n, e := snow.Insert(
-      open_o,
+      db,
       "album_t (album_s, date_s, url_s) values (?, ?, '')",
       album_s,
       date_s,
@@ -66,7 +66,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    for n := range credit_a {
       // Chicago, Chicago Transit Authority
       name_s := credit_a.M(n).M("artist").S("name")
-      query_o := open_o.QueryRow(
+      query_o := db.QueryRow(
          "select artist_n from artist_t where artist_s = ?", name_s,
       )
       e = query_o.Scan(&artist_n)
@@ -89,7 +89,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    // ITERATE SONG ARRAY
    for _, song_o := range song_a {
       song_n, e := snow.Insert(
-         open_o,
+         db,
          "song_t (song_s, note_s, album_n) values (?, ?, ?)",
          song_o.Title,
          song_o.Note,
@@ -101,7 +101,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       // ITERATE ARTIST ARRAY
       for _, artist_n := range artist_a {
          _, e = snow.Insert(
-            open_o, "song_artist_t values (?, ?)", song_n, artist_n,
+            db, "song_artist_t values (?, ?)", song_n, artist_n,
          )
          if e != nil {
             log.Fatal(e)

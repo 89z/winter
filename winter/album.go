@@ -5,10 +5,14 @@ import (
    "winter/snow"
 )
 
-func CopyAlbum(open_o *sql.DB, source , dest string) error {
+func CopyAlbum(db *sql.DB, source , dest string) error {
    var note_s, song_s, url_s string
+   tx, e := db.Begin()
+   if e != nil {
+      return e
+   }
    // COPY URL
-   e := open_o.QueryRow(
+   e := tx.QueryRow(
       "select url_s from album_t where album_n = ?", source,
    ).Scan(&url_s)
    if e != nil {
@@ -16,13 +20,13 @@ func CopyAlbum(open_o *sql.DB, source , dest string) error {
    }
    // PASTE URL
    e = snow.Update(
-      open_o, "album_t set url_s = ? where album_n = ?", url_s, dest,
+      tx, "album_t set url_s = ? where album_n = ?", url_s, dest,
    )
    if e != nil {
       return e
    }
    // COPY NOTES
-   query_o, e := open_o.Query(
+   query_o, e := tx.Query(
       "select song_s, note_s from song_t where album_n = ?", source,
    )
    if e != nil {
@@ -39,7 +43,7 @@ func CopyAlbum(open_o *sql.DB, source , dest string) error {
    // PASTE NOTES
    for song_s, note_s := range song_m {
       e = snow.Update(
-         open_o,
+         tx,
          "song_t set note_s = ? where album_n = ? and song_s = ? COLLATE NOCASE",
          note_s,
          dest,
@@ -49,11 +53,15 @@ func CopyAlbum(open_o *sql.DB, source , dest string) error {
          return e
       }
    }
-   return nil
+   return tx.Commit()
 }
 
-func DeleteAlbum(open_o *sql.DB, album_s string) error {
-   query_o, e := open_o.Query(
+func DeleteAlbum(db *sql.DB, album_s string) error {
+   tx, e := db.Begin()
+   if e != nil {
+      return e
+   }
+   query_o, e := tx.Query(
       "select song_n from song_t where album_n = ?", album_s,
    )
    if e != nil {
@@ -68,18 +76,18 @@ func DeleteAlbum(open_o *sql.DB, album_s string) error {
       song_a = append(song_a, song_n)
    }
    for _, song_n := range song_a {
-      e = snow.Delete(open_o, "song_t where song_n = ?", song_n)
+      e = snow.Delete(tx, "song_t where song_n = ?", song_n)
       if e != nil {
          return e
       }
-      e = snow.Delete(open_o, "song_artist_t where song_n = ?", song_n)
+      e = snow.Delete(tx, "song_artist_t where song_n = ?", song_n)
       if e != nil {
          return e
       }
    }
-   e = snow.Delete(open_o, "album_t where album_n = ?", album_s)
+   e = snow.Delete(tx, "album_t where album_n = ?", album_s)
    if e != nil {
       return e
    }
-   return nil
+   return tx.Commit()
 }

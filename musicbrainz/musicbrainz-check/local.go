@@ -10,8 +10,8 @@ type Local struct {
    Date string
 }
 
-func LocalAlbum(open_o *sql.DB, artist_s string) (map[string]Local, error) {
-   query_o, e := open_o.Query(`
+func LocalAlbum(db *sql.DB, artist_s string) (map[string]Local, error) {
+   query_o, e := db.Query(`
    select
       album_s,
       date_s,

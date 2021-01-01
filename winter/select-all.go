@@ -6,9 +6,9 @@ import (
    "time"
 )
 
-func SelectAll(open_o *sql.DB) error {
+func SelectAll(db *sql.DB) error {
    then := time.Now().AddDate(-1, 0, 0)
-   query_o, e := open_o.Query(`
+   query_o, e := db.Query(`
    select
       count(1) filter (where note_s = 'good') as count_n,
       artist_s

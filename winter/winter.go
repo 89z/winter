@@ -43,69 +43,77 @@ Update song note:
    winter note 999 good`)
       os.Exit(1)
    }
-   db_s := os.Getenv("WINTER")
-   open_o, e := sql.Open("sqlite3", db_s)
+   key_s := os.Args[1]
+   winter_s := os.Getenv("WINTER")
+   db, e := sql.Open("sqlite3", winter_s)
    if e != nil {
       log.Fatal(e)
    }
-   key_s := os.Args[1]
+   tx, e := db.Begin()
+   if e != nil {
+      log.Fatal(e)
+   }
    switch key_s {
    case "album":
       source := os.Args[2]
       if len(os.Args) == 4 {
          dest := os.Args[3]
-         e = CopyAlbum(open_o, source, dest)
+         e = CopyAlbum(tx, source, dest)
       } else {
-         e = DeleteAlbum(open_o, source)
+         e = DeleteAlbum(tx, source)
       }
    case "artist":
       if len(os.Args) == 2 {
-         e = SelectAll(open_o)
+         e = SelectAll(tx)
       } else {
          _, e = snow.Insert(
-            open_o,
+            tx,
             "artist_t (artist_s, check_s, mb_s) values (?, '', '')",
             os.Args[2],
          )
       }
    case "check":
       e = snow.Update(
-         open_o,
+         tx,
          "artist_t set check_s = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "date":
       e = snow.Update(
-         open_o,
+         tx,
          "album_t set date_s = ? where album_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "mb":
       e = snow.Update(
-         open_o,
+         tx,
          "artist_t set mb_s = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "note":
       e = snow.Update(
-         open_o,
+         tx,
          "song_t set note_s = ? where song_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "url":
       e = snow.Update(
-         open_o,
+         tx,
          "album_t set url_s = ? where album_n = ?",
          os.Args[3],
          os.Args[2],
       )
    default:
-      e = SelectOne(open_o, key_s)
+      e = SelectOne(tx, key_s)
    }
+   if e != nil {
+      log.Fatal(e)
+   }
+   e = tx.Commit()
    if e != nil {
       log.Fatal(e)
    }
