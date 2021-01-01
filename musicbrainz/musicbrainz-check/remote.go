@@ -48,18 +48,15 @@ func RemoteAlbum(mb_s string) ([]Group, error) {
          }
          id_s := group_m.S("id")
          index_n, b := remote_m[id_s]
+         release_s := release_m.S("title")
          if b {
             // add release to group
-            remote_a[index_n].Release = append(
-               remote_a[index_n].Release, release_m.S("title"),
-            )
+            remote_a[index_n].Release[release_s] = true
          } else {
             // add group
             remote_a = append(remote_a, Group{
                Date: group_m.S("first-release-date"),
-               Release: []string{
-                  release_m.S("title"),
-               },
+               Release: map[string]bool{release_s: true},
                Title: group_m.S("title"),
             })
             remote_m[id_s] = len(remote_a) - 1

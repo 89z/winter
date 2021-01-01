@@ -35,6 +35,6 @@ remote Group date */
 type Group struct {
    Color string
    Date string
-   Release []string
+   Release map[string]bool
    Title string
 }

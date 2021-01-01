@@ -42,7 +42,7 @@ func main() {
       log.Fatal(e)
    }
    for n, group_o := range remote_a {
-      for _, release_s := range group_o.Release {
+      for release_s := range group_o.Release {
          local_o, b := local_m[strings.ToUpper(release_s)]
          if b {
             remote_a[n].Date = local_o.Date

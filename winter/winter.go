@@ -10,9 +10,7 @@ import (
 
 func main() {
    if len(os.Args) == 1 {
-      println(`winter <target> <arguments>
-
-Copy album:
+      println(`Copy album:
    winter album 999 1000
 
 Delete album:
