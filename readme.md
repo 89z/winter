@@ -1,5 +1,5 @@
 # Winter
 
-Music database via SQLite
+Music SQL database
 
 https://github.com/mattn/go-sqlite3

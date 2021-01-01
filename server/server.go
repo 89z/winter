@@ -1,35 +1,44 @@
 package main
 
 import (
-   "fmt"
+   "html/template"
+   "log"
    "net/http"
+   "net/url"
    "time"
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
-   t := time.Now()
-   q := r.URL.Query()
-   fmt.Fprint(w, t, "\n", q, "\n")
+func check(err error) {
+   if err != nil {
+      log.Fatal(err)
+   }
 }
 
-func Month(w http.ResponseWriter, r *http.Request) {
-   fmt.Fprintln(w, `
-   <!doctype html>
-   <html lang="en">
-   <head>
-      <meta charset="utf-8">
-      <title>March</title>
-   </head>
-   <body>
-      <h1>March</h1>
-   </body>
-   </html>
-   `)
+type Page struct {
+   Items url.Values
+   Title time.Time
+}
+
+const tpl = `
+<h1>{{ .Title }}</h1>
+{{ range .Items }}
+<div>{{ . }}</div>
+{{ end }}
+`
+
+func Index(w http.ResponseWriter, r *http.Request) {
+   t, e := template.New("webpage").Parse(tpl)
+   check(e)
+   data := Page{
+      Items: r.URL.Query(),
+      Title: time.Now(),
+   }
+   e = t.Execute(w, data)
+   check(e)
 }
 
 func main() {
    http.HandleFunc("/", Index)
-   http.HandleFunc("/month", Month)
    srv := http.Server{}
    srv.ListenAndServe()
 }
