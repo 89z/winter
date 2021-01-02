@@ -6,6 +6,7 @@ import (
    "log"
    "net/http"
    "net/url"
+   "os"
    "time"
    _ "github.com/mattn/go-sqlite3"
 )
@@ -16,10 +17,17 @@ func check(err error) {
    }
 }
 
-type Page struct {
-   H1 url.Values
-   H2 time.Time
-   Table []string
+type Artist struct {
+   Check string
+   MB string
+   Album []Album
+}
+
+type Album struct {
+   Name string
+   Date string
+   URL string
+   Song []Song
 }
 
 const tpl = `
