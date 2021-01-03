@@ -26,13 +26,13 @@ Insert artist:
    winter artist 'Kate Bush'
 
 Update artist date:
-   winter check 999 2019-12-31
+   winter check 999 2020-12-31
 
 Update artist id:
    winter mb 999 3f5be744-e867-42fb-8913-5fd69e4099b5
 
 Update album date:
-   winter date 999 2019-12-31
+   winter date 999 2020-12-31
 
 Update album URL:
    winter url 999 youtube.com/watch?v=HQmmM_qwG4k

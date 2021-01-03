@@ -35,15 +35,6 @@ func numberFormat(n float64) string {
    return fmt.Sprintf("%.3f", n3) + []string{"", " k", " M", " B"}[n2]
 }
 
-func timeHours(value string) (float64, error) {
-   layout := time.RFC3339[:len(value)]
-   o, e := time.Parse(layout, value)
-   if e != nil {
-      return 0, e
-   }
-   return time.Since(o).Hours(), nil
-}
-
 func Color(n float64) (string, bool) {
    s := numberFormat(n)
    if n > 8_000_000 {
@@ -69,6 +60,15 @@ func Info(id_s string) (snow.Map, error) {
       return nil, e
    }
    return json_m.M("microformat").M("playerMicroformatRenderer"), nil
+}
+
+func timeHours(left string) (float64, error) {
+   right := "1970-01-01T00:00:00Z"[len(left):]
+   o, e := time.Parse(time.RFC3339, left + right)
+   if e != nil {
+      return 0, e
+   }
+   return time.Since(o).Hours(), nil
 }
 
 func Views(m snow.Map) (float64, error) {
