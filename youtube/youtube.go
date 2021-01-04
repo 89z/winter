@@ -62,7 +62,7 @@ func Info(id_s string) (snow.Map, error) {
    return json_m.M("microformat").M("playerMicroformatRenderer"), nil
 }
 
-func timeHours(left string) (float64, error) {
+func sinceHours(left string) (float64, error) {
    right := "1970-01-01T00:00:00Z"[len(left):]
    o, e := time.Parse(time.RFC3339, left + right)
    if e != nil {
@@ -78,7 +78,7 @@ func Views(m snow.Map) (float64, error) {
       return 0, e
    }
    date_s := m.S("publishDate")
-   hour_n, e := timeHours(date_s)
+   hour_n, e := sinceHours(date_s)
    if e != nil {
       return 0, e
    }
