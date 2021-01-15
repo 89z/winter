@@ -23,14 +23,14 @@ func Note(r Row, song_m map[string]int) (string, string) {
    return YELLOW + "%6v", ""
 }
 
-func SelectOne(db *sql.DB, artist_s string) error {
+func SelectOne(tx *sql.Tx, artist_s string) error {
    // ARTIST
    var (
       artist_n int
       check_s string
       mb_s string
    )
-   e := db.QueryRow(
+   e := tx.QueryRow(
       "select artist_n, check_s, mb_s from artist_t where artist_s LIKE ?",
       artist_s,
    ).Scan(&artist_n, &check_s, &mb_s)
@@ -38,7 +38,7 @@ func SelectOne(db *sql.DB, artist_s string) error {
       return e
    }
    // ALBUMS
-   query_o, e := db.Query(`
+   query_o, e := tx.Query(`
       SELECT
          album_n,
          album_s,

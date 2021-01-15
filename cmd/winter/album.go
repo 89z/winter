@@ -5,14 +5,10 @@ import (
    "winter"
 )
 
-func CopyAlbum(db *sql.DB, source , dest string) error {
+func CopyAlbum(tx *sql.Tx, source , dest string) error {
    var note_s, song_s, url_s string
-   tx, e := db.Begin()
-   if e != nil {
-      return e
-   }
    // COPY URL
-   e = tx.QueryRow(
+   e := tx.QueryRow(
       "select url_s from album_t where album_n = ?", source,
    ).Scan(&url_s)
    if e != nil {
@@ -56,11 +52,7 @@ func CopyAlbum(db *sql.DB, source , dest string) error {
    return tx.Commit()
 }
 
-func DeleteAlbum(db *sql.DB, album_s string) error {
-   tx, e := db.Begin()
-   if e != nil {
-      return e
-   }
+func DeleteAlbum(tx *sql.Tx, album_s string) error {
    query_o, e := tx.Query(
       "select song_n from song_t where album_n = ?", album_s,
    )
