@@ -4,7 +4,24 @@ import (
    "database/sql"
    "fmt"
    "strings"
+   "winter"
 )
+
+const (
+   DASH = "-----------------------------------------------------------------"
+   WIDTH = 50
+   YELLOW = "\x1b[43m   \x1b[m"
+)
+
+func Note(r Row, song_m map[string]int) (string, string) {
+   if r.NoteStr != "" || winter.Pop(r.UrlStr) {
+      return "%-9v", r.NoteStr
+   }
+   if song_m[strings.ToUpper(r.SongStr)] > 1 {
+      return "\x1b[30;43m%v\x1b[m", "duplicate"
+   }
+   return YELLOW + "%6v", ""
+}
 
 func SelectOne(db *sql.DB, artist_s string) error {
    // ARTIST
@@ -120,4 +137,14 @@ func SelectOne(db *sql.DB, artist_s string) error {
       fmt.Fprintln(pipe, r.SongStr)
    }
    return nil
+}
+
+type Row struct {
+   AlbumInt int
+   AlbumStr string
+   DateStr string
+   NoteStr string
+   SongInt int
+   SongStr string
+   UrlStr string
 }

@@ -4,7 +4,7 @@ import (
    "database/sql"
    "log"
    "os"
-   "winter/snow"
+   "winter"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -64,42 +64,42 @@ Update song note:
       if len(os.Args) == 2 {
          e = SelectAll(tx)
       } else {
-         _, e = snow.Insert(
+         _, e = winter.Insert(
             tx,
             "artist_t (artist_s, check_s, mb_s) values (?, '', '')",
             os.Args[2],
          )
       }
    case "check":
-      e = snow.Update(
+      e = winter.Update(
          tx,
          "artist_t set check_s = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "date":
-      e = snow.Update(
+      e = winter.Update(
          tx,
          "album_t set date_s = ? where album_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "mb":
-      e = snow.Update(
+      e = winter.Update(
          tx,
          "artist_t set mb_s = ? where artist_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "note":
-      e = snow.Update(
+      e = winter.Update(
          tx,
          "song_t set note_s = ? where song_n = ?",
          os.Args[3],
          os.Args[2],
       )
    case "url":
-      e = snow.Update(
+      e = winter.Update(
          tx,
          "album_t set url_s = ? where album_n = ?",
          os.Args[3],

@@ -3,7 +3,6 @@ package winter
 import (
    "database/sql"
    "fmt"
-   "strings"
 )
 
 func Delete(tx sql.Tx, query string, args ...interface{}) error {

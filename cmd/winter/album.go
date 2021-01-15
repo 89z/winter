@@ -2,7 +2,7 @@ package main
 
 import (
    "database/sql"
-   "winter/snow"
+   "winter"
 )
 
 func CopyAlbum(db *sql.DB, source , dest string) error {
@@ -12,14 +12,14 @@ func CopyAlbum(db *sql.DB, source , dest string) error {
       return e
    }
    // COPY URL
-   e := tx.QueryRow(
+   e = tx.QueryRow(
       "select url_s from album_t where album_n = ?", source,
    ).Scan(&url_s)
    if e != nil {
       return e
    }
    // PASTE URL
-   e = snow.Update(
+   e = winter.Update(
       tx, "album_t set url_s = ? where album_n = ?", url_s, dest,
    )
    if e != nil {
@@ -42,7 +42,7 @@ func CopyAlbum(db *sql.DB, source , dest string) error {
    }
    // PASTE NOTES
    for song_s, note_s := range song_m {
-      e = snow.Update(
+      e = winter.Update(
          tx,
          "song_t set note_s = ? where album_n = ? and song_s = ? COLLATE NOCASE",
          note_s,
@@ -76,16 +76,16 @@ func DeleteAlbum(db *sql.DB, album_s string) error {
       song_a = append(song_a, song_n)
    }
    for _, song_n := range song_a {
-      e = snow.Delete(tx, "song_t where song_n = ?", song_n)
+      e = winter.Delete(tx, "song_t where song_n = ?", song_n)
       if e != nil {
          return e
       }
-      e = snow.Delete(tx, "song_artist_t where song_n = ?", song_n)
+      e = winter.Delete(tx, "song_artist_t where song_n = ?", song_n)
       if e != nil {
          return e
       }
    }
-   e = snow.Delete(tx, "album_t where album_n = ?", album_s)
+   e = winter.Delete(tx, "album_t where album_n = ?", album_s)
    if e != nil {
       return e
    }

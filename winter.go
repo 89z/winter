@@ -1,10 +1,5 @@
 package winter
-
-import (
-   "database/sql"
-   "fmt"
-   "strings"
-)
+import "strings"
 
 func Pop(s string) bool {
    return strings.HasPrefix(s, "youtube.com/watch?")
@@ -33,4 +28,3 @@ type Slice []interface{}
 func (a Slice) M(n int) Map {
    return a[n].(map[string]interface{})
 }
-
