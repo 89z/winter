@@ -1,6 +1,16 @@
-package snow
+package winter
+
+import (
+   "database/sql"
+   "fmt"
+   "strings"
+)
+
+func Pop(s string) bool {
+   return strings.HasPrefix(s, "youtube.com/watch?")
+}
+
 type Map map[string]interface{}
-type Slice []interface{}
 
 func (m Map) A(s string) Slice {
    return m[s].([]interface{})
@@ -18,6 +28,9 @@ func (m Map) S(s string) string {
    return m[s].(string)
 }
 
+type Slice []interface{}
+
 func (a Slice) M(n int) Map {
    return a[n].(map[string]interface{})
 }
+

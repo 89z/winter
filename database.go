@@ -1,15 +1,10 @@
-package snow
+package winter
 
 import (
    "database/sql"
    "fmt"
+   "strings"
 )
-
-func Update(tx sql.Tx, query string, args ...interface{}) error {
-   fmt.Println(args)
-   _, e := tx.Exec("update " + query, args...)
-   return e
-}
 
 func Delete(tx sql.Tx, query string, args ...interface{}) error {
    fmt.Println(args)
@@ -24,4 +19,10 @@ func Insert(tx sql.Tx, query string, args ...interface{}) (int64, error) {
       return 0, e
    }
    return res.LastInsertId()
+}
+
+func Update(tx sql.Tx, query string, args ...interface{}) error {
+   fmt.Println(args)
+   _, e := tx.Exec("update " + query, args...)
+   return e
 }
