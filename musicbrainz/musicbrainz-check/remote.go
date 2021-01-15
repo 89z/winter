@@ -5,7 +5,7 @@ import (
    "fmt"
    "net/http"
    "net/url"
-   "winter/snow"
+   "winter"
 )
 
 var offset_n float64
@@ -26,7 +26,7 @@ func RemoteAlbum(mb_s string) ([]Group, error) {
       if e != nil {
          return nil, e
       }
-      json_m := snow.Map{}
+      json_m := winter.Map{}
       e = json.NewDecoder(o.Body).Decode(&json_m)
       if e != nil {
          return nil, e
@@ -69,4 +69,18 @@ func RemoteAlbum(mb_s string) ([]Group, error) {
       q.Set("offset", fmt.Sprint(offset_n))
    }
    return remote_a, nil
+}
+
+/* Regarding the title and date:
+
+For the title, we will display the remote Group title, but we also need to get
+the remote Release titles to match against the local Release titles.
+
+For the date, if we have a local match, use that date. Otherwise, use use the
+remote Group date */
+type Group struct {
+   Color string
+   Date string
+   Release map[string]bool
+   Title string
 }

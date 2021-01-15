@@ -4,8 +4,8 @@ import (
    "encoding/json"
    "net/http"
    "net/url"
-   "winter/snow"
    "sort"
+   "winter"
 )
 
 const API = "https://musicbrainz.org/ws/2/release"
@@ -22,7 +22,7 @@ func New(mbid_s string) MB {
    return MB{mbid_s, m}
 }
 
-func (this MB) Group() (snow.Slice, error) {
+func (this MB) Group() (winter.Slice, error) {
    this.Query.Set("release-group", this.ID)
    url_s := API + "?" + this.Query.Encode()
    println(url_s)
@@ -30,7 +30,7 @@ func (this MB) Group() (snow.Slice, error) {
    if e != nil {
       return nil, e
    }
-   json_m := snow.Map{}
+   json_m := winter.Map{}
    e = json.NewDecoder(o.Body).Decode(&json_m)
    if e != nil {
       return nil, e
@@ -38,18 +38,18 @@ func (this MB) Group() (snow.Slice, error) {
    return json_m.A("releases"), nil
 }
 
-func (this MB) Release() (snow.Map, error) {
+func (this MB) Release() (winter.Map, error) {
    url_s := API + "/" + this.ID + "?" + this.Query.Encode()
    println(url_s)
    o, e := http.Get(url_s)
    if e != nil {
       return nil, e
    }
-   m := snow.Map{}
+   m := winter.Map{}
    return m, json.NewDecoder(o.Body).Decode(&m)
 }
 
-func Status(m snow.Map) int {
+func Status(m winter.Map) int {
    if m["status"] == nil {
       return 0
    }
@@ -59,7 +59,7 @@ func Status(m snow.Map) int {
    return 1
 }
 
-func Date(m snow.Map, width int) string {
+func Date(m winter.Map, width int) string {
    left := ""
    if m["date"] != nil {
       left = m.S("date")
@@ -69,7 +69,7 @@ func Date(m snow.Map, width int) string {
    return (left + right)[:width]
 }
 
-func TrackLen(m snow.Map) float64 {
+func TrackLen(m winter.Map) float64 {
    var track_n float64
    a := m.A("media")
    for n := range a {
@@ -78,7 +78,7 @@ func TrackLen(m snow.Map) float64 {
    return track_n
 }
 
-func Sort(a snow.Slice) {
+func Sort(a winter.Slice) {
    sort.Slice(a, func (first, second int) bool {
       first_m, second_m := a.M(first), a.M(second)
       // 1. STATUS

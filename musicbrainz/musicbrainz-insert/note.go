@@ -2,10 +2,10 @@ package main
 
 import (
    "time"
-   "winter/snow"
+   "winter"
 )
 
-func Note(m snow.Map) string {
+func Note(m winter.Map) string {
    if m["length"] == nil {
       return "?:??"
    }

@@ -7,10 +7,16 @@ import (
    "os"
    "path"
    "strings"
+   "winter"
    "winter/musicbrainz"
-   "winter/snow"
    _ "github.com/mattn/go-sqlite3"
 )
+
+func check(e error) {
+   if e != nil {
+      log.Fatal(e)
+   }
+}
 
 func main() {
    if len(os.Args) != 2 {
@@ -24,7 +30,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    url_s := os.Args[1]
    mbid_s := path.Base(url_s)
    mb_o := musicbrainz.New(mbid_s)
-   rel_m := snow.Map{}
+   rel_m := winter.Map{}
    if strings.Contains(url_s, "release-group") {
       rel_a, e := mb_o.Group()
       if e != nil {
@@ -47,7 +53,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       log.Fatal(e)
    }
    // ALBUM
-   album_n, e := snow.Insert(
+   album_n, e := winter.Insert(
       db,
       "album_t (album_s, date_s, url_s) values (?, ?, '')",
       album_s,
@@ -88,7 +94,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    }
    // ITERATE SONG ARRAY
    for _, song_o := range song_a {
-      song_n, e := snow.Insert(
+      song_n, e := winter.Insert(
          db,
          "song_t (song_s, note_s, album_n) values (?, ?, ?)",
          song_o.Title,
@@ -100,7 +106,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       }
       // ITERATE ARTIST ARRAY
       for _, artist_n := range artist_a {
-         _, e = snow.Insert(
+         _, e = winter.Insert(
             db, "song_artist_t values (?, ?)", song_n, artist_n,
          )
          if e != nil {
