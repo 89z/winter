@@ -6,10 +6,16 @@ import (
    "path"
    "strings"
    "time"
+   "winter"
    "winter/musicbrainz"
-   "winter/snow"
    "winter/youtube"
 )
+
+func check(e error) {
+   if e != nil {
+      log.Fatal(e)
+   }
+}
 
 func main() {
    if len(os.Args) != 2 {
@@ -24,20 +30,16 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
    url_s := os.Args[1]
    mbid_s := path.Base(url_s)
    mb_o := musicbrainz.New(mbid_s)
-   rel_m := snow.Map{}
+   rel_m := winter.Map{}
    if strings.Contains(url_s, "release-group") {
       rel_a, e := mb_o.Group()
-      if e != nil {
-         log.Fatal(e)
-      }
+      check(e)
       musicbrainz.Sort(rel_a)
       rel_m = rel_a.M(0)
    } else {
       var e error
       rel_m, e = mb_o.Release()
-      if e != nil {
-         log.Fatal(e)
-      }
+      check(e)
    }
    out_a := []string{}
    artist_a := rel_m.A("artist-credit")
@@ -52,17 +54,11 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
       for n := range track_a {
          title_s := track_a.M(n).S("title")
          id_s, e := YoutubeResult(artist_s + " " + title_s)
-         if e != nil {
-            log.Fatal(e)
-         }
+         check(e)
          info_m, e := youtube.Info(id_s)
-         if e != nil {
-            log.Fatal(e)
-         }
+         check(e)
          view_n, e := youtube.Views(info_m)
-         if e != nil {
-            log.Fatal(e)
-         }
+         check(e)
          color_s, b := youtube.Color(view_n)
          println(color_s)
          if b {

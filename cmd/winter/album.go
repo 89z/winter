@@ -49,7 +49,7 @@ func CopyAlbum(tx *sql.Tx, source , dest string) error {
          return e
       }
    }
-   return tx.Commit()
+   return nil
 }
 
 func DeleteAlbum(tx *sql.Tx, album_s string) error {
@@ -81,5 +81,5 @@ func DeleteAlbum(tx *sql.Tx, album_s string) error {
    if e != nil {
       return e
    }
-   return tx.Commit()
+   return nil
 }

@@ -9,7 +9,7 @@ import (
    "net/url"
    "strconv"
    "time"
-   "winter/snow"
+   "winter"
 )
 
 func floatVal(s string) (float64, error) {
@@ -43,7 +43,7 @@ func Color(n float64) (string, bool) {
    return "\x1b[1;32m" + s + "\x1b[m", false
 }
 
-func Info(id_s string) (snow.Map, error) {
+func Info(id_s string) (winter.Map, error) {
    info_s := "https://www.youtube.com/get_video_info?video_id=" + id_s
    query_s, e := getContents(info_s)
    if e != nil {
@@ -54,7 +54,7 @@ func Info(id_s string) (snow.Map, error) {
       return nil, e
    }
    resp_s := o.Get("player_response")
-   json_m := snow.Map{}
+   json_m := winter.Map{}
    e = json.Unmarshal([]byte(resp_s), &json_m)
    if e != nil {
       return nil, e
@@ -71,7 +71,7 @@ func sinceHours(left string) (float64, error) {
    return time.Since(o).Hours(), nil
 }
 
-func Views(m snow.Map) (float64, error) {
+func Views(m winter.Map) (float64, error) {
    view_s := m.S("viewCount")
    view_n, e := floatVal(view_s)
    if e != nil {
