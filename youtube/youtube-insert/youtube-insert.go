@@ -22,10 +22,10 @@ func findSubmatch(pat, sub string) string {
 
 func getImage(id_s string) string {
    url_s := "https://i.ytimg.com/vi/"
-   if HttpHead(url_s + id_s + "/sddefault.jpg") {
+   if httpHead(url_s + id_s + "/sddefault.jpg") {
       return ""
    }
-   if HttpHead(url_s + id_s + "/sd1.jpg") {
+   if httpHead(url_s + id_s + "/sd1.jpg") {
       return "/sd1"
    }
    return "/hqdefault"

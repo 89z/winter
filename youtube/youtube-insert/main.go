@@ -2,6 +2,7 @@ package main
 
 import (
    "encoding/json"
+   "log"
    "net/url"
    "os"
    "regexp"
@@ -17,8 +18,8 @@ func main() {
       println("youtube-insert <URL>")
       os.Exit(1)
    }
-   url := os.Args[1]
-   o, e := url.Parse(url)
+   url_s := os.Args[1]
+   o, e := url.Parse(url_s)
    check(e)
    id := o.Query().Get("v")
    // year
@@ -35,7 +36,7 @@ func main() {
       ` (\d{4})`, `(\d{4}) `, `Released on: (\d{4})`, `℗ (\d{4})`,
    }
    for _, reg_s := range reg_a {
-      mat_s := FindSubmatch(reg_s, desc_s)
+      mat_s := findSubmatch(reg_s, desc_s)
       if mat_s == "" {
          continue
       }
@@ -58,7 +59,7 @@ func main() {
    date_n := time.Now().Unix()
    date_s := strconv.FormatInt(date_n, 36)
    // image
-   image_s := GetImage(id)
+   image_s := getImage(id)
    // print
    rec_a := winter.Slice{date_s, year_n, "y/" + id + image_s, title_s}
    json_y, e := json.Marshal(rec_a)

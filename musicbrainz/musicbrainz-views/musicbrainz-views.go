@@ -2,6 +2,7 @@ package main
 
 import (
    "io/ioutil"
+   "log"
    "net/http"
    "net/url"
    "regexp"
@@ -34,10 +35,10 @@ func youtubeResult(query_s string) (string, error) {
    m.Set("search_query", query_s)
    res_s := "https://www.youtube.com/results?" + m.Encode()
    println(res_s)
-   get_y, e := GetContents(res_s)
+   get_y, e := getContents(res_s)
    if e != nil {
       return "", e
    }
-   find_y := FindSubmatch("/vi/([^/]*)/", get_y)
+   find_y := findSubmatch("/vi/([^/]*)/", get_y)
    return string(find_y), nil
 }

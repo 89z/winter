@@ -1,7 +1,6 @@
 package main
 
 import (
-   "log"
    "os"
    "path"
    "strings"
@@ -47,16 +46,16 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
       track_a := media_a.M(n).A("tracks")
       for n := range track_a {
          title_s := track_a.M(n).S("title")
-         id_s, e := YoutubeResult(artist_s + " " + title_s)
+         id, e := youtubeResult(artist_s + " " + title_s)
          check(e)
-         info_m, e := youtube.Info(id_s)
+         info_m, e := youtube.Info(id)
          check(e)
          view_n, e := youtube.Views(info_m)
          check(e)
          color_s, b := youtube.Color(view_n)
          println(color_s)
          if b {
-            print("youtube.com/watch?v=", id_s, "\n")
+            print("youtube.com/watch?v=", id, "\n")
             return
          }
          time.Sleep(500 * time.Millisecond)
