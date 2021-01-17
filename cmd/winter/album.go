@@ -5,7 +5,7 @@ import (
    "winter"
 )
 
-func CopyAlbum(tx *sql.Tx, source , dest string) error {
+func copyAlbum(tx *sql.Tx, source , dest string) error {
    var note_s, song_s, url_s string
    // COPY URL
    e := tx.QueryRow(
@@ -52,7 +52,7 @@ func CopyAlbum(tx *sql.Tx, source , dest string) error {
    return nil
 }
 
-func DeleteAlbum(tx *sql.Tx, album_s string) error {
+func deleteAlbum(tx *sql.Tx, album_s string) error {
    query_o, e := tx.Query(
       "select song_n from song_t where album_n = ?", album_s,
    )

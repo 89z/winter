@@ -56,13 +56,13 @@ Update song note:
       source := os.Args[2]
       if len(os.Args) == 4 {
          dest := os.Args[3]
-         e = CopyAlbum(tx, source, dest)
+         e = copyAlbum(tx, source, dest)
       } else {
-         e = DeleteAlbum(tx, source)
+         e = deleteAlbum(tx, source)
       }
    case "artist":
       if len(os.Args) == 2 {
-         e = SelectAll(tx)
+         e = selectAll(tx)
       } else {
          _, e = winter.Insert(
             tx,
@@ -106,7 +106,7 @@ Update song note:
          os.Args[2],
       )
    default:
-      e = SelectOne(tx, key_s)
+      e = selectOne(tx, key_s)
    }
    if e != nil {
       log.Fatal(e)

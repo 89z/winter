@@ -6,12 +6,12 @@ import (
    "os/exec"
 )
 
-func Less() (*exec.Cmd, io.WriteCloser, error) {
-   less := exec.Command("less")
-   pipe, e := less.StdinPipe()
+func less() (*exec.Cmd, io.WriteCloser, error) {
+   cmd := exec.Command("less")
+   pipe, e := cmd.StdinPipe()
    if e != nil {
       return nil, nil, e
    }
-   less.Stdout = os.Stdout
-   return less, pipe, less.Start()
+   cmd.Stdout = os.Stdout
+   return cmd, pipe, cmd.Start()
 }

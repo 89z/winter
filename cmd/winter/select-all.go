@@ -6,7 +6,7 @@ import (
    "time"
 )
 
-func SelectAll(tx *sql.Tx) error {
+func selectAll(tx *sql.Tx) error {
    then := time.Now().AddDate(-1, 0, 0)
    query_o, e := tx.Query(`
    select
@@ -26,11 +26,11 @@ func SelectAll(tx *sql.Tx) error {
       artist_s string
       count_n int
    )
-   less, pipe, e := Less()
+   cmd, pipe, e := less()
    if e != nil {
       return e
    }
-   defer less.Wait()
+   defer cmd.Wait()
    defer pipe.Close()
    for query_o.Next() {
       e = query_o.Scan(&count_n, &artist_s)
