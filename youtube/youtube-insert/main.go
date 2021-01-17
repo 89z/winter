@@ -2,7 +2,6 @@ package main
 
 import (
    "encoding/json"
-   "log"
    "net/url"
    "os"
    "regexp"
@@ -18,17 +17,13 @@ func main() {
       println("youtube-insert <URL>")
       os.Exit(1)
    }
-   url_s := os.Args[1]
-   o, e := url.Parse(url_s)
-   if e != nil {
-      log.Fatal(e)
-   }
-   id_s := o.Query().Get("v")
+   url := os.Args[1]
+   o, e := url.Parse(url)
+   check(e)
+   id := o.Query().Get("v")
    // year
-   info_m, e := youtube.Info(id_s)
-   if e != nil {
-      log.Fatal(e)
-   }
+   info_m, e := youtube.Info(id)
+   check(e)
    if info_m["description"] == nil {
       log.Fatal("Clapham Junction")
    }
@@ -50,9 +45,7 @@ func main() {
       year_s = mat_s
    }
    year_n, e := strconv.Atoi(year_s)
-   if e != nil {
-      log.Fatal(e)
-   }
+   check(e)
    // song, artist
    title_s := info_m.M("title").S("simpleText")
    line_s := regexp.MustCompile(".* · .*").FindString(desc_s)
@@ -65,13 +58,11 @@ func main() {
    date_n := time.Now().Unix()
    date_s := strconv.FormatInt(date_n, 36)
    // image
-   image_s := GetImage(id_s)
+   image_s := GetImage(id)
    // print
-   rec_a := winter.Slice{date_s, year_n, "y/" + id_s + image_s, title_s}
+   rec_a := winter.Slice{date_s, year_n, "y/" + id + image_s, title_s}
    json_y, e := json.Marshal(rec_a)
-   if e != nil {
-      log.Fatal(e)
-   }
+   check(e)
    json_y = append(json_y, ',', '\n')
    os.Stdout.Write(json_y)
 }

@@ -1,11 +1,18 @@
 package main
 
 import (
+   "log"
    "net/http"
    "regexp"
 )
 
-func FindSubmatch(pat, sub string) string {
+func check(e error) {
+   if e != nil {
+      log.Fatal(e)
+   }
+}
+
+func findSubmatch(pat, sub string) string {
    a := regexp.MustCompile(pat).FindStringSubmatch(sub)
    if len(a) < 2 {
       return ""
@@ -13,7 +20,7 @@ func FindSubmatch(pat, sub string) string {
    return a[1]
 }
 
-func GetImage(id_s string) string {
+func getImage(id_s string) string {
    url_s := "https://i.ytimg.com/vi/"
    if HttpHead(url_s + id_s + "/sddefault.jpg") {
       return ""
@@ -24,7 +31,7 @@ func GetImage(id_s string) string {
    return "/hqdefault"
 }
 
-func HttpHead(s string) bool {
+func httpHead(s string) bool {
    println(s)
    o, e := http.Head(s)
    return e == nil && o.StatusCode == 200
