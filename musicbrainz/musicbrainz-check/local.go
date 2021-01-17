@@ -7,31 +7,31 @@ import (
 )
 
 const (
-   BLOCK = "\u2587\u2587\u2587\u2587\u2587"
-   GREEN_10 = "\x1b[92m" + BLOCK + BLOCK + "\x1b[m"
-   GREEN_5 = "\x1b[92m" + BLOCK + "\x1b[90m" + BLOCK + "\x1b[m"
-   RED_10 = "\x1b[91m" + BLOCK + BLOCK + "\x1b[m"
-   RED_5 = "\x1b[91m" + BLOCK + "\x1b[90m" + BLOCK + "\x1b[m"
+   block = "\u2587\u2587\u2587\u2587\u2587"
+   green_10 = "\x1b[92m" + block + block + "\x1b[m"
+   green_5 = "\x1b[92m" + block + "\x1b[90m" + block + "\x1b[m"
+   red_10 = "\x1b[91m" + block + block + "\x1b[m"
+   red_5 = "\x1b[91m" + block + "\x1b[90m" + block + "\x1b[m"
 )
 
-func Color(url_s string, unrated_n, good_n int) string {
+func color(url_s string, unrated_n, good_n int) string {
    if winter.Pop(url_s) {
-      return GREEN_10
+      return green_10
    }
    if unrated_n == 0 && good_n == 0 {
-      return RED_10
+      return red_10
    }
    if unrated_n == 0 {
-      return GREEN_10
+      return green_10
    }
    if good_n == 0 {
-      return RED_5
+      return red_5
    }
-   return GREEN_5
+   return green_5
 }
 
-func LocalAlbum(db *sql.DB, artist_s string) (map[string]Local, error) {
-   query_o, e := db.Query(`
+func localAlbum(db *sql.DB, artist_s string) (map[string]local, error) {
+   query, e := db.Query(`
    select
       album_s,
       date_s,
@@ -55,20 +55,20 @@ func LocalAlbum(db *sql.DB, artist_s string) (map[string]Local, error) {
       unrated_n int
       url_s string
    )
-   local_m := map[string]Local{}
-   for query_o.Next() {
-      e = query_o.Scan(&album_s, &date_s, &url_s, &unrated_n, &good_n)
+   local_m := map[string]local{}
+   for query.Next() {
+      e = query.Scan(&album_s, &date_s, &url_s, &unrated_n, &good_n)
       if e != nil {
          return nil, e
       }
-      local_m[strings.ToUpper(album_s)] = Local{
-         Color(url_s, unrated_n, good_n), date_s,
+      local_m[strings.ToUpper(album_s)] = local{
+         color(url_s, unrated_n, good_n), date_s,
       }
    }
    return local_m, nil
 }
 
-type Local struct {
-   Color string
-   Date string
+type local struct {
+   color string
+   date string
 }

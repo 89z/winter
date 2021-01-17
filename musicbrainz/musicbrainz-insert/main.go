@@ -49,9 +49,9 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    )
    check(e)
    var (
-      artist_a []int
       artist_n int
-      song_a []Song
+      artists []int
+      songs []song
    )
    // CREATE ARTIST ARRAY
    credit_a := album.A("artist-credit")
@@ -63,7 +63,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       )
       e = query_o.Scan(&artist_n)
       check(e)
-      artist_a = append(artist_a, artist_n)
+      artists = append(artists, artist_n)
    }
    // CREATE SONG ARRAY
    media_a := album.A("media")
@@ -72,22 +72,22 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       for n := range track_a {
          track_m := track_a.M(n)
          song_s := track_m.S("title")
-         note_s := Note(track_m)
-         song_a = append(song_a, Song{song_s, note_s})
+         note_s := note(track_m)
+         songs = append(songs, song{song_s, note_s})
       }
    }
    // ITERATE SONG ARRAY
-   for _, song_o := range song_a {
+   for _, song_o := range songs {
       song_n, e := winter.Insert(
          tx,
          "song_t (song_s, note_s, album_n) values (?, ?, ?)",
-         song_o.Title,
-         song_o.Note,
+         song_o.title,
+         song_o.note,
          album_n,
       )
       check(e)
       // ITERATE ARTIST ARRAY
-      for _, artist_n := range artist_a {
+      for _, artist_n := range artists {
          _, e = winter.Insert(
             tx, "song_artist_t values (?, ?)", song_n, artist_n,
          )

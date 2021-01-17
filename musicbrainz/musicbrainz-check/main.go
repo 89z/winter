@@ -10,6 +10,12 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
+func check(e error) {
+   if e != nil {
+      log.Fatal(e)
+   }
+}
+
 func main() {
    if len(os.Args) != 2 {
       println("musicbrainz-check <artist>")
@@ -18,44 +24,36 @@ func main() {
    artist_s := os.Args[1]
    winter_s := os.Getenv("WINTER")
    db, e := sql.Open("sqlite3", winter_s)
-   if e != nil {
-      log.Fatal(e)
-   }
+   check(e)
    // local albums
-   local_m, e := LocalAlbum(db, artist_s)
-   if e != nil {
-      log.Fatal(e)
-   }
+   local_m, e := localAlbum(db, artist_s)
+   check(e)
    // remote albums
    var mb_s string
    e = db.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", artist_s,
    ).Scan(&mb_s)
-   if e != nil {
-      log.Fatal(e)
-   }
+   check(e)
    if mb_s == "" {
       log.Fatal("mb_s missing")
    }
    remote_a, e := RemoteAlbum(mb_s)
-   if e != nil {
-      log.Fatal(e)
-   }
-   for n, group_o := range remote_a {
-      for release_s := range group_o.Release {
+   check(e)
+   for n, group := range remote_a {
+      for release_s := range group.Release {
          local_o, b := local_m[strings.ToUpper(release_s)]
          if b {
-            remote_a[n].Date = local_o.Date
-            remote_a[n].Color = local_o.Color
+            remote_a[n].date = local_o.date
+            remote_a[n].color = local_o.color
          }
       }
    }
    sort.Slice(remote_a, func(n, n2 int) bool {
-      return remote_a[n].Date < remote_a[n2].Date
+      return remote_a[n].date < remote_a[n2].date
    })
-   for _, group_o := range remote_a {
+   for _, group := range remote_a {
       fmt.Printf(
-         "%-10v | %40.40v | %v\n", group_o.Date, group_o.Title, group_o.Color,
+         "%-10v | %40.40v | %v\n", group.date, group.title, group.color,
       )
    }
 }
