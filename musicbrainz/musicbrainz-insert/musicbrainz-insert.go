@@ -5,7 +5,13 @@ import (
    "winter"
 )
 
-func Note(m winter.Map) string {
+func check(e error) {
+   if e != nil {
+      log.Fatal(e)
+   }
+}
+
+func note(m winter.Map) string {
    if m["length"] == nil {
       return "?:??"
    }
@@ -19,7 +25,7 @@ func Note(m winter.Map) string {
    return ""
 }
 
-type Song struct {
-   Title string
-   Note string
+type song struct {
+   title string
+   note string
 }

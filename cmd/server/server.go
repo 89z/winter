@@ -31,19 +31,19 @@ func selectOne(w http.ResponseWriter, r *http.Request) {
    check(e)
    query_o, e := db.Query("select artist_s from artist_t")
    check(e)
-   var artist_a []string
+   var artists []string
    for query_o.Next() {
       var artist string
       e = query_o.Scan(&artist)
       check(e)
-      artist_a = append(artist_a, artist)
+      artists = append(artists, artist)
    }
    t, e := template.New("webpage").Parse(tpl)
    check(e)
-   data := Page{
-      H1: r.URL.Query(),
-      H2: time.Now(),
-      Table: artist_a,
+   data := page{
+      h1: r.URL.Query(),
+      h2: time.Now(),
+      table: artists,
    }
    e = t.Execute(w, data)
    check(e)

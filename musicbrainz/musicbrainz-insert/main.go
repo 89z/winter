@@ -3,7 +3,6 @@ package main
 import (
    "database/sql"
    "fmt"
-   "log"
    "os"
    "path"
    "strings"
@@ -11,12 +10,6 @@ import (
    "winter/musicbrainz"
    _ "github.com/mattn/go-sqlite3"
 )
-
-func check(e error) {
-   if e != nil {
-      log.Fatal(e)
-   }
-}
 
 func main() {
    if len(os.Args) != 2 {
@@ -27,22 +20,21 @@ https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
 https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       os.Exit(1)
    }
-   url_s := os.Args[1]
-   mbid_s := path.Base(url_s)
-   mb_o := musicbrainz.New(mbid_s)
-   rel_m := winter.Map{}
-   if strings.Contains(url_s, "release-group") {
-      rel_a, e := mb_o.Group()
+   url := os.Args[1]
+   id := path.Base(url)
+   var album winter.Map
+   if strings.Contains(url, "release-group") {
+      albums, e := musicbrainz.Group(id)
       check(e)
-      musicbrainz.Sort(rel_a)
-      rel_m = rel_a.M(0)
+      musicbrainz.Sort(albums)
+      album = albums.M(0)
    } else {
       var e error
-      rel_m, e = mb_o.Release()
+      album, e = musicbrainz.Release(id)
       check(e)
    }
-   album_s := rel_m.S("title")
-   date_s := rel_m.S("date")
+   album_s := album.S("title")
+   date_s := album.S("date")
    winter_s := os.Getenv("WINTER")
    db, e := sql.Open("sqlite3", winter_s)
    check(e)
@@ -62,7 +54,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       song_a []Song
    )
    // CREATE ARTIST ARRAY
-   credit_a := rel_m.A("artist-credit")
+   credit_a := album.A("artist-credit")
    for n := range credit_a {
       // Chicago, Chicago Transit Authority
       name_s := credit_a.M(n).M("artist").S("name")
@@ -74,7 +66,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       artist_a = append(artist_a, artist_n)
    }
    // CREATE SONG ARRAY
-   media_a := rel_m.A("media")
+   media_a := album.A("media")
    for n := range media_a {
       track_a := media_a.M(n).A("tracks")
       for n := range track_a {
