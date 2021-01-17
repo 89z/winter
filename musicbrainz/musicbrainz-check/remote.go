@@ -1,9 +1,7 @@
 package main
 
 import (
-   "encoding/json"
    "fmt"
-   "net/http"
    "net/url"
    "winter"
 )
@@ -20,14 +18,8 @@ func RemoteAlbum(mb_s string) ([]Group, error) {
    q.Set("type", "album")
    remote_a, remote_m := []Group{}, map[string]int{}
    for {
-      url_s := "https://musicbrainz.org/ws/2/release?" + q.Encode()
-      fmt.Println(url_s)
-      o, e := http.Get(url_s)
-      if e != nil {
-         return nil, e
-      }
-      json_m := winter.Map{}
-      e = json.NewDecoder(o.Body).Decode(&json_m)
+      url := "https://musicbrainz.org/ws/2/release?" + q.Encode()
+      json_m, e := winter.JsonGetHttp(url)
       if e != nil {
          return nil, e
       }

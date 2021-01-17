@@ -1,52 +1,38 @@
 package musicbrainz
 
 import (
-   "encoding/json"
-   "net/http"
    "net/url"
    "sort"
    "winter"
 )
 
-const API = "https://musicbrainz.org/ws/2/release"
+const api = "https://musicbrainz.org/ws/2/release"
 
 type MB struct {
    ID string
    Query url.Values
 }
 
-func New(mbid_s string) MB {
-   m := url.Values{}
-   m.Set("fmt", "json")
-   m.Set("inc", "artist-credits recordings")
-   return MB{mbid_s, m}
+func New(mbid string) MB {
+   query := url.Values{}
+   query.Set("fmt", "json")
+   query.Set("inc", "artist-credits recordings")
+   return MB{mbid, query}
 }
 
 func (this MB) Group() (winter.Slice, error) {
    this.Query.Set("release-group", this.ID)
-   url_s := API + "?" + this.Query.Encode()
-   println(url_s)
-   o, e := http.Get(url_s)
+   url := api + "?" + this.Query.Encode()
+   m, e := winter.JsonGetHttp(url)
    if e != nil {
       return nil, e
    }
-   json_m := winter.Map{}
-   e = json.NewDecoder(o.Body).Decode(&json_m)
-   if e != nil {
-      return nil, e
-   }
-   return json_m.A("releases"), nil
+   return m.A("releases"), nil
 }
 
 func (this MB) Release() (winter.Map, error) {
-   url_s := API + "/" + this.ID + "?" + this.Query.Encode()
-   println(url_s)
-   o, e := http.Get(url_s)
-   if e != nil {
-      return nil, e
-   }
-   m := winter.Map{}
-   return m, json.NewDecoder(o.Body).Decode(&m)
+   url := api + "/" + this.ID + "?" + this.Query.Encode()
+   return winter.JsonGetHttp(url)
 }
 
 func Status(m winter.Map) int {

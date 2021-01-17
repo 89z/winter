@@ -1,7 +1,6 @@
 package youtube
 
 import (
-   "encoding/json"
    "fmt"
    "io/ioutil"
    "math"
@@ -11,6 +10,14 @@ import (
    "time"
    "winter"
 )
+
+func Color(n float64) (string, bool) {
+   s := numberFormat(n)
+   if n > 8_000_000 {
+      return "\x1b[1;31m" + s + "\x1b[m", true
+   }
+   return "\x1b[1;32m" + s + "\x1b[m", false
+}
 
 func floatVal(s string) (float64, error) {
    return strconv.ParseFloat(s, 64)
@@ -29,37 +36,28 @@ func getContents(s string) (string, error) {
    return string(y), nil
 }
 
+func Info(id string) (winter.Map, error) {
+   info := "https://www.youtube.com/get_video_info?video_id=" + id
+   query, e := getContents(info)
+   if e != nil {
+      return nil, e
+   }
+   o, e := url.ParseQuery(query)
+   if e != nil {
+      return nil, e
+   }
+   resp := o.Get("player_response")
+   m, e := winter.JsonGetString(resp)
+   if e != nil {
+      return nil, e
+   }
+   return m.M("microformat").M("playerMicroformatRenderer"), nil
+}
+
 func numberFormat(n float64) string {
    n2 := int(math.Log10(n)) / 3
    n3 := n / math.Pow10(n2 * 3)
    return fmt.Sprintf("%.3f", n3) + []string{"", " k", " M", " B"}[n2]
-}
-
-func Color(n float64) (string, bool) {
-   s := numberFormat(n)
-   if n > 8_000_000 {
-      return "\x1b[1;31m" + s + "\x1b[m", true
-   }
-   return "\x1b[1;32m" + s + "\x1b[m", false
-}
-
-func Info(id_s string) (winter.Map, error) {
-   info_s := "https://www.youtube.com/get_video_info?video_id=" + id_s
-   query_s, e := getContents(info_s)
-   if e != nil {
-      return nil, e
-   }
-   o, e := url.ParseQuery(query_s)
-   if e != nil {
-      return nil, e
-   }
-   resp_s := o.Get("player_response")
-   json_m := winter.Map{}
-   e = json.Unmarshal([]byte(resp_s), &json_m)
-   if e != nil {
-      return nil, e
-   }
-   return json_m.M("microformat").M("playerMicroformatRenderer"), nil
 }
 
 func sinceHours(left string) (float64, error) {
