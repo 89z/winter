@@ -23,17 +23,18 @@ func note(r row, song_m map[string]int) (string, string) {
    return yellow + "%6v", ""
 }
 
-func selectOne(tx *sql.Tx, artist_s string) error {
+func selectOne(tx *sql.Tx, like string) error {
    // ARTIST
    var (
       artist_n int
+      artist_s string
       check_s string
       mb_s string
    )
    e := tx.QueryRow(
-      "select artist_n, check_s, mb_s from artist_t where artist_s LIKE ?",
-      artist_s,
-   ).Scan(&artist_n, &check_s, &mb_s)
+      "select * from artist_t where artist_s LIKE ?",
+      like,
+   ).Scan(&artist_n, &artist_s, &check_s, &mb_s)
    if e != nil {
       return e
    }
@@ -53,7 +54,7 @@ func selectOne(tx *sql.Tx, artist_s string) error {
       NATURAL JOIN artist_t
       WHERE artist_s LIKE ?
       ORDER BY date_s
-      `, artist_s,
+      `, like,
    )
    if e != nil {
       return e
@@ -91,6 +92,8 @@ func selectOne(tx *sql.Tx, artist_s string) error {
    defer pipe.Close()
    // print artist number
    fmt.Fprintln(pipe, "artist_n |", artist_n)
+   // print artist name
+   fmt.Fprintln(pipe, "artist_s |", artist_s)
    // print artist check
    if check_s != "" {
       fmt.Fprintln(pipe, "check_s  |", check_s)

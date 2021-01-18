@@ -6,9 +6,9 @@ import (
    "winter"
 )
 
-var offset_n float64
+var offset float64
 
-func RemoteAlbum(mb_s string) ([]Group, error) {
+func remoteAlbum(mb_s string) ([]group, error) {
    q := url.Values{}
    q.Set("artist", mb_s)
    q.Set("fmt", "json")
@@ -16,7 +16,7 @@ func RemoteAlbum(mb_s string) ([]Group, error) {
    q.Set("limit", "100")
    q.Set("status", "official")
    q.Set("type", "album")
-   remote_a, remote_m := []Group{}, map[string]int{}
+   remote_a, remote_m := []group{}, map[string]int{}
    for {
       url := "https://musicbrainz.org/ws/2/release?" + q.Encode()
       json_m, e := winter.JsonGetHttp(url)
@@ -38,27 +38,27 @@ func RemoteAlbum(mb_s string) ([]Group, error) {
          if len(second_a) > 0 {
             continue
          }
-         id_s := group_m.S("id")
-         index_n, b := remote_m[id_s]
+         id := group_m.S("id")
+         index_n, b := remote_m[id]
          release_s := release_m.S("title")
          if b {
             // add release to group
-            remote_a[index_n].Release[release_s] = true
+            remote_a[index_n].release[release_s] = true
          } else {
             // add group
-            remote_a = append(remote_a, Group{
-               Date: group_m.S("first-release-date"),
-               Release: map[string]bool{release_s: true},
-               Title: group_m.S("title"),
+            remote_a = append(remote_a, group{
+               date: group_m.S("first-release-date"),
+               release: map[string]bool{release_s: true},
+               title: group_m.S("title"),
             })
-            remote_m[id_s] = len(remote_a) - 1
+            remote_m[id] = len(remote_a) - 1
          }
       }
-      offset_n += 100
-      if offset_n >= json_m.N("release-count") {
+      offset += 100
+      if offset >= json_m.N("release-count") {
          break
       }
-      q.Set("offset", fmt.Sprint(offset_n))
+      q.Set("offset", fmt.Sprint(offset))
    }
    return remote_a, nil
 }
@@ -70,9 +70,9 @@ the remote Release titles to match against the local Release titles.
 
 For the date, if we have a local match, use that date. Otherwise, use use the
 remote Group date */
-type Group struct {
-   Color string
-   Date string
-   Release map[string]bool
-   Title string
+type group struct {
+   color string
+   date string
+   release map[string]bool
+   title string
 }

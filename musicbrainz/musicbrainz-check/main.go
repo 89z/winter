@@ -37,10 +37,10 @@ func main() {
    if mb_s == "" {
       log.Fatal("mb_s missing")
    }
-   remote_a, e := RemoteAlbum(mb_s)
+   remote_a, e := remoteAlbum(mb_s)
    check(e)
    for n, group := range remote_a {
-      for release_s := range group.Release {
+      for release_s := range group.release {
          local_o, b := local_m[strings.ToUpper(release_s)]
          if b {
             remote_a[n].date = local_o.date
