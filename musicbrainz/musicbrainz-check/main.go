@@ -52,8 +52,6 @@ func main() {
       return remote_a[n].date < remote_a[n2].date
    })
    for _, group := range remote_a {
-      fmt.Printf(
-         "%-10v | %40.40v | %v\n", group.date, group.title, group.color,
-      )
+      fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
    }
 }
