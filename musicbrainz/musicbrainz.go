@@ -1,7 +1,7 @@
 package musicbrainz
 
 import (
-   "github.com/89z/sienna/json"
+   "github.com/89z/json"
    "net/url"
    "sort"
 )

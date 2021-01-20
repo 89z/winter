@@ -3,7 +3,7 @@ package main
 import (
    "database/sql"
    "fmt"
-   "github.com/89z/sienna/json"
+   "github.com/89z/json"
    "os"
    "path"
    "strings"

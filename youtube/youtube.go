@@ -2,7 +2,7 @@ package youtube
 
 import (
    "fmt"
-   "github.com/89z/sienna/json"
+   "github.com/89z/json"
    "io/ioutil"
    "math"
    "net/http"

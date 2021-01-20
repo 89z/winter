@@ -1,7 +1,7 @@
 package main
 
 import (
-   "encoding/json"
+   "github.com/89z/json"
    "log"
    "net/url"
    "os"
@@ -9,7 +9,6 @@ import (
    "strconv"
    "strings"
    "time"
-   "winter"
    "winter/youtube"
 )
 
@@ -61,8 +60,8 @@ func main() {
    // image
    image_s := getImage(id)
    // print
-   rec_a := winter.Slice{date_s, year_n, "y/" + id + image_s, title_s}
-   rec_y, e := json.Marshal(rec_a)
+   rec_a := json.Slice{date_s, year_n, "y/" + id + image_s, title_s}
+   rec_y, e := json.Dump(rec_a)
    check(e)
    rec_y = append(rec_y, ',', '\n')
    os.Stdout.Write(rec_y)

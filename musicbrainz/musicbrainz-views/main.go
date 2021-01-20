@@ -1,7 +1,7 @@
 package main
 
 import (
-   "github.com/89z/sienna/json"
+   "github.com/89z/json"
    "os"
    "path"
    "strings"
@@ -55,7 +55,6 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
          println(color_s)
          if b {
             print("youtube.com/watch?v=", ytid, "\n")
-            return
          }
          time.Sleep(500 * time.Millisecond)
       }

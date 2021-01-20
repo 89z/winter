@@ -1,7 +1,7 @@
 package main
 
 import (
-   "github.com/89z/sienna/json"
+   "github.com/89z/json"
    "log"
    "time"
 )
