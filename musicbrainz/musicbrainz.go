@@ -1,12 +1,12 @@
 package musicbrainz
 
 import (
+   "github.com/89z/sienna/json"
    "net/url"
    "sort"
-   "winter"
 )
 
-func date(m winter.Map, width int) string {
+func date(m json.Map, width int) string {
    left := ""
    if m["date"] != nil {
       left = m.S("date")
@@ -16,28 +16,28 @@ func date(m winter.Map, width int) string {
    return (left + right)[:width]
 }
 
-func Group(id string) (winter.Slice, error) {
+func Group(id string) (json.Slice, error) {
    q := url.Values{}
    q.Set("fmt", "json")
    q.Set("inc", "artist-credits recordings")
    q.Set("release-group", id)
    url := "https://musicbrainz.org/ws/2/release?" + q.Encode()
-   m, e := winter.JsonGetHttp(url)
+   m, e := json.LoadHttp(url)
    if e != nil {
       return nil, e
    }
    return m.A("releases"), nil
 }
 
-func Release(id string) (winter.Map, error) {
+func Release(id string) (json.Map, error) {
    q := url.Values{}
    q.Set("fmt", "json")
    q.Set("inc", "artist-credits recordings")
    url := "https://musicbrainz.org/ws/2/release/" + id + "?" + q.Encode()
-   return winter.JsonGetHttp(url)
+   return json.LoadHttp(url)
 }
 
-func Sort(a winter.Slice) {
+func Sort(a json.Slice) {
    sort.Slice(a, func (first, second int) bool {
       first_m, second_m := a.M(first), a.M(second)
       // 1. STATUS
@@ -66,7 +66,7 @@ func Sort(a winter.Slice) {
    })
 }
 
-func status(m winter.Map) int {
+func status(m json.Map) int {
    if m["status"] == nil {
       return 0
    }
@@ -76,7 +76,7 @@ func status(m winter.Map) int {
    return 1
 }
 
-func trackLen(m winter.Map) float64 {
+func trackLen(m json.Map) float64 {
    var track_n float64
    a := m.A("media")
    for n := range a {

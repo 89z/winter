@@ -62,8 +62,8 @@ func main() {
    image_s := getImage(id)
    // print
    rec_a := winter.Slice{date_s, year_n, "y/" + id + image_s, title_s}
-   json_y, e := json.Marshal(rec_a)
+   rec_y, e := json.Marshal(rec_a)
    check(e)
-   json_y = append(json_y, ',', '\n')
-   os.Stdout.Write(json_y)
+   rec_y = append(rec_y, ',', '\n')
+   os.Stdout.Write(rec_y)
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
+   "github.com/89z/sienna/json"
    "log"
    "time"
-   "winter"
 )
 
 func check(e error) {
@@ -12,7 +12,7 @@ func check(e error) {
    }
 }
 
-func note(m winter.Map) string {
+func note(m json.Map) string {
    if m["length"] == nil {
       return "?:??"
    }

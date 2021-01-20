@@ -2,13 +2,13 @@ package youtube
 
 import (
    "fmt"
+   "github.com/89z/sienna/json"
    "io/ioutil"
    "math"
    "net/http"
    "net/url"
    "strconv"
    "time"
-   "winter"
 )
 
 func Color(n float64) (string, bool) {
@@ -36,18 +36,18 @@ func getContents(s string) (string, error) {
    return string(y), nil
 }
 
-func Info(id string) (winter.Map, error) {
+func Info(id string) (json.Map, error) {
    info := "https://www.youtube.com/get_video_info?video_id=" + id
    query, e := getContents(info)
    if e != nil {
       return nil, e
    }
-   o, e := url.ParseQuery(query)
+   v, e := url.ParseQuery(query)
    if e != nil {
       return nil, e
    }
-   resp := o.Get("player_response")
-   m, e := winter.JsonGetString(resp)
+   resp := v.Get("player_response")
+   m, e := json.Load(resp)
    if e != nil {
       return nil, e
    }
@@ -69,7 +69,7 @@ func sinceHours(left string) (float64, error) {
    return time.Since(o).Hours(), nil
 }
 
-func Views(m winter.Map) (float64, error) {
+func Views(m json.Map) (float64, error) {
    view_s := m.S("viewCount")
    view_n, e := floatVal(view_s)
    if e != nil {

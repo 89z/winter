@@ -2,8 +2,8 @@ package main
 
 import (
    "fmt"
+   "github.com/89z/sienna/json"
    "net/url"
-   "winter"
 )
 
 var offset float64
@@ -19,11 +19,11 @@ func remoteAlbum(mb_s string) ([]group, error) {
    remote_a, remote_m := []group{}, map[string]int{}
    for {
       url := "https://musicbrainz.org/ws/2/release?" + q.Encode()
-      json_m, e := winter.JsonGetHttp(url)
+      mb, e := json.LoadHttp(url)
       if e != nil {
          return nil, e
       }
-      release_a := json_m.A("releases")
+      release_a := mb.A("releases")
       for n := range release_a {
          release_m := release_a.M(n)
          group_m := release_m.M("release-group")
@@ -55,7 +55,7 @@ func remoteAlbum(mb_s string) ([]group, error) {
          }
       }
       offset += 100
-      if offset >= json_m.N("release-count") {
+      if offset >= mb.N("release-count") {
          break
       }
       q.Set("offset", fmt.Sprint(offset))

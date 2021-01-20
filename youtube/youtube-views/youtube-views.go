@@ -1,31 +1,8 @@
 package main
+import "log"
 
-import (
-   "log"
-   "net/url"
-   "os"
-   "winter/youtube"
-)
-
-func main() {
-   if len(os.Args) != 2 {
-      println("youtube-views <URL>")
-      os.Exit(1)
-   }
-   url_s := os.Args[1]
-   o, e := url.Parse(url_s)
+func check(e error) {
    if e != nil {
       log.Fatal(e)
    }
-   id_s := o.Query().Get("v")
-   m, e := youtube.Info(id_s)
-   if e != nil {
-      log.Fatal(e)
-   }
-   view_n, e := youtube.Views(m)
-   if e != nil {
-      log.Fatal(e)
-   }
-   color_s, _ := youtube.Color(view_n)
-   println(color_s)
 }
