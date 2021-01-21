@@ -1,7 +1,8 @@
 package main
 
 import (
-   "github.com/89z/json"
+   "github.com/89z/x"
+   "github.com/89z/x/json"
    "log"
    "net/url"
    "os"
@@ -60,7 +61,7 @@ func main() {
    // image
    image_s := getImage(id)
    // print
-   rec_a := json.Slice{date_s, year_n, "y/" + id + image_s, title_s}
+   rec_a := x.Slice{date_s, year_n, "y/" + id + image_s, title_s}
    rec_y, e := json.Dump(rec_a)
    check(e)
    rec_y = append(rec_y, ',', '\n')

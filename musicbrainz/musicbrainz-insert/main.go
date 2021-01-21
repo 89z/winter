@@ -3,7 +3,7 @@ package main
 import (
    "database/sql"
    "fmt"
-   "github.com/89z/json"
+   "github.com/89z/x"
    "os"
    "path"
    "strings"
@@ -23,7 +23,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    }
    url := os.Args[1]
    id := path.Base(url)
-   var album json.Map
+   var album x.Map
    if strings.Contains(url, "release-group") {
       albums, e := musicbrainz.Group(id)
       check(e)

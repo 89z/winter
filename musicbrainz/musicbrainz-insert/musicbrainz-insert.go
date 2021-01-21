@@ -1,7 +1,7 @@
 package main
 
 import (
-   "github.com/89z/json"
+   "github.com/89z/x"
    "log"
    "time"
 )
@@ -12,7 +12,7 @@ func check(e error) {
    }
 }
 
-func note(m json.Map) string {
+func note(m x.Map) string {
    if m["length"] == nil {
       return "?:??"
    }

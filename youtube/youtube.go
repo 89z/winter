@@ -2,7 +2,8 @@ package youtube
 
 import (
    "fmt"
-   "github.com/89z/json"
+   "github.com/89z/x"
+   "github.com/89z/x/json"
    "io/ioutil"
    "math"
    "net/http"
@@ -36,7 +37,7 @@ func getContents(s string) (string, error) {
    return string(y), nil
 }
 
-func Info(id string) (json.Map, error) {
+func Info(id string) (x.Map, error) {
    info := "https://www.youtube.com/get_video_info?video_id=" + id
    query, e := getContents(info)
    if e != nil {
@@ -69,7 +70,7 @@ func sinceHours(left string) (float64, error) {
    return time.Since(o).Hours(), nil
 }
 
-func Views(m json.Map) (float64, error) {
+func Views(m x.Map) (float64, error) {
    view_s := m.S("viewCount")
    view_n, e := floatVal(view_s)
    if e != nil {

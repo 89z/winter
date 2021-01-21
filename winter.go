@@ -3,7 +3,12 @@ package winter
 import (
    "database/sql"
    "fmt"
+   "strings"
 )
+
+func Pop(s string) bool {
+   return strings.HasPrefix(s, "youtube.com/watch?")
+}
 
 func Delete(tx *sql.Tx, query string, args ...interface{}) error {
    fmt.Println(args)

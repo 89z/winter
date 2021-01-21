@@ -1,7 +1,7 @@
 package main
 
 import (
-   "github.com/89z/json"
+   "github.com/89z/x"
    "os"
    "path"
    "strings"
@@ -22,7 +22,7 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
    }
    url := os.Args[1]
    mbid := path.Base(url)
-   album := json.Map{}
+   album := x.Map{}
    if strings.Contains(url, "release-group") {
       albums, e := musicbrainz.Group(mbid)
       check(e)

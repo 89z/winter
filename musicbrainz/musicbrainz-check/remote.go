@@ -2,7 +2,7 @@ package main
 
 import (
    "fmt"
-   "github.com/89z/json"
+   "github.com/89z/x/json"
    "net/url"
 )
 
