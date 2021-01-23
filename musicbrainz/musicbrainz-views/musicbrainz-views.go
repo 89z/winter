@@ -14,6 +14,14 @@ func check(e error) {
    }
 }
 
+func findSubmatch(re string, input []byte) string {
+   a := regexp.MustCompile(re).FindSubmatch(input)
+   if len(a) < 2 {
+      return ""
+   }
+   return string(a[1])
+}
+
 func getContents(s string) ([]byte, error) {
    o, e := http.Get(s)
    if e != nil {
@@ -22,23 +30,14 @@ func getContents(s string) ([]byte, error) {
    return ioutil.ReadAll(o.Body)
 }
 
-func findSubmatch(pat string, sub []byte) []byte {
-   a := regexp.MustCompile(pat).FindSubmatch(sub)
-   if len(a) < 2 {
-      return []byte{}
-   }
-   return a[1]
-}
-
-func youtubeResult(query_s string) (string, error) {
-   m := url.Values{}
-   m.Set("search_query", query_s)
-   res_s := "https://www.youtube.com/results?" + m.Encode()
-   println(res_s)
-   get_y, e := getContents(res_s)
+func youtubeResult(query string) (string, error) {
+   value := url.Values{}
+   value.Set("search_query", query)
+   result := "https://www.youtube.com/results?" + value.Encode()
+   println(result)
+   get, e := getContents(result)
    if e != nil {
       return "", e
    }
-   find_y := findSubmatch("/vi/([^/]*)/", get_y)
-   return string(find_y), nil
+   return findSubmatch("/vi/([^/]*)/", get), nil
 }

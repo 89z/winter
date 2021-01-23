@@ -12,8 +12,8 @@ func check(e error) {
    }
 }
 
-func findSubmatch(pat, sub string) string {
-   a := regexp.MustCompile(pat).FindStringSubmatch(sub)
+func findSubmatch(re, input string) string {
+   a := regexp.MustCompile(re).FindStringSubmatch(input)
    if len(a) < 2 {
       return ""
    }
@@ -31,8 +31,8 @@ func getImage(id_s string) string {
    return "/hqdefault"
 }
 
-func httpHead(s string) bool {
-   println(s)
-   o, e := http.Head(s)
-   return e == nil && o.StatusCode == 200
+func httpHead(url string) bool {
+   println(url)
+   resp, e := http.Head(url)
+   return e == nil && resp.StatusCode == 200
 }

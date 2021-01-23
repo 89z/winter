@@ -28,7 +28,7 @@ func main() {
    if info_m["description"] == nil {
       log.Fatal("Clapham Junction")
    }
-   desc_s := info_m.M("description").S("simpleText")
+   desc := info_m.M("description").S("simpleText")
    year_s := info_m.S("publishDate")[:4]
    /* the order doesnt matter here, as we will find the lowest date of all
    matches */
@@ -36,7 +36,7 @@ func main() {
       ` (\d{4})`, `(\d{4}) `, `Released on: (\d{4})`, `℗ (\d{4})`,
    }
    for _, reg_s := range reg_a {
-      mat_s := findSubmatch(reg_s, desc_s)
+      mat_s := findSubmatch(reg_s, desc)
       if mat_s == "" {
          continue
       }
@@ -49,9 +49,9 @@ func main() {
    check(e)
    // song, artist
    title_s := info_m.M("title").S("simpleText")
-   line_s := regexp.MustCompile(".* · .*").FindString(desc_s)
-   if line_s != "" {
-      title_a := strings.Split(line_s, " · ")
+   line := regexp.MustCompile(".* · .*").FindString(desc)
+   if line != "" {
+      title_a := strings.Split(line, " · ")
       artist_a := title_a[1:]
       title_s = strings.Join(artist_a, ", ") + " - " + title_a[0]
    }
