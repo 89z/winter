@@ -6,12 +6,6 @@ import (
    "time"
 )
 
-func check(e error) {
-   if e != nil {
-      log.Fatal(e)
-   }
-}
-
 func note(m x.Map) string {
    if m["length"] == nil {
       return "?:??"

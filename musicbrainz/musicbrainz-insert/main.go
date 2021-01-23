@@ -4,6 +4,7 @@ import (
    "database/sql"
    "fmt"
    "github.com/89z/x"
+   "log"
    "os"
    "path"
    "strings"
@@ -26,21 +27,29 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    var album x.Map
    if strings.Contains(url, "release-group") {
       albums, e := musicbrainz.Group(id)
-      check(e)
+      if e != nil {
+         log.Fatal(e)
+      }
       musicbrainz.Sort(albums)
       album = albums.M(0)
    } else {
       var e error
       album, e = musicbrainz.Release(id)
-      check(e)
+      if e != nil {
+         log.Fatal(e)
+      }
    }
    album_s := album.S("title")
    date_s := album.S("date")
    winter_s := os.Getenv("WINTER")
    db, e := sql.Open("sqlite3", winter_s)
-   check(e)
+   if e != nil {
+      log.Fatal(e)
+   }
    tx, e := db.Begin()
-   check(e)
+   if e != nil {
+      log.Fatal(e)
+   }
    // ALBUM
    album_n, e := winter.Insert(
       tx,
@@ -48,28 +57,32 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       album_s,
       date_s,
    )
-   check(e)
+   if e != nil {
+      log.Fatal(e)
+   }
    var (
       artist_n int
       artists []int
       songs []song
    )
    // CREATE ARTIST ARRAY
-   credit_a := album.A("artist-credit")
-   for n := range credit_a {
+   credit := album.A("artist-credit")
+   for n := range credit {
       // Chicago, Chicago Transit Authority
-      name_s := credit_a.M(n).M("artist").S("name")
-      query_o := tx.QueryRow(
-         "select artist_n from artist_t where artist_s = ?", name_s,
+      name := credit.M(n).M("artist").S("name")
+      query := tx.QueryRow(
+         "select artist_n from artist_t where artist_s = ?", name,
       )
-      e = query_o.Scan(&artist_n)
-      check(e)
+      e = query.Scan(&artist_n)
+      if e != nil {
+         log.Fatal(e)
+      }
       artists = append(artists, artist_n)
    }
    // CREATE SONG ARRAY
-   media_a := album.A("media")
-   for n := range media_a {
-      track_a := media_a.M(n).A("tracks")
+   media := album.A("media")
+   for n := range media {
+      track_a := media.M(n).A("tracks")
       for n := range track_a {
          track_m := track_a.M(n)
          song_s := track_m.S("title")
@@ -86,15 +99,21 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          song_o.note,
          album_n,
       )
-      check(e)
+      if e != nil {
+         log.Fatal(e)
+      }
       // ITERATE ARTIST ARRAY
       for _, artist_n := range artists {
          _, e = winter.Insert(
             tx, "song_artist_t values (?, ?)", song_n, artist_n,
          )
-         check(e)
+         if e != nil {
+            log.Fatal(e)
+         }
       }
    }
    e = tx.Commit()
-   check(e)
+   if e != nil {
+      log.Fatal(e)
+   }
 }

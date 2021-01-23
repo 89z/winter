@@ -17,27 +17,6 @@ func date(m x.Map, width int) string {
    return (left + right)[:width]
 }
 
-func Group(id string) (x.Slice, error) {
-   q := url.Values{}
-   q.Set("fmt", "json")
-   q.Set("inc", "artist-credits recordings")
-   q.Set("release-group", id)
-   url := "https://musicbrainz.org/ws/2/release?" + q.Encode()
-   m, e := json.LoadHttp(url)
-   if e != nil {
-      return nil, e
-   }
-   return m.A("releases"), nil
-}
-
-func Release(id string) (x.Map, error) {
-   q := url.Values{}
-   q.Set("fmt", "json")
-   q.Set("inc", "artist-credits recordings")
-   url := "https://musicbrainz.org/ws/2/release/" + id + "?" + q.Encode()
-   return json.LoadHttp(url)
-}
-
 func Sort(a x.Slice) {
    sort.Slice(a, func (first, second int) bool {
       first_m, second_m := a.M(first), a.M(second)
