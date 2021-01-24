@@ -3,8 +3,8 @@ package main
 import (
    "database/sql"
    "fmt"
+   "github.com/89z/winter"
    "strings"
-   "winter"
 )
 
 const (

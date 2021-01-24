@@ -2,7 +2,7 @@ package main
 
 import (
    "database/sql"
-   "winter"
+   "github.com/89z/winter"
 )
 
 func copyAlbum(tx *sql.Tx, source , dest string) error {

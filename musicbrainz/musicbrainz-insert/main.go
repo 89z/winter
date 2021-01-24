@@ -3,10 +3,10 @@ package main
 import (
    "database/sql"
    "fmt"
+   "github.com/89z/winter"
+   "github.com/89z/winter/musicbrainz"
    "log"
    "os"
-   "winter"
-   "winter/musicbrainz"
    _ "github.com/mattn/go-sqlite3"
 )
 

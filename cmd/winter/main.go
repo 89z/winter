@@ -2,9 +2,9 @@ package main
 
 import (
    "database/sql"
+   "github.com/89z/winter"
    "log"
    "os"
-   "winter"
    _ "github.com/mattn/go-sqlite3"
 )
 

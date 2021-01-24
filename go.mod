@@ -1,8 +1,8 @@
-module winter
+module github.com/89z/winter
 
 go 1.15
 
 require (
-	github.com/89z/x v1.1.7
+	github.com/89z/x v1.2.1
 	github.com/mattn/go-sqlite3 v1.14.6
 )

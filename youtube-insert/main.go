@@ -2,7 +2,7 @@ package main
 
 import (
    "encoding/json"
-   "github.com/89z/x"
+   "github.com/89z/winter/youtube"
    "log"
    "net/url"
    "os"
@@ -10,7 +10,6 @@ import (
    "strconv"
    "strings"
    "time"
-   "winter/youtube"
 )
 
 func main() {
@@ -61,7 +60,7 @@ func main() {
    // image
    image_s := getImage(id)
    // print
-   rec_a := x.Slice{date_s, year_n, "y/" + id + image_s, title_s}
+   rec_a := []interface{}{date_s, year_n, "y/" + id + image_s, title_s}
    rec, e := json.Marshal(rec_a)
    check(e)
    rec = append(rec, ',', '\n')

@@ -1,11 +1,11 @@
 package main
 
 import (
+   "github.com/89z/winter/musicbrainz"
+   "github.com/89z/winter/youtube"
    "os"
    "strings"
    "time"
-   "winter/musicbrainz"
-   "winter/youtube"
 )
 
 func main() {
