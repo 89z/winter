@@ -4,26 +4,26 @@ import (
    "github.com/89z/x"
    "github.com/89z/x/json"
    "net/url"
-   "sort"
+   "path"
+   "strings"
 )
 
-func Group(id string) (x.Slice, error) {
-   q := url.Values{}
-   q.Set("fmt", "json")
-   q.Set("inc", "artist-credits recordings")
-   q.Set("release-group", id)
-   url := "https://musicbrainz.org/ws/2/release?" + q.Encode()
-   group, e := json.LoadHttp(url)
+func Release(in string) (x.Map, error) {
+   id := path.Base(in)
+   v := url.Values{}
+   v.Set("fmt", "json")
+   v.Set("inc", "artist-credits recordings")
+   if strings.Contains(in, "/release/") {
+      out := "https://musicbrainz.org/ws/2/release/" + id + "?" + v.Encode()
+      return json.LoadHttp(out)
+   }
+   v.Set("release-group", id)
+   out := "https://musicbrainz.org/ws/2/release?" + v.Encode()
+   group, e := json.LoadHttp(out)
    if e != nil {
       return nil, e
    }
-   return group.A("releases"), nil
-}
-
-func Release(id string) (x.Map, error) {
-   q := url.Values{}
-   q.Set("fmt", "json")
-   q.Set("inc", "artist-credits recordings")
-   url := "https://musicbrainz.org/ws/2/release/" + id + "?" + q.Encode()
-   return json.LoadHttp(url)
+   albums := group.A("releases")
+   Sort(albums)
+   return albums.M(0), nil
 }

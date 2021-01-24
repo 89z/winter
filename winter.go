@@ -11,13 +11,13 @@ func Pop(s string) bool {
 }
 
 func Delete(tx *sql.Tx, query string, args ...interface{}) error {
-   fmt.Println("delete from", query, args)
+   fmt.Println("delete", args)
    _, e := tx.Exec("delete from " + query, args...)
    return e
 }
 
 func Insert(tx *sql.Tx, query string, args ...interface{}) (int64, error) {
-   fmt.Println("insert into", query, args)
+   fmt.Println("insert", args)
    res, e := tx.Exec("insert into " + query, args...)
    if e != nil {
       return 0, e
@@ -26,7 +26,7 @@ func Insert(tx *sql.Tx, query string, args ...interface{}) (int64, error) {
 }
 
 func Update(tx *sql.Tx, query string, args ...interface{}) error {
-   fmt.Println("update", query, args)
+   fmt.Println("update", args)
    _, e := tx.Exec("update " + query, args...)
    return e
 }

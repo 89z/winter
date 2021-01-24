@@ -3,11 +3,8 @@ package main
 import (
    "database/sql"
    "fmt"
-   "github.com/89z/x"
    "log"
    "os"
-   "path"
-   "strings"
    "winter"
    "winter/musicbrainz"
    _ "github.com/mattn/go-sqlite3"
@@ -23,21 +20,9 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       os.Exit(1)
    }
    url := os.Args[1]
-   id := path.Base(url)
-   var album x.Map
-   if strings.Contains(url, "release-group") {
-      albums, e := musicbrainz.Group(id)
-      if e != nil {
-         log.Fatal(e)
-      }
-      musicbrainz.Sort(albums)
-      album = albums.M(0)
-   } else {
-      var e error
-      album, e = musicbrainz.Release(id)
-      if e != nil {
-         log.Fatal(e)
-      }
+   album, e := musicbrainz.Release(url)
+   if e != nil {
+      log.Fatal(e)
    }
    album_s := album.S("title")
    date_s := album.S("date")
@@ -75,7 +60,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       )
       e = query.Scan(&artist_n)
       if e != nil {
-         log.Fatal(e)
+         log.Fatalln(name, e)
       }
       artists = append(artists, artist_n)
    }

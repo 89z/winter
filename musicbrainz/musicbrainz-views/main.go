@@ -1,9 +1,7 @@
 package main
 
 import (
-   "github.com/89z/x"
    "os"
-   "path"
    "strings"
    "time"
    "winter/musicbrainz"
@@ -21,18 +19,8 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
       os.Exit(1)
    }
    url := os.Args[1]
-   mbid := path.Base(url)
-   album := x.Map{}
-   if strings.Contains(url, "release-group") {
-      albums, e := musicbrainz.Group(mbid)
-      check(e)
-      musicbrainz.Sort(albums)
-      album = albums.M(0)
-   } else {
-      var e error
-      album, e = musicbrainz.Release(mbid)
-      check(e)
-   }
+   album, e := musicbrainz.Release(url)
+   check(e)
    out_a := []string{}
    artist_a := album.A("artist-credit")
    for n := range artist_a {

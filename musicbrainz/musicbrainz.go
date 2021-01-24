@@ -2,8 +2,6 @@ package musicbrainz
 
 import (
    "github.com/89z/x"
-   "github.com/89z/x/json"
-   "net/url"
    "sort"
 )
 

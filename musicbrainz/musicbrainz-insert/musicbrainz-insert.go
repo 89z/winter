@@ -2,7 +2,6 @@ package main
 
 import (
    "github.com/89z/x"
-   "log"
    "time"
 )
 

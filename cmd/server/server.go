@@ -25,6 +25,12 @@ func check(err error) {
    }
 }
 
+func main() {
+   http.HandleFunc("/", selectOne)
+   serve := http.Server{}
+   serve.ListenAndServe()
+}
+
 func selectOne(w http.ResponseWriter, r *http.Request) {
    winter_s := os.Getenv("WINTER")
    db, e := sql.Open("sqlite3", winter_s)
