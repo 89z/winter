@@ -1,7 +1,7 @@
 package main
 
 import (
-   "github.com/89z/winter/youtube"
+   "github.com/89z/x/youtube"
    "log"
    "net/url"
    "os"

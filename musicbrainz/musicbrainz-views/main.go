@@ -2,7 +2,8 @@ package main
 
 import (
    "github.com/89z/winter/musicbrainz"
-   "github.com/89z/winter/youtube"
+   "github.com/89z/x"
+   "github.com/89z/x/youtube"
    "os"
    "strings"
    "time"
@@ -20,7 +21,7 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
    }
    url := os.Args[1]
    album, e := musicbrainz.Release(url)
-   check(e)
+   x.Check(e)
    out_a := []string{}
    artist_a := album.A("artist-credit")
    for n := range artist_a {
@@ -34,11 +35,11 @@ https://musicbrainz.org/release/7a629d52-6a61-3ea1-a0a0-dd50bdef63b4`)
       for n := range track_a {
          title_s := track_a.M(n).S("title")
          ytid, e := youtubeResult(artist_s + " " + title_s)
-         check(e)
+         x.Check(e)
          info_m, e := youtube.Info(ytid)
-         check(e)
+         x.Check(e)
          view_n, e := youtube.Views(info_m)
-         check(e)
+         x.Check(e)
          color_s, b := youtube.Color(view_n)
          println(color_s)
          if b {
