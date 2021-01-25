@@ -8,12 +8,6 @@ import (
    "regexp"
 )
 
-func check(e error) {
-   if e != nil {
-      log.Fatal(e)
-   }
-}
-
 func findSubmatch(re string, input []byte) string {
    a := regexp.MustCompile(re).FindSubmatch(input)
    if len(a) < 2 {
@@ -22,20 +16,15 @@ func findSubmatch(re string, input []byte) string {
    return string(a[1])
 }
 
-func getContents(s string) ([]byte, error) {
-   o, e := http.Get(s)
-   if e != nil {
-      return []byte{}, e
-   }
-   return ioutil.ReadAll(o.Body)
-}
-
 func youtubeResult(query string) (string, error) {
    value := url.Values{}
    value.Set("search_query", query)
    result := "https://www.youtube.com/results?" + value.Encode()
-   println(result)
-   get, e := getContents(result)
+   resp, e := http.Get(result)
+   if e != nil {
+      return "", e
+   }
+   get, e := ioutil.ReadAll(resp.Body)
    if e != nil {
       return "", e
    }
