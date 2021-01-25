@@ -1,8 +1,8 @@
 package main
 
 import (
-   "github.com/89z/winter/musicbrainz"
    "github.com/89z/x"
+   "github.com/89z/x/musicbrainz"
    "github.com/89z/x/youtube"
    "os"
    "strings"

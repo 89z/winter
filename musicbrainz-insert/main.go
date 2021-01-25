@@ -4,7 +4,7 @@ import (
    "database/sql"
    "fmt"
    "github.com/89z/winter"
-   "github.com/89z/winter/musicbrainz"
+   "github.com/89z/x/musicbrainz"
    "log"
    "os"
    _ "github.com/mattn/go-sqlite3"
