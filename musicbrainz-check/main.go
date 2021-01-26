@@ -3,18 +3,13 @@ package main
 import (
    "database/sql"
    "fmt"
+   "github.com/89z/x"
    "log"
    "os"
    "sort"
    "strings"
    _ "github.com/mattn/go-sqlite3"
 )
-
-func check(e error) {
-   if e != nil {
-      log.Fatal(e)
-   }
-}
 
 func main() {
    if len(os.Args) != 2 {
@@ -24,21 +19,21 @@ func main() {
    artist_s := os.Args[1]
    winter_s := os.Getenv("WINTER")
    db, e := sql.Open("sqlite3", winter_s)
-   check(e)
+   x.Check(e)
    // local albums
    local_m, e := localAlbum(db, artist_s)
-   check(e)
+   x.Check(e)
    // remote albums
    var mb_s string
    e = db.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", artist_s,
    ).Scan(&mb_s)
-   check(e)
+   x.Check(e)
    if mb_s == "" {
       log.Fatal("mb_s missing")
    }
    remote_a, e := remoteAlbum(mb_s)
-   check(e)
+   x.Check(e)
    for n, group := range remote_a {
       for release_s := range group.release {
          local_o, b := local_m[strings.ToUpper(release_s)]

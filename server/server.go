@@ -2,8 +2,8 @@ package main
 
 import (
    "database/sql"
+   "github.com/89z/x"
    "html/template"
-   "log"
    "net/http"
    "net/url"
    "os"
@@ -19,40 +19,28 @@ const tpl = `
 {{ end }}
 `
 
-func check(err error) {
-   if err != nil {
-      log.Fatal(err)
-   }
-}
-
-func main() {
-   http.HandleFunc("/", selectOne)
-   serve := http.Server{}
-   serve.ListenAndServe()
-}
-
 func selectOne(w http.ResponseWriter, r *http.Request) {
    winter_s := os.Getenv("WINTER")
    db, e := sql.Open("sqlite3", winter_s)
-   check(e)
+   x.Check(e)
    query_o, e := db.Query("select artist_s from artist_t")
-   check(e)
+   x.Check(e)
    var artists []string
    for query_o.Next() {
       var artist string
       e = query_o.Scan(&artist)
-      check(e)
+      x.Check(e)
       artists = append(artists, artist)
    }
    t, e := template.New("webpage").Parse(tpl)
-   check(e)
+   x.Check(e)
    data := page{
       h1: r.URL.Query(),
       h2: time.Now(),
       table: artists,
    }
    e = t.Execute(w, data)
-   check(e)
+   x.Check(e)
 }
 
 type page struct {
