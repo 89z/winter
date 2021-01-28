@@ -39,7 +39,7 @@ func selectOne(tx *sql.Tx, like string) error {
       return e
    }
    // ALBUMS
-   query_o, e := tx.Query(`
+   query, e := tx.Query(`
       SELECT
          album_n,
          album_s,
@@ -61,9 +61,9 @@ func selectOne(tx *sql.Tx, like string) error {
    }
    row_a := []row{}
    song_m := map[string]int{}
-   for query_o.Next() {
+   for query.Next() {
       r := row{}
-      e = query_o.Scan(
+      e = query.Scan(
          &r.albumInt,
          &r.albumStr,
          &r.dateStr,

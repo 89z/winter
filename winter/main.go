@@ -42,8 +42,7 @@ Update song note:
       os.Exit(1)
    }
    key_s := os.Args[1]
-   winter_s := os.Getenv("WINTER")
-   db, e := sql.Open("sqlite3", winter_s)
+   db, e := sql.Open("sqlite3", os.Getenv("WINTER"))
    if e != nil {
       log.Fatal(e)
    }
