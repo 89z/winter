@@ -67,8 +67,3 @@ func localAlbum(db *sql.DB, artist_s string) (map[string]local, error) {
    }
    return local_m, nil
 }
-
-type local struct {
-   color string
-   date string
-}

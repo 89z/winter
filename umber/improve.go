@@ -22,13 +22,13 @@ func main() {
    query, e := db.Query("select artist_s from artist_t")
    x.Check(e)
    var (
-      artist string
-      artists = map[string]bool{}
+      row string
+      table = make(map[string]bool)
    )
    for query.Next() {
-      e = query.Scan(&artist)
+      e = query.Scan(&row)
       x.Check(e)
-      artists[strings.ToUpper(artist)] = true
+      table[strings.ToUpper(row)] = true
    }
    // check JSON
    data, e := ioutil.ReadFile(os.Getenv("UMBER"))
@@ -36,8 +36,9 @@ func main() {
    e = json.Unmarshal(data, &songs)
    x.Check(e)
    for _, each := range songs {
-      artist := strings.Split(each.S, " - ")[0]
-      if ! artists[strings.ToUpper(artist)] {
+      artists := strings.Split(each.S, " - ")[0]
+      artist := strings.Split(artists, ", ")[0]
+      if ! table[strings.ToUpper(artist)] {
          println(artist)
       }
    }
