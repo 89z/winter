@@ -14,7 +14,7 @@ type winterRemote struct{
    title string
 }
 
-type winterLocal struct {
+type winterLocal struct{
    color string
    date string
 }
@@ -23,8 +23,8 @@ type mbRelease struct{
    ReleaseCount int `json:"release-count"`
    Releases []struct{
       Date string
-      ReleaseGroup struct{
-         FirstReleaseDate string `json:"first-release-date"`
+      Group struct{
+         FirstRelease string `json:"first-release-date"`
          Id string
          SecondaryTypes []string `json:"secondary-types"`
          Title string

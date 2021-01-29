@@ -1,14 +1,15 @@
 package main
 
 import (
+   "encoding/json"
    "fmt"
-   "github.com/89z/x/json"
+   "net/http"
    "net/url"
 )
 
-var offset float64
+var offset int
 
-func remoteAlbum(mb_s string) ([]winterGroup, error) {
+func remoteAlbum(mb_s string) ([]winterRemote, error) {
    value := make(url.Values)
    value.Set("artist", mb_s)
    value.Set("fmt", "json")
@@ -16,7 +17,7 @@ func remoteAlbum(mb_s string) ([]winterGroup, error) {
    value.Set("limit", "100")
    value.Set("status", "official")
    value.Set("type", "album")
-   remotes, remote := []winterGroup{}, map[string]int{}
+   remotes, remote := []winterRemote{}, map[string]int{}
    for {
       get, e := http.Get(
          "https://musicbrainz.org/ws/2/release?" + value.Encode(),
@@ -29,37 +30,29 @@ func remoteAlbum(mb_s string) ([]winterGroup, error) {
       if e != nil {
          return nil, e
       }
-      releases := mb.A("releases")
-      for n := range releases {
-         release := releases.M(n)
-         group := release.M("release-group")
-         if release["date"] == nil {
+      for _, release := range mb.Releases {
+         if release.Date == "" {
             continue
          }
-         if release.S("date") == "" {
+         if len(release.Group.SecondaryTypes) > 0 {
             continue
          }
-         if len(group.A("secondary-types")) > 0 {
-            continue
-         }
-         id := group.S("id")
-         release_s := release.S("title")
-         index_n, b := remote[id]
+         index, b := remote[release.Group.Id]
          if b {
             // add release to group
-            remotes[index_n].release[release_s] = true
+            remotes[index].release[release.Title] = true
          } else {
             // add group
-            remotes = append(remotes, winterGroup{
-               date: group.S("first-release-date"),
-               release: map[string]bool{release_s: true},
-               title: group.S("title"),
+            remotes = append(remotes, winterRemote{
+               date: release.Group.FirstRelease,
+               release: map[string]bool{release.Title: true},
+               title: release.Group.Title,
             })
-            remote[id] = len(remotes) - 1
+            remote[release.Group.Id] = len(remotes) - 1
          }
       }
       offset += 100
-      if offset >= mb.N("release-count") {
+      if offset >= mb.ReleaseCount {
          break
       }
       value.Set("offset", fmt.Sprint(offset))

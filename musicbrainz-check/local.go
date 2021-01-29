@@ -8,29 +8,29 @@ import (
 
 const (
    block = "\u2587\u2587\u2587\u2587\u2587"
-   green_10 = "\x1b[92m" + block + block + "\x1b[m"
-   green_5 = "\x1b[92m" + block + "\x1b[90m" + block + "\x1b[m"
-   red_10 = "\x1b[91m" + block + block + "\x1b[m"
-   red_5 = "\x1b[91m" + block + "\x1b[90m" + block + "\x1b[m"
+   greenFive = "\x1b[92m" + block + "\x1b[90m" + block + "\x1b[m"
+   greenTen = "\x1b[92m" + block + block + "\x1b[m"
+   redFive = "\x1b[91m" + block + "\x1b[90m" + block + "\x1b[m"
+   redTen = "\x1b[91m" + block + block + "\x1b[m"
 )
 
-func color(url_s string, unrated_n, good_n int) string {
-   if winter.Pop(url_s) {
-      return green_10
+func color(url string, unrated, good int) string {
+   if winter.Pop(url) {
+      return greenTen
    }
-   if unrated_n == 0 && good_n == 0 {
-      return red_10
+   if unrated == 0 && good == 0 {
+      return redTen
    }
-   if unrated_n == 0 {
-      return green_10
+   if unrated == 0 {
+      return greenTen
    }
-   if good_n == 0 {
-      return red_5
+   if good == 0 {
+      return redFive
    }
-   return green_5
+   return greenFive
 }
 
-func localAlbum(db *sql.DB, artist_s string) (map[string]local, error) {
+func localAlbum(db *sql.DB, artist string) (map[string]winterLocal, error) {
    query, e := db.Query(`
    select
       album_s,
@@ -44,7 +44,7 @@ func localAlbum(db *sql.DB, artist_s string) (map[string]local, error) {
    natural join artist_t
    where artist_s LIKE ?
    group by album_n
-   `, artist_s)
+   `, artist)
    if e != nil {
       return nil, e
    }
@@ -55,13 +55,13 @@ func localAlbum(db *sql.DB, artist_s string) (map[string]local, error) {
       unrated_n int
       url_s string
    )
-   local_m := map[string]local{}
+   local_m := map[string]winterLocal{}
    for query.Next() {
       e = query.Scan(&album_s, &date_s, &url_s, &unrated_n, &good_n)
       if e != nil {
          return nil, e
       }
-      local_m[strings.ToUpper(album_s)] = local{
+      local_m[strings.ToUpper(album_s)] = winterLocal{
          color(url_s, unrated_n, good_n), date_s,
       }
    }

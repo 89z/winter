@@ -4,6 +4,7 @@ import (
    "database/sql"
    "fmt"
    "github.com/89z/winter"
+   "github.com/89z/x"
    "github.com/89z/x/musicbrainz"
    "log"
    "os"
@@ -19,22 +20,15 @@ https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
 https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       os.Exit(1)
    }
-   url := os.Args[1]
-   album, e := musicbrainz.Release(url)
-   if e != nil {
-      log.Fatal(e)
-   }
+   album, e := musicbrainz.Release(os.Args[1])
+   x.Check(e)
    album_s := album.S("title")
    date_s := album.S("date")
    winter_s := os.Getenv("WINTER")
    db, e := sql.Open("sqlite3", winter_s)
-   if e != nil {
-      log.Fatal(e)
-   }
+   x.Check(e)
    tx, e := db.Begin()
-   if e != nil {
-      log.Fatal(e)
-   }
+   x.Check(e)
    // ALBUM
    album_n, e := winter.Insert(
       tx,
@@ -42,9 +36,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       album_s,
       date_s,
    )
-   if e != nil {
-      log.Fatal(e)
-   }
+   x.Check(e)
    var (
       artist_n int
       artists []int
@@ -59,9 +51,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          "select artist_n from artist_t where artist_s = ?", name,
       )
       e = query.Scan(&artist_n)
-      if e != nil {
-         log.Fatalln(name, e)
-      }
+      x.Check(e, name)
       artists = append(artists, artist_n)
    }
    // CREATE SONG ARRAY
@@ -84,21 +74,15 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
          song_o.note,
          album_n,
       )
-      if e != nil {
-         log.Fatal(e)
-      }
+      x.Check(e)
       // ITERATE ARTIST ARRAY
       for _, artist_n := range artists {
          _, e = winter.Insert(
             tx, "song_artist_t values (?, ?)", song_n, artist_n,
          )
-         if e != nil {
-            log.Fatal(e)
-         }
+         x.Check(e)
       }
    }
    e = tx.Commit()
-   if e != nil {
-      log.Fatal(e)
-   }
+   x.Check(e)
 }
