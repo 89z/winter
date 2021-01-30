@@ -25,7 +25,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    x.Check(e)
    tx, e := db.Begin()
    x.Check(e)
-   album, e := musicbrainz.Release(os.Args[1])
+   album, e := musicbrainz.NewRelease(os.Args[1])
    x.Check(e)
    // ALBUM
    albumId, e := winter.Insert(
