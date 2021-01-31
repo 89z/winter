@@ -40,13 +40,11 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       artist int
       artists []int
    )
-   for _, credit := range album.ArtistCredit {
-      query := tx.QueryRow(
-         // Chicago, Chicago Transit Authority
-         "select artist_n from artist_t where artist_s = ?", credit.Artist.Name,
-      )
-      e = query.Scan(&artist)
-      x.Check(e, credit.Artist.Name)
+   for _, each := range album.ArtistCredit {
+      e = tx.QueryRow(
+         "select artist_n from artist_t where mb_s = ?", each.Artist.Id,
+      ).Scan(&artist)
+      x.Check(e, each.Artist.Name)
       artists = append(artists, artist)
    }
    // CREATE SONG ARRAY
