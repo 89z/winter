@@ -16,6 +16,19 @@ func Delete(tx *sql.Tx, query string, args ...interface{}) error {
    return e
 }
 
+func Exec(tx *sql.Tx, query string, args ...interface{}) (int64, error) {
+   fmt.Println(args)
+   if strings.HasPrefix(query, "insert into ") {
+      res, e := tx.Exec(query, args...)
+      if e != nil {
+         return 0, e
+      }
+      return res.LastInsertId()
+   }
+   _, e := tx.Exec(query, args...)
+   return 0, e
+}
+
 func Insert(tx *sql.Tx, query string, args ...interface{}) (int64, error) {
    fmt.Println(args)
    res, e := tx.Exec("insert into " + query, args...)

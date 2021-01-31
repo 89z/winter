@@ -11,42 +11,44 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
+var mb string
+
 func main() {
    if len(os.Args) != 2 {
       println("musicbrainz-check <artist>")
       os.Exit(1)
    }
-   artist_s := os.Args[1]
-   winter_s := os.Getenv("WINTER")
-   db, e := sql.Open("sqlite3", winter_s)
+   artist := os.Args[1]
+   db, e := sql.Open(
+      "sqlite3", os.Getenv("WINTER"),
+   )
    x.Check(e)
-   // local albums
-   local_m, e := localAlbum(db, artist_s)
-   x.Check(e)
-   // remote albums
-   var mb_s string
    e = db.QueryRow(
-      "select mb_s from artist_t where artist_s LIKE ?", artist_s,
-   ).Scan(&mb_s)
+      "select mb_s from artist_t where artist_s LIKE ?", artist,
+   ).Scan(&mb)
    x.Check(e)
-   if mb_s == "" {
+   if mb == "" {
       log.Fatal("mb_s missing")
    }
-   remote_a, e := remoteAlbum(mb_s)
+   // local albums
+   locals, e := localAlbum(db, mb)
    x.Check(e)
-   for n, group := range remote_a {
-      for release_s := range group.release {
-         local_o, b := local_m[strings.ToUpper(release_s)]
+   // remote albums
+   remote, e := remoteAlbum(mb)
+   x.Check(e)
+   for n, group := range remote {
+      for release := range group.release {
+         local, b := locals[strings.ToUpper(release)]
          if b {
-            remote_a[n].date = local_o.date
-            remote_a[n].color = local_o.color
+            remote[n].date = local.date
+            remote[n].color = local.color
          }
       }
    }
-   sort.Slice(remote_a, func(n, n2 int) bool {
-      return remote_a[n].date < remote_a[n2].date
+   sort.Slice(remote, func(n, n2 int) bool {
+      return remote[n].date < remote[n2].date
    })
-   for _, group := range remote_a {
+   for _, group := range remote {
       fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
    }
 }

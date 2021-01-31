@@ -6,7 +6,7 @@ import (
 )
 
 func copyAlbum(tx *sql.Tx, source , dest string) error {
-   var note_s, song_s, url_s string
+   var note, song, url_s string
    // COPY URL
    e := tx.QueryRow(
       "select url_s from album_t where album_n = ?", source,
@@ -15,8 +15,8 @@ func copyAlbum(tx *sql.Tx, source , dest string) error {
       return e
    }
    // PASTE URL
-   e = winter.Update(
-      tx, "album_t set url_s = ? where album_n = ?", url_s, dest,
+   _, e = winter.Exec(
+      tx, "update album_t set url_s = ? where album_n = ?", url_s, dest,
    )
    if e != nil {
       return e
@@ -28,23 +28,20 @@ func copyAlbum(tx *sql.Tx, source , dest string) error {
    if e != nil {
       return e
    }
-   song_m := map[string]string{}
+   songs := map[string]string{}
    for query_o.Next() {
-      e = query_o.Scan(&song_s, &note_s)
+      e = query_o.Scan(&song, &note)
       if e != nil {
          return e
       }
-      song_m[song_s] = note_s
+      songs[song] = note
    }
    // PASTE NOTES
-   for song_s, note_s := range song_m {
-      e = winter.Update(
-         tx,
-         "song_t set note_s = ? where album_n = ? and song_s = ? COLLATE NOCASE",
-         note_s,
-         dest,
-         song_s,
-      )
+   for song, note := range songs {
+      _, e = winter.Exec(tx, `
+      update song_t set note_s = ?
+      where album_n = ? and song_s = ? COLLATE NOCASE
+      `, note, dest, song)
       if e != nil {
          return e
       }

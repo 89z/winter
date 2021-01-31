@@ -30,7 +30,7 @@ func color(url string, unrated, good int) string {
    return greenFive
 }
 
-func localAlbum(db *sql.DB, artist string) (map[string]winterLocal, error) {
+func localAlbum(db *sql.DB, mb string) (map[string]winterLocal, error) {
    query, e := db.Query(`
    select
       album_s,
@@ -42,9 +42,9 @@ func localAlbum(db *sql.DB, artist string) (map[string]winterLocal, error) {
    natural join song_t
    natural join song_artist_t
    natural join artist_t
-   where artist_s LIKE ?
+   where mb_s = ?
    group by album_n
-   `, artist)
+   `, mb)
    if e != nil {
       return nil, e
    }

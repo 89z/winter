@@ -27,14 +27,14 @@ func selectOne(tx *sql.Tx, like string) error {
    // ARTIST
    var (
       artist_n int
-      artist_s string
-      check_s string
-      mb_s string
+      artist string
+      check string
+      mb string
    )
    e := tx.QueryRow(
       "select * from artist_t where artist_s LIKE ?",
       like,
-   ).Scan(&artist_n, &artist_s, &check_s, &mb_s)
+   ).Scan(&artist_n, &artist, &check, &mb)
    if e != nil {
       return e
    }
@@ -93,16 +93,16 @@ func selectOne(tx *sql.Tx, like string) error {
    // print artist number
    fmt.Fprintln(pipe, "artist_n |", artist_n)
    // print artist name
-   fmt.Fprintln(pipe, "artist_s |", artist_s)
+   fmt.Fprintln(pipe, "artist_s |", artist)
    // print artist check
-   if check_s != "" {
-      fmt.Fprintln(pipe, "check_s  |", check_s)
+   if check != "" {
+      fmt.Fprintln(pipe, "check_s  |", check)
    } else {
       fmt.Fprintln(pipe, "check_s  |", yellow)
    }
    // print musicbrainz id
-   if mb_s != "" {
-      fmt.Fprintln(pipe, "mb_s     |", mb_s)
+   if mb != "" {
+      fmt.Fprintln(pipe, "mb_s     |", mb)
    } else {
       fmt.Fprintln(pipe, "mb_s     |", yellow)
    }

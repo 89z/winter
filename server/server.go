@@ -20,15 +20,16 @@ const tpl = `
 `
 
 func selectOne(w http.ResponseWriter, r *http.Request) {
-   winter_s := os.Getenv("WINTER")
-   db, e := sql.Open("sqlite3", winter_s)
+   db, e := sql.Open(
+      "sqlite3", os.Getenv("WINTER"),
+   )
    x.Check(e)
-   query_o, e := db.Query("select artist_s from artist_t")
+   query, e := db.Query("select artist_s from artist_t")
    x.Check(e)
    var artists []string
-   for query_o.Next() {
+   for query.Next() {
       var artist string
-      e = query_o.Scan(&artist)
+      e = query.Scan(&artist)
       x.Check(e)
       artists = append(artists, artist)
    }

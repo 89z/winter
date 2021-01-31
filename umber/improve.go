@@ -3,6 +3,7 @@ package main
 import (
    "database/sql"
    "encoding/json"
+   "fmt"
    "github.com/89z/x"
    "io/ioutil"
    "os"
@@ -39,7 +40,8 @@ func main() {
       artists := strings.Split(each.S, " - ")[0]
       artist := strings.Split(artists, ", ")[0]
       if ! table[strings.ToUpper(artist)] {
-         println(artist)
+         fmt.Println(artist)
+         table[strings.ToUpper(artist)] = true
       }
    }
 }

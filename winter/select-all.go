@@ -8,7 +8,7 @@ import (
 
 func selectAll(tx *sql.Tx) error {
    then := time.Now().AddDate(-1, 0, 0)
-   query_o, e := tx.Query(`
+   query, e := tx.Query(`
    select
       count(1) filter (where note_s = 'good') as count_n,
       artist_s
@@ -23,8 +23,8 @@ func selectAll(tx *sql.Tx) error {
       return e
    }
    var (
-      artist_s string
-      count_n int
+      artist string
+      count int
    )
    cmd, pipe, e := less()
    if e != nil {
@@ -32,12 +32,12 @@ func selectAll(tx *sql.Tx) error {
    }
    defer cmd.Wait()
    defer pipe.Close()
-   for query_o.Next() {
-      e = query_o.Scan(&count_n, &artist_s)
+   for query.Next() {
+      e = query.Scan(&count, &artist)
       if e != nil {
          return e
       }
-      fmt.Fprintln(pipe, count_n, "|", artist_s)
+      fmt.Fprintln(pipe, count, "|", artist)
    }
    return nil
 }
