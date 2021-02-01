@@ -3,24 +3,29 @@ package main
 import (
    "encoding/json"
    "fmt"
+   "github.com/89z/x"
    "net/http"
-   "net/url"
 )
 
-var offset int
+var (
+   offset int
+   remote = map[string]int{}
+   remotes []winterRemote
+)
 
-func remoteAlbum(mb_s string) ([]winterRemote, error) {
-   value := make(url.Values)
-   value.Set("artist", mb_s)
-   value.Set("fmt", "json")
-   value.Set("inc", "release-groups")
-   value.Set("limit", "100")
-   value.Set("status", "official")
-   value.Set("type", "album")
-   remotes, remote := []winterRemote{}, map[string]int{}
+func remoteAlbum(id string) ([]winterRemote, error) {
+   url := x.NewURL()
+   url.Host = "musicbrainz.org"
+   url.Path = "ws/2/release"
+   url.QuerySet("fmt", "json")
+   url.QuerySet("inc", "release-groups")
+   url.QuerySet("limit", "100")
+   url.QuerySet("status", "official")
+   url.QuerySet("type", "album")
+   url.QuerySet("artist", id)
    for {
       get, e := http.Get(
-         "https://musicbrainz.org/ws/2/release?" + value.Encode(),
+         url.String(),
       )
       if e != nil {
          return nil, e
@@ -55,7 +60,9 @@ func remoteAlbum(mb_s string) ([]winterRemote, error) {
       if offset >= mb.ReleaseCount {
          break
       }
-      value.Set("offset", fmt.Sprint(offset))
+      url.QuerySet(
+         "offset", fmt.Sprint(offset),
+      )
    }
    return remotes, nil
 }

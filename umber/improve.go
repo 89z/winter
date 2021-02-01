@@ -15,6 +15,12 @@ type song struct {
    S string
 }
 
+var (
+   row string
+   songs []song
+   table = map[string]bool{}
+)
+
 // find rows where the artist is not in the database
 func main() {
    // get all artists
@@ -22,10 +28,6 @@ func main() {
    x.Check(e)
    query, e := db.Query("select artist_s from artist_t")
    x.Check(e)
-   var (
-      row string
-      table = make(map[string]bool)
-   )
    for query.Next() {
       e = query.Scan(&row)
       x.Check(e)
@@ -33,7 +35,6 @@ func main() {
    }
    // check JSON
    data, e := ioutil.ReadFile(os.Getenv("UMBER"))
-   var songs []song
    e = json.Unmarshal(data, &songs)
    x.Check(e)
    for _, each := range songs {

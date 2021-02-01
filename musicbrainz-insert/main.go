@@ -10,6 +10,12 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
+var (
+   artist int
+   artists []int
+   songs []titleNote
+)
+
 func main() {
    if len(os.Args) != 2 {
       fmt.Println(`musicbrainz-insert <URL>
@@ -27,6 +33,14 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    x.Check(e)
    album, e := musicbrainz.NewRelease(os.Args[1])
    x.Check(e)
+   // CREATE ARTIST ARRAY
+   for _, each := range album.ArtistCredit {
+      e = tx.QueryRow(
+         "select artist_n from artist_t where mb_s = ?", each.Artist.Id,
+      ).Scan(&artist)
+      x.Check(e, each.Name)
+      artists = append(artists, artist)
+   }
    // ALBUM
    albumId, e := winter.Insert(
       tx,
@@ -35,20 +49,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       album.Date,
    )
    x.Check(e)
-   // CREATE ARTIST ARRAY
-   var (
-      artist int
-      artists []int
-   )
-   for _, each := range album.ArtistCredit {
-      e = tx.QueryRow(
-         "select artist_n from artist_t where mb_s = ?", each.Artist.Id,
-      ).Scan(&artist)
-      x.Check(e, each.Artist.Name)
-      artists = append(artists, artist)
-   }
    // CREATE SONG ARRAY
-   var songs []titleNote
    for _, media := range album.Media {
       for _, track := range media.Tracks {
          songs = append(songs, titleNote{
