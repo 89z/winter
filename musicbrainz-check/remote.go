@@ -17,12 +17,12 @@ func remoteAlbum(id string) ([]winterRemote, error) {
    url := x.NewURL()
    url.Host = "musicbrainz.org"
    url.Path = "ws/2/release"
-   url.QuerySet("fmt", "json")
-   url.QuerySet("inc", "release-groups")
-   url.QuerySet("limit", "100")
-   url.QuerySet("status", "official")
-   url.QuerySet("type", "album")
-   url.QuerySet("artist", id)
+   url.Query.Set("fmt", "json")
+   url.Query.Set("inc", "release-groups")
+   url.Query.Set("limit", "100")
+   url.Query.Set("status", "official")
+   url.Query.Set("type", "album")
+   url.Query.Set("artist", id)
    for {
       get, e := http.Get(
          url.String(),
@@ -60,7 +60,7 @@ func remoteAlbum(id string) ([]winterRemote, error) {
       if offset >= mb.ReleaseCount {
          break
       }
-      url.QuerySet(
+      url.Query.Set(
          "offset", fmt.Sprint(offset),
       )
    }
