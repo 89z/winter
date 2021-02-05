@@ -11,7 +11,6 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
-var mb string
 
 func main() {
    if len(os.Args) != 2 {
@@ -23,6 +22,7 @@ func main() {
       "sqlite3", os.Getenv("WINTER"),
    )
    x.Check(e)
+   var mb string
    e = db.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", artist,
    ).Scan(&mb)

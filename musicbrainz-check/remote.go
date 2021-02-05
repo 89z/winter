@@ -8,6 +8,7 @@ import (
 )
 
 var (
+   mb mbRelease
    offset int
    remote = map[string]int{}
    remotes []winterRemote
@@ -30,8 +31,7 @@ func remoteAlbum(id string) ([]winterRemote, error) {
       if e != nil {
          return nil, e
       }
-      mb := new(mbRelease)
-      e = json.NewDecoder(get.Body).Decode(mb)
+      e = json.NewDecoder(get.Body).Decode(&mb)
       if e != nil {
          return nil, e
       }
