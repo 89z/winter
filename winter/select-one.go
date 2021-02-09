@@ -13,11 +13,11 @@ const (
    yellow = "\x1b[43m   \x1b[m"
 )
 
-func note(r row, song_m map[string]int) (string, string) {
+func note(r row, songs map[string]int) (string, string) {
    if r.noteStr != "" || winter.Pop(r.urlStr) {
       return "%-9v", r.noteStr
    }
-   if song_m[strings.ToUpper(r.songStr)] > 1 {
+   if songs[strings.ToUpper(r.songStr)] > 1 {
       return "\x1b[30;43m%v\x1b[m", "duplicate"
    }
    return yellow + "%6v", ""
@@ -60,7 +60,7 @@ func selectOne(tx *sql.Tx, like string) error {
       return e
    }
    row_a := []row{}
-   song_m := map[string]int{}
+   songs := map[string]int{}
    for query.Next() {
       r := row{}
       e = query.Scan(
@@ -77,10 +77,10 @@ func selectOne(tx *sql.Tx, like string) error {
       }
       row_a = append(row_a, r)
       upper := strings.ToUpper(r.songStr)
-      if song_m[upper] == 0 {
-         song_m[upper] = 1
+      if songs[upper] == 0 {
+         songs[upper] = 1
       } else {
-         song_m[upper]++
+         songs[upper]++
       }
    }
    album_prev_n := 0
@@ -134,7 +134,7 @@ func selectOne(tx *sql.Tx, like string) error {
       // print song number
       fmt.Fprintf(pipe, "%7v | ", r.songInt)
       // print song note
-      fmt_s, note_s := note(r, song_m)
+      fmt_s, note_s := note(r, songs)
       fmt.Fprintf(pipe, fmt_s + " | ", note_s)
       // print song title
       fmt.Fprintln(pipe, r.songStr)
