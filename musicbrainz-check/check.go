@@ -4,11 +4,8 @@ import (
    "encoding/json"
    "errors"
    "fmt"
-   "log"
    "net/http"
    "net/url"
-   "os"
-   "sort"
    "strings"
    "winter"
 )
@@ -16,63 +13,6 @@ import (
 type winterLocal struct {
    color string
    date string
-}
-
-func selectMb(tx winter.Tx, artist string) (string, error) {
-   var mb string
-   e := tx.QueryRow(
-      "select mb_s from artist_t where artist_s LIKE ?", artist,
-   ).Scan(&mb)
-   if e != nil {
-      return "", e
-   } else if mb == "" {
-      return "", errors.New("mb_s missing")
-   }
-   return mb, nil
-}
-
-func main() {
-   if len(os.Args) != 2 {
-      println("musicbrainz-check <artist>")
-      os.Exit(1)
-   }
-   tx, e := winter.NewTx(
-      os.Getenv("WINTER"),
-   )
-   if e != nil {
-      log.Fatal(e)
-   }
-   mb, e := selectMb(
-      tx, os.Args[1],
-   )
-   if e != nil {
-      log.Fatal(e)
-   }
-   // local albums
-   locals, e := localAlbum(tx, mb)
-   if e != nil {
-      log.Fatal(e)
-   }
-   // remote albums
-   remotes, e := remoteAlbum(mb)
-   if e != nil {
-      log.Fatal(e)
-   }
-   for n, group := range remotes {
-      for release := range group.release {
-         local, ok := locals[strings.ToUpper(release)]
-         if ok {
-            remotes[n].date = local.date
-            remotes[n].color = local.color
-         }
-      }
-   }
-   sort.Slice(remotes, func(i, j int) bool {
-      return remotes[i].date < remotes[j].date
-   })
-   for _, group := range remotes {
-      fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
-   }
 }
 
 func color(url string, unrated, good int) string {
@@ -96,6 +36,19 @@ func color(url string, unrated, good int) string {
       return redFive
    }
    return greenFive
+}
+
+func selectMb(tx winter.Tx, artist string) (string, error) {
+   var mb string
+   e := tx.QueryRow(
+      "select mb_s from artist_t where artist_s LIKE ?", artist,
+   ).Scan(&mb)
+   if e != nil {
+      return "", e
+   } else if mb == "" {
+      return "", errors.New("mb_s missing")
+   }
+   return mb, nil
 }
 
 func localAlbum(tx winter.Tx, mb string) (map[string]winterLocal, error) {
