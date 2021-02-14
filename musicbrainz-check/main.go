@@ -3,7 +3,6 @@ package main
 import (
    "database/sql"
    "fmt"
-   "github.com/89z/x"
    "log"
    "os"
    "sort"
@@ -11,6 +10,38 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
+/* Regarding the title and date:
+
+For the title, we will display the remote Group title, but we also need to get
+the remote Release titles to match against the local Release titles.
+
+For the date, if we have a local match, use that date. Otherwise, use use the
+remote Group date */
+type winterRemote struct{
+   color string
+   date string
+   release map[string]bool
+   title string
+}
+
+type winterLocal struct{
+   color string
+   date string
+}
+
+type mbRelease struct{
+   ReleaseCount int `json:"release-count"`
+   Releases []struct{
+      Date string
+      Group struct{
+         FirstRelease string `json:"first-release-date"`
+         Id string
+         SecondaryTypes []string `json:"secondary-types"`
+         Title string
+      } `json:"release-group"`
+      Title string
+   }
+}
 
 func main() {
    if len(os.Args) != 2 {
@@ -21,21 +52,28 @@ func main() {
    db, e := sql.Open(
       "sqlite3", os.Getenv("WINTER"),
    )
-   x.Check(e)
+   if e != nil {
+      log.Fatal(e)
+   }
    var mb string
    e = db.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", artist,
    ).Scan(&mb)
-   x.Check(e)
-   if mb == "" {
+   if e != nil {
+      log.Fatal(e)
+   } else if mb == "" {
       log.Fatal("mb_s missing")
    }
    // local albums
    locals, e := localAlbum(db, mb)
-   x.Check(e)
+   if e != nil {
+      log.Fatal(e)
+   }
    // remote albums
    remote, e := remoteAlbum(mb)
-   x.Check(e)
+   if e != nil {
+      log.Fatal(e)
+   }
    for n, group := range remote {
       for release := range group.release {
          local, b := locals[strings.ToUpper(release)]
