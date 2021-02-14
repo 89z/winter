@@ -1,4 +1,4 @@
-module github.com/89z/winter
+module winter
 
 go 1.15
 

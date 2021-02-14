@@ -2,9 +2,9 @@ package main
 
 import (
    "database/sql"
-   "github.com/89z/winter"
    "log"
    "os"
+   "winter"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -41,7 +41,7 @@ Update song note:
    winter note 999 good`)
       os.Exit(1)
    }
-   key_s := os.Args[1]
+   key := os.Args[1]
    db, e := sql.Open("sqlite3", os.Getenv("WINTER"))
    if e != nil {
       log.Fatal(e)
@@ -50,7 +50,7 @@ Update song note:
    if e != nil {
       log.Fatal(e)
    }
-   switch key_s {
+   switch key {
    case "album":
       source := os.Args[2]
       if len(os.Args) == 4 {
@@ -105,7 +105,7 @@ Update song note:
          os.Args[2],
       )
    default:
-      e = selectOne(tx, key_s)
+      e = selectOne(tx, key)
    }
    if e != nil {
       log.Fatal(e)

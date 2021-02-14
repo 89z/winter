@@ -3,7 +3,6 @@ package winter
 import (
    "database/sql"
    "fmt"
-   "strings"
 )
 
 type Tx struct {

@@ -2,7 +2,6 @@ package main
 
 import (
    "database/sql"
-   "github.com/89z/winter"
    "strings"
 )
 
