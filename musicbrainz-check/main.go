@@ -20,17 +20,8 @@ func main() {
       log.Fatal(e)
    }
    /*
-   local := map[string]winterLocal{}
-   for query.Next() {
-      var q queryRow
-      e = query.Scan(&q.album, &q.date, &q.url, &q.unrated, &q.good)
-      if e != nil {
-         return nil, e
-      }
-      local[strings.ToUpper(q.album)] = winterLocal{
-         color(q.url, q.unrated, q.good), q.date,
-      }
+   local[strings.ToUpper(q.album)] = winterLocal{
+      color(q.url, q.unrated, q.good), q.date,
    }
-   return local, nil
    */
 }

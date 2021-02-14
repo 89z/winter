@@ -13,11 +13,6 @@ import (
    "winter"
 )
 
-type winterLocal struct {
-   color string
-   date string
-}
-
 func color(url string, unrated, good int) string {
    const (
       block = "\u2587\u2587\u2587\u2587\u2587"
@@ -55,22 +50,6 @@ type mbRelease struct {
    }
 }
 
-type values struct {
-   offset int
-   url.Values
-}
-
-func newValues(id string) values {
-   value := values{}
-   value.Set("fmt", "json")
-   value.Set("inc", "release-groups")
-   value.Set("limit", "100")
-   value.Set("status", "official")
-   value.Set("type", "album")
-   value.Set("artist", id)
-   return value
-}
-
 /* Regarding the title and date:
 
 For the title, we will display the remote Group title, but we also need to get
@@ -105,4 +84,70 @@ func main() {
    for _, group := range remotes {
       fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
    }
+}
+
+type values struct {
+   offset int
+   url.Values
+}
+
+func newValues(id string) values {
+   value := values{}
+   value.Set("fmt", "json")
+   value.Set("inc", "release-groups")
+   value.Set("limit", "100")
+   value.Set("status", "official")
+   value.Set("type", "album")
+   value.Set("artist", id)
+   return value
+}
+
+func remoteAlbum(id string) ([]winterRemote, error) {
+   var (
+      remote = map[string]int{}
+      remotes []winterRemote
+      value = newValues(id)
+   )
+   for {
+      get, e := http.Get(
+         "http://musicbrainz.org/ws/2/release?" + value.Encode(),
+      )
+      if e != nil {
+         return nil, e
+      }
+      var mb mbRelease
+      e = json.NewDecoder(get.Body).Decode(&mb)
+      if e != nil {
+         return nil, e
+      }
+      for _, release := range mb.Releases {
+         if release.Date == "" {
+            continue
+         }
+         if len(release.Group.SecondaryTypes) > 0 {
+            continue
+         }
+         index, ok := remote[release.Group.Id]
+         if ok {
+            // add release to group
+            remotes[index].release[release.Title] = true
+         } else {
+            // add group
+            remotes = append(remotes, winterRemote{
+               date: release.Group.FirstRelease,
+               release: map[string]bool{release.Title: true},
+               title: release.Group.Title,
+            })
+            remote[release.Group.Id] = len(remotes) - 1
+         }
+      }
+      value.offset += 100
+      if value.offset >= mb.ReleaseCount {
+         break
+      }
+      value.Set(
+         "offset", fmt.Sprint(value.offset),
+      )
+   }
+   return remotes, nil
 }
