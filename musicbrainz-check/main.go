@@ -1,7 +1,6 @@
 package main
 
 import (
-   "fmt"
    "log"
    "os"
 )
@@ -12,23 +11,26 @@ func main() {
       os.Exit(1)
    }
    name, file := os.Args[1], os.Getenv("WINTER")
-   locals, e := getLocal(name, file)
+   local, e := newLocalArtist(name, file)
    if e != nil {
       log.Fatal(e)
    }
-   fmt.Println(locals)
+   remote, e := newRemoteArtist(local.artistId)
+   if e != nil {
+      log.Fatal(e)
+   }
    /*
-   locals := map[string]winterLocal{}
+   local := map[string]winterLocal{}
    for query.Next() {
       var q queryRow
       e = query.Scan(&q.album, &q.date, &q.url, &q.unrated, &q.good)
       if e != nil {
          return nil, e
       }
-      locals[strings.ToUpper(q.album)] = winterLocal{
+      local[strings.ToUpper(q.album)] = winterLocal{
          color(q.url, q.unrated, q.good), q.date,
       }
    }
-   return locals, nil
+   return local, nil
    */
 }
