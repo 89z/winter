@@ -1,26 +1,26 @@
 package main
 
 import (
-   "os"
+   "errors"
    "log"
+   "os"
    "winter"
 )
 
-func localAlbums(artist, file string) error {
+func getLocal(name, file string) (localArtist, error) {
    tx, e := winter.NewTx(file)
    if e != nil {
-      return e
+      return localArtist{}, e
    }
-   var mb string
+   var artistId string
    e := tx.QueryRow(
-      "select mb_s from artist_t where artist_s LIKE ?", artist,
-   ).Scan(&mb)
+      "select mb_s from artist_t where artist_s LIKE ?", name,
+   ).Scan(&artistId)
    if e != nil {
-      return e
-   } else if mb == "" {
-      return errors.New("mb_s missing")
+      return localArtist{}, e
+   } else if artistId == "" {
+      return localArtist{}, errors.New("artistId missing")
    }
-   // FIXME
    query, e := tx.Query(`
    select
       album_s,
@@ -34,15 +34,48 @@ func localAlbums(artist, file string) error {
    natural join artist_t
    where mb_s = ?
    group by album_n
-   `, mb)
+   `, artistId)
    if e != nil {
-      return nil, e
+      return localArtist{}, e
    }
-   var (
-      locals = map[string]winterLocal{}
-      q queryRow
-   )
+   var artist localArtist
    for query.Next() {
+      var alb localAlbum
+      e = query.Scan(&alb.title, &alb.date, &alb.url, &alb.unrated, &alb.good)
+      if e != nil {
+         return localArtist{}, e
+      }
+      artist.albums = append(artist.albums, alb)
+   }
+   return artist, nil
+}
+
+type localArtist struct {
+   artistId string
+   albums []localAlbum
+}
+
+type localAlbum struct {
+   date string
+   good int
+   title string
+   unrated int
+   url string
+}
+
+func main() {
+   if len(os.Args) != 2 {
+      println("musicbrainz-check <artist>")
+      os.Exit(1)
+   }
+   name, file := os.Args[1], os.Getenv("WINTER")
+   locals, e := getLocal(name, file)
+   if e != nil {
+      log.Fatal(e)
+   }
+   locals := map[string]winterLocal{}
+   for query.Next() {
+      var q queryRow
       e = query.Scan(&q.album, &q.date, &q.url, &q.unrated, &q.good)
       if e != nil {
          return nil, e
@@ -52,16 +85,4 @@ func localAlbums(artist, file string) error {
       }
    }
    return locals, nil
-}
-
-func main() {
-   if len(os.Args) != 2 {
-      println("musicbrainz-check <artist>")
-      os.Exit(1)
-   }
-   artist, file := os.Args[1], os.Getenv("WINTER")
-   locals, e := localAlbums(artist, file)
-   if e != nil {
-      log.Fatal(e)
-   }
 }

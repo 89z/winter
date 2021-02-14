@@ -4,8 +4,11 @@ import (
    "encoding/json"
    "errors"
    "fmt"
+   "fmt"
    "net/http"
    "net/url"
+   "sort"
+   "strings"
    "strings"
    "winter"
 )
@@ -36,14 +39,6 @@ func color(url string, unrated, good int) string {
       return redFive
    }
    return greenFive
-}
-
-type queryRow struct {
-   album string
-   date string
-   url string
-   unrated int
-   good int
 }
 
 type mbRelease struct {
@@ -138,4 +133,26 @@ func remoteAlbum(id string) ([]winterRemote, error) {
       )
    }
    return remotes, nil
+}
+
+func main() {
+   remotes, e := remoteAlbum(mb)
+   if e != nil {
+      log.Fatal(e)
+   }
+   for n, group := range remotes {
+      for release := range group.release {
+         local, ok := locals[strings.ToUpper(release)]
+         if ok {
+            remotes[n].date = local.date
+            remotes[n].color = local.color
+         }
+      }
+   }
+   sort.Slice(remotes, func(i, j int) bool {
+      return remotes[i].date < remotes[j].date
+   })
+   for _, group := range remotes {
+      fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
+   }
 }
