@@ -38,53 +38,6 @@ func color(url string, unrated, good int) string {
    return greenFive
 }
 
-func selectMb(tx winter.Tx, artist string) (string, error) {
-   var mb string
-   e := tx.QueryRow(
-      "select mb_s from artist_t where artist_s LIKE ?", artist,
-   ).Scan(&mb)
-   if e != nil {
-      return "", e
-   } else if mb == "" {
-      return "", errors.New("mb_s missing")
-   }
-   return mb, nil
-}
-
-func localAlbum(tx winter.Tx, mb string) (map[string]winterLocal, error) {
-   query, e := tx.Query(`
-   select
-      album_s,
-      date_s,
-      url_s,
-      count(1) filter (where note_s = '') as unrated,
-      count(1) filter (where note_s = 'good') as good
-   from album_t
-   natural join song_t
-   natural join song_artist_t
-   natural join artist_t
-   where mb_s = ?
-   group by album_n
-   `, mb)
-   if e != nil {
-      return nil, e
-   }
-   var (
-      locals = map[string]winterLocal{}
-      q queryRow
-   )
-   for query.Next() {
-      e = query.Scan(&q.album, &q.date, &q.url, &q.unrated, &q.good)
-      if e != nil {
-         return nil, e
-      }
-      locals[strings.ToUpper(q.album)] = winterLocal{
-         color(q.url, q.unrated, q.good), q.date,
-      }
-   }
-   return locals, nil
-}
-
 type queryRow struct {
    album string
    date string

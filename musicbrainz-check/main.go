@@ -1,54 +1,67 @@
 package main
 
 import (
-   "fmt"
-   "log"
    "os"
-   "sort"
-   "strings"
+   "log"
    "winter"
 )
+
+func localAlbums(artist, file string) error {
+   tx, e := winter.NewTx(file)
+   if e != nil {
+      return e
+   }
+   var mb string
+   e := tx.QueryRow(
+      "select mb_s from artist_t where artist_s LIKE ?", artist,
+   ).Scan(&mb)
+   if e != nil {
+      return e
+   } else if mb == "" {
+      return errors.New("mb_s missing")
+   }
+   // FIXME
+   query, e := tx.Query(`
+   select
+      album_s,
+      date_s,
+      url_s,
+      count(1) filter (where note_s = '') as unrated,
+      count(1) filter (where note_s = 'good') as good
+   from album_t
+   natural join song_t
+   natural join song_artist_t
+   natural join artist_t
+   where mb_s = ?
+   group by album_n
+   `, mb)
+   if e != nil {
+      return nil, e
+   }
+   var (
+      locals = map[string]winterLocal{}
+      q queryRow
+   )
+   for query.Next() {
+      e = query.Scan(&q.album, &q.date, &q.url, &q.unrated, &q.good)
+      if e != nil {
+         return nil, e
+      }
+      locals[strings.ToUpper(q.album)] = winterLocal{
+         color(q.url, q.unrated, q.good), q.date,
+      }
+   }
+   return locals, nil
+}
 
 func main() {
    if len(os.Args) != 2 {
       println("musicbrainz-check <artist>")
       os.Exit(1)
    }
-   tx, e := winter.NewTx(
-      os.Getenv("WINTER"),
-   )
+   artist, file := os.Args[1], os.Getenv("WINTER")
+   locals, e := localAlbums(artist, file)
    if e != nil {
       log.Fatal(e)
-   }
-   mb, e := selectMb(
-      tx, os.Args[1],
-   )
-   if e != nil {
-      log.Fatal(e)
-   }
-   // local albums
-   locals, e := localAlbum(tx, mb)
-   if e != nil {
-      log.Fatal(e)
-   }
-   // remote albums
-   remotes, e := remoteAlbum(mb)
-   if e != nil {
-      log.Fatal(e)
-   }
-   for n, group := range remotes {
-      for release := range group.release {
-         local, ok := locals[strings.ToUpper(release)]
-         if ok {
-            remotes[n].date = local.date
-            remotes[n].color = local.color
-         }
-      }
-   }
-   sort.Slice(remotes, func(i, j int) bool {
-      return remotes[i].date < remotes[j].date
-   })
-   for _, group := range remotes {
-      fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
    }
 }
