@@ -14,7 +14,7 @@ const (
 )
 
 func note(r row, songs map[string]int) (string, string) {
-   if r.noteStr != "" || winter.Pop(r.urlStr) {
+   if r.noteStr != "" || strings.HasPrefix(r.urlStr, "youtube.com/watch?") {
       return "%-9v", r.noteStr
    }
    if songs[strings.ToUpper(r.songStr)] > 1 {

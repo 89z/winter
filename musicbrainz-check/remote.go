@@ -21,13 +21,13 @@ type mbRelease struct {
    }
 }
 
-type urlValues struct {
+type values struct {
    offset int
    url.Values
 }
 
-func values(id string) urlValues {
-   value := urlValues{}
+func newValues(id string) values {
+   value := values{}
    value.Set("fmt", "json")
    value.Set("inc", "release-groups")
    value.Set("limit", "100")
@@ -37,12 +37,25 @@ func values(id string) urlValues {
    return value
 }
 
+/* Regarding the title and date:
+
+For the title, we will display the remote Group title, but we also need to get
+the remote Release titles to match against the local Release titles.
+
+For the date, if we have a local match, use that date. Otherwise, use use the
+remote Group date */
+type winterRemote struct {
+   color string
+   date string
+   release map[string]bool
+   title string
+}
+
 func remoteAlbum(id string) ([]winterRemote, error) {
    var (
-      mb mbRelease
       remote = map[string]int{}
       remotes []winterRemote
-      value = values(id)
+      value = newValues(id)
    )
    for {
       get, e := http.Get(
@@ -51,6 +64,7 @@ func remoteAlbum(id string) ([]winterRemote, error) {
       if e != nil {
          return nil, e
       }
+      var mb mbRelease
       e = json.NewDecoder(get.Body).Decode(&mb)
       if e != nil {
          return nil, e
@@ -62,8 +76,8 @@ func remoteAlbum(id string) ([]winterRemote, error) {
          if len(release.Group.SecondaryTypes) > 0 {
             continue
          }
-         index, b := remote[release.Group.Id]
-         if b {
+         index, ok := remote[release.Group.Id]
+         if ok {
             // add release to group
             remotes[index].release[release.Title] = true
          } else {

@@ -14,7 +14,7 @@ func color(url string, unrated, good int) string {
       redFive = "\x1b[91m" + block + "\x1b[90m" + block + "\x1b[m"
       redTen = "\x1b[91m" + block + block + "\x1b[m"
    )
-   if winter.Pop(url) {
+   if strings.HasPrefix(url, "youtube.com/watch?") {
       return greenTen
    }
    if unrated == 0 && good == 0 {

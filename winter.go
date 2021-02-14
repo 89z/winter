@@ -6,40 +6,27 @@ import (
    "strings"
 )
 
-func Pop(s string) bool {
-   return strings.HasPrefix(s, "youtube.com/watch?")
+type Tx struct {
+   sql.Tx
 }
 
-func Delete(tx *sql.Tx, query string, args ...interface{}) error {
-   fmt.Println(args)
-   _, e := tx.Exec("delete from " + query, args...)
+func (tx Tx) Delete(query string, arg ...interface{}) error {
+   fmt.Println(arg)
+   _, e := tx.Exec("delete from " + query, arg...)
    return e
 }
 
-func Exec(tx *sql.Tx, query string, args ...interface{}) (int64, error) {
-   fmt.Println(args)
-   if strings.HasPrefix(query, "insert into ") {
-      res, e := tx.Exec(query, args...)
-      if e != nil {
-         return 0, e
-      }
-      return res.LastInsertId()
-   }
-   _, e := tx.Exec(query, args...)
-   return 0, e
-}
-
-func Insert(tx *sql.Tx, query string, args ...interface{}) (int64, error) {
-   fmt.Println(args)
-   res, e := tx.Exec("insert into " + query, args...)
+func (tx Tx) Insert(query string, arg ...interface{}) (int64, error) {
+   fmt.Println(arg)
+   res, e := tx.Exec("insert into " + query, arg...)
    if e != nil {
       return 0, e
    }
    return res.LastInsertId()
 }
 
-func Update(tx *sql.Tx, query string, args ...interface{}) error {
-   fmt.Println(args)
-   _, e := tx.Exec("update " + query, args...)
+func (tx Tx) Update(query string, arg ...interface{}) error {
+   fmt.Println(arg)
+   _, e := tx.Exec("update " + query, arg...)
    return e
 }

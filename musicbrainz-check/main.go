@@ -16,20 +16,6 @@ type winterLocal struct {
    date string
 }
 
-/* Regarding the title and date:
-
-For the title, we will display the remote Group title, but we also need to get
-the remote Release titles to match against the local Release titles.
-
-For the date, if we have a local match, use that date. Otherwise, use use the
-remote Group date */
-type winterRemote struct {
-   color string
-   date string
-   release map[string]bool
-   title string
-}
-
 func selectMb(db *sql.DB, artist string) (string, error) {
    var mb string
    e := db.QueryRow(

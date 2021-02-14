@@ -7,14 +7,35 @@ import (
    "github.com/89z/x"
    "github.com/89z/x/musicbrainz"
    "os"
+   "time"
    _ "github.com/mattn/go-sqlite3"
 )
 
-var (
-   artist int
-   artists []int
-   songs []titleNote
-)
+type titleNote struct {
+   note, title string
+}
+
+func begin(file string) (*sql.Tx, error) {
+   db, e := sql.Open("sqlite3", file)
+   if e != nil {
+      return e
+   }
+   return db.Begin()
+}
+
+func note(length int) string {
+   if length == 0 {
+      return "?:??"
+   }
+   dur := time.Duration(length) * time.Millisecond
+   if dur < 179_500 * time.Millisecond {
+      return "short"
+   }
+   if dur > 15 * time.Minute {
+      return "long"
+   }
+   return ""
+}
 
 func main() {
    if len(os.Args) != 2 {
@@ -25,16 +46,16 @@ https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
 https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
       os.Exit(1)
    }
-   db, e := sql.Open(
-      "sqlite3", os.Getenv("WINTER"),
+   tx, e := begin(
+      os.Getenv("WINTER"),
    )
-   x.Check(e)
-   tx, e := db.Begin()
    x.Check(e)
    album, e := musicbrainz.NewRelease(os.Args[1])
    x.Check(e)
    // CREATE ARTIST ARRAY
+   var artists []int
    for _, each := range album.ArtistCredit {
+      var artist int
       e = tx.QueryRow(
          "select artist_n from artist_t where mb_s = ?", each.Artist.Id,
       ).Scan(&artist)
@@ -50,6 +71,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    )
    x.Check(e)
    // CREATE SONG ARRAY
+   var songs []titleNote
    for _, media := range album.Media {
       for _, track := range media.Tracks {
          songs = append(songs, titleNote{
