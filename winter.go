@@ -6,7 +6,19 @@ import (
 )
 
 type Tx struct {
-   sql.Tx
+   *sql.Tx
+}
+
+func NewTx(file string) (Tx, error) {
+   db, e := sql.Open("sqlite3", file)
+   if e != nil {
+      return Tx{}, e
+   }
+   tx, e := db.Begin()
+   if e != nil {
+      return Tx{}, e
+   }
+   return Tx{tx}, nil
 }
 
 func (tx Tx) Delete(query string, arg ...interface{}) error {
