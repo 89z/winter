@@ -5,6 +5,8 @@ import (
    "fmt"
 )
 
+type Rows = sql.Rows
+
 type Tx struct {
    *sql.Tx
 }

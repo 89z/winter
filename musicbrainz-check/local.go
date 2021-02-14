@@ -1,8 +1,8 @@
 package main
 
 import (
-   "database/sql"
    "strings"
+   "winter"
 )
 
 func color(url string, unrated, good int) string {
@@ -28,8 +28,8 @@ func color(url string, unrated, good int) string {
    return greenFive
 }
 
-func localAlbum(db *sql.DB, mb string) (map[string]winterLocal, error) {
-   query, e := db.Query(`
+func localAlbum(tx winter.Tx, mb string) (map[string]winterLocal, error) {
+   query, e := tx.Query(`
    select
       album_s,
       date_s,

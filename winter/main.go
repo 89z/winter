@@ -1,11 +1,9 @@
 package main
 
 import (
-   "database/sql"
    "log"
    "os"
    "winter"
-   _ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
@@ -42,11 +40,9 @@ Update song note:
       os.Exit(1)
    }
    key := os.Args[1]
-   db, e := sql.Open("sqlite3", os.Getenv("WINTER"))
-   if e != nil {
-      log.Fatal(e)
-   }
-   tx, e := db.Begin()
+   tx, e := winter.NewTx(
+      os.Getenv("WINTER"),
+   )
    if e != nil {
       log.Fatal(e)
    }
@@ -63,46 +59,29 @@ Update song note:
       if len(os.Args) == 2 {
          e = selectAll(tx)
       } else {
-         _, e = winter.Insert(
-            tx,
-            "artist_t (artist_s, check_s, mb_s) values (?, '', '')",
-            os.Args[2],
+         _, e = tx.Insert(
+            "artist_t (artist_s, check_s, mb_s) values (?, '', '')", os.Args[2],
          )
       }
    case "check":
-      e = winter.Update(
-         tx,
-         "artist_t set check_s = ? where artist_n = ?",
-         os.Args[3],
-         os.Args[2],
+      e = tx.Update(
+         "artist_t set check_s = ? where artist_n = ?", os.Args[3], os.Args[2],
       )
    case "date":
-      e = winter.Update(
-         tx,
-         "album_t set date_s = ? where album_n = ?",
-         os.Args[3],
-         os.Args[2],
+      e = tx.Update(
+         "album_t set date_s = ? where album_n = ?", os.Args[3], os.Args[2],
       )
    case "mb":
-      e = winter.Update(
-         tx,
-         "artist_t set mb_s = ? where artist_n = ?",
-         os.Args[3],
-         os.Args[2],
+      e = tx.Update(
+         "artist_t set mb_s = ? where artist_n = ?", os.Args[3], os.Args[2],
       )
    case "note":
-      e = winter.Update(
-         tx,
-         "song_t set note_s = ? where song_n = ?",
-         os.Args[3],
-         os.Args[2],
+      e = tx.Update(
+         "song_t set note_s = ? where song_n = ?", os.Args[3], os.Args[2],
       )
    case "url":
-      e = winter.Update(
-         tx,
-         "album_t set url_s = ? where album_n = ?",
-         os.Args[3],
-         os.Args[2],
+      e = tx.Update(
+         "album_t set url_s = ? where album_n = ?", os.Args[3], os.Args[2],
       )
    default:
       e = selectOne(tx, key)

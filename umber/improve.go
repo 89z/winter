@@ -1,32 +1,33 @@
 package main
 
 import (
-   "database/sql"
    "encoding/json"
    "fmt"
    "io/ioutil"
    "log"
    "os"
    "strings"
-   _ "github.com/mattn/go-sqlite3"
+   "winter"
 )
 
 type song struct {
    S string
 }
 
-func query(winter string) (*sql.Rows, error) {
+func query(file string) (*winter.Rows, error) {
    // get all artists
-   db, e := sql.Open("sqlite3", winter)
+   tx, e := winter.NewTx(file)
    if e != nil {
       return nil, e
    }
-   return db.Query("select artist_s from artist_t")
+   return tx.Query("select artist_s from artist_t")
 }
 
 // find where the artist is not in the database
 func main() {
-   rows, e := query(os.Getenv("WINTER"))
+   rows, e := query(
+      os.Getenv("WINTER"),
+   )
    if e != nil {
       log.Fatal(e)
    }

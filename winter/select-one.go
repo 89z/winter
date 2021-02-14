@@ -1,9 +1,9 @@
 package main
 
 import (
-   "database/sql"
    "fmt"
    "strings"
+   "winter"
 )
 
 const (
@@ -22,7 +22,7 @@ func note(r row, songs map[string]int) (string, string) {
    return yellow + "%6v", ""
 }
 
-func selectOne(tx *sql.Tx, like string) error {
+func selectOne(tx winter.Tx, like string) error {
    // ARTIST
    var (
       artist_n int

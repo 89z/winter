@@ -1,14 +1,13 @@
 package main
 
 import (
-   "database/sql"
    "errors"
    "fmt"
    "log"
    "os"
    "sort"
    "strings"
-   _ "github.com/mattn/go-sqlite3"
+   "winter"
 )
 
 type winterLocal struct {
@@ -16,9 +15,9 @@ type winterLocal struct {
    date string
 }
 
-func selectMb(db *sql.DB, artist string) (string, error) {
+func selectMb(tx winter.Tx, artist string) (string, error) {
    var mb string
-   e := db.QueryRow(
+   e := tx.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", artist,
    ).Scan(&mb)
    if e != nil {
@@ -34,19 +33,20 @@ func main() {
       println("musicbrainz-check <artist>")
       os.Exit(1)
    }
-   artist := os.Args[1]
-   db, e := sql.Open(
-      "sqlite3", os.Getenv("WINTER"),
+   tx, e := winter.NewTx(
+      os.Getenv("WINTER"),
    )
    if e != nil {
       log.Fatal(e)
    }
-   mb, e := selectMb(db, artist)
+   mb, e := selectMb(
+      tx, os.Args[1],
+   )
    if e != nil {
       log.Fatal(e)
    }
    // local albums
-   locals, e := localAlbum(db, mb)
+   locals, e := localAlbum(tx, mb)
    if e != nil {
       log.Fatal(e)
    }

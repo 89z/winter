@@ -1,12 +1,12 @@
 package main
 
 import (
-   "database/sql"
    "fmt"
    "time"
+   "winter"
 )
 
-func selectAll(tx *sql.Tx) error {
+func selectAll(tx winter.Tx) error {
    then := time.Now().AddDate(-1, 0, 0)
    query, e := tx.Query(`
    select
