@@ -3,30 +3,50 @@ package main
 import (
    "encoding/json"
    "fmt"
-   "github.com/89z/x"
    "net/http"
+   "net/url"
 )
 
-var (
-   mb mbRelease
+type mbRelease struct {
+   ReleaseCount int `json:"release-count"`
+   Releases []struct {
+      Date string
+      Group struct {
+         FirstRelease string `json:"first-release-date"`
+         Id string
+         SecondaryTypes []string `json:"secondary-types"`
+         Title string
+      } `json:"release-group"`
+      Title string
+   }
+}
+
+type urlValues struct {
    offset int
-   remote = map[string]int{}
-   remotes []winterRemote
-)
+   url.Values
+}
+
+func values(id string) urlValues {
+   value := urlValues{}
+   value.Set("fmt", "json")
+   value.Set("inc", "release-groups")
+   value.Set("limit", "100")
+   value.Set("status", "official")
+   value.Set("type", "album")
+   value.Set("artist", id)
+   return value
+}
 
 func remoteAlbum(id string) ([]winterRemote, error) {
-   url := x.NewURL()
-   url.Host = "musicbrainz.org"
-   url.Path = "ws/2/release"
-   url.Query.Set("fmt", "json")
-   url.Query.Set("inc", "release-groups")
-   url.Query.Set("limit", "100")
-   url.Query.Set("status", "official")
-   url.Query.Set("type", "album")
-   url.Query.Set("artist", id)
+   var (
+      mb mbRelease
+      remote = map[string]int{}
+      remotes []winterRemote
+      value = values(id)
+   )
    for {
       get, e := http.Get(
-         url.String(),
+         "http://musicbrainz.org/ws/2/release?" + value.Encode(),
       )
       if e != nil {
          return nil, e
@@ -56,12 +76,12 @@ func remoteAlbum(id string) ([]winterRemote, error) {
             remote[release.Group.Id] = len(remotes) - 1
          }
       }
-      offset += 100
-      if offset >= mb.ReleaseCount {
+      value.offset += 100
+      if value.offset >= mb.ReleaseCount {
          break
       }
-      url.Query.Set(
-         "offset", fmt.Sprint(offset),
+      value.Set(
+         "offset", fmt.Sprint(value.offset),
       )
    }
    return remotes, nil

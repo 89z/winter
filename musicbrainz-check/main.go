@@ -2,6 +2,7 @@ package main
 
 import (
    "database/sql"
+   "errors"
    "fmt"
    "log"
    "os"
@@ -10,6 +11,11 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
+type winterLocal struct {
+   color string
+   date string
+}
+
 /* Regarding the title and date:
 
 For the title, we will display the remote Group title, but we also need to get
@@ -17,30 +23,24 @@ the remote Release titles to match against the local Release titles.
 
 For the date, if we have a local match, use that date. Otherwise, use use the
 remote Group date */
-type winterRemote struct{
+type winterRemote struct {
    color string
    date string
    release map[string]bool
    title string
 }
 
-type winterLocal struct{
-   color string
-   date string
-}
-
-type mbRelease struct{
-   ReleaseCount int `json:"release-count"`
-   Releases []struct{
-      Date string
-      Group struct{
-         FirstRelease string `json:"first-release-date"`
-         Id string
-         SecondaryTypes []string `json:"secondary-types"`
-         Title string
-      } `json:"release-group"`
-      Title string
+func selectMb(db *sql.DB, artist string) (string, error) {
+   var mb string
+   e := db.QueryRow(
+      "select mb_s from artist_t where artist_s LIKE ?", artist,
+   ).Scan(&mb)
+   if e != nil {
+      return "", e
+   } else if mb == "" {
+      return "", errors.New("mb_s missing")
    }
+   return mb, nil
 }
 
 func main() {
@@ -55,14 +55,9 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
-   var mb string
-   e = db.QueryRow(
-      "select mb_s from artist_t where artist_s LIKE ?", artist,
-   ).Scan(&mb)
+   mb, e := selectMb(db, artist)
    if e != nil {
       log.Fatal(e)
-   } else if mb == "" {
-      log.Fatal("mb_s missing")
    }
    // local albums
    locals, e := localAlbum(db, mb)
@@ -70,23 +65,23 @@ func main() {
       log.Fatal(e)
    }
    // remote albums
-   remote, e := remoteAlbum(mb)
+   remotes, e := remoteAlbum(mb)
    if e != nil {
       log.Fatal(e)
    }
-   for n, group := range remote {
+   for n, group := range remotes {
       for release := range group.release {
          local, b := locals[strings.ToUpper(release)]
          if b {
-            remote[n].date = local.date
-            remote[n].color = local.color
+            remotes[n].date = local.date
+            remotes[n].color = local.color
          }
       }
    }
-   sort.Slice(remote, func(n, n2 int) bool {
-      return remote[n].date < remote[n2].date
+   sort.Slice(remotes, func(n, n2 int) bool {
+      return remotes[n].date < remotes[n2].date
    })
-   for _, group := range remote {
+   for _, group := range remotes {
       fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
    }
 }

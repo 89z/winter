@@ -1,6 +1,0 @@
-# MusicBrainz check
-
-~~~
-mbRelease
-winterGroup
-~~~
