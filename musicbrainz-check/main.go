@@ -1,6 +1,7 @@
 package main
 
 import (
+   "fmt"
    "log"
    "os"
 )
@@ -15,13 +16,29 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
-   remote, e := newRemoteArtist(local.artistId)
+   remote, e := remoteAlbums(local.artistId)
    if e != nil {
       log.Fatal(e)
    }
+   fmt.Println(local, remote)
    /*
+   FIXME local
    local[strings.ToUpper(q.album)] = winterLocal{
       color(q.url, q.unrated, q.good), q.date,
+   }
+   FIXME remote
+   index, ok := remote[release.Group.Id]
+   if ok {
+      // add release to group
+      remotes[index].release[release.Title] = true
+   } else {
+      // add group
+      remotes = append(remotes, winterRemote{
+         date: release.Group.FirstRelease,
+         release: map[string]bool{release.Title: true},
+         title: release.Group.Title,
+      })
+      remote[release.Group.Id] = len(remotes) - 1
    }
    */
 }

@@ -11,34 +11,6 @@ import (
    "winter"
 )
 
-func remoteAlbum(id string) ([]winterRemote, error) {
-   for {
-      for _, release := range mb.Releases {
-         index, ok := remote[release.Group.Id]
-         if ok {
-            // add release to group
-            remotes[index].release[release.Title] = true
-         } else {
-            // add group
-            remotes = append(remotes, winterRemote{
-               date: release.Group.FirstRelease,
-               release: map[string]bool{release.Title: true},
-               title: release.Group.Title,
-            })
-            remote[release.Group.Id] = len(remotes) - 1
-         }
-      }
-      value.offset += 100
-      if value.offset >= mb.ReleaseCount {
-         break
-      }
-      value.Set(
-         "offset", fmt.Sprint(value.offset),
-      )
-   }
-   return remotes, nil
-}
-
 func color(url string, unrated, good int) string {
    const (
       block = "\u2587\u2587\u2587\u2587\u2587"

@@ -1,7 +1,10 @@
 package main
 
 import (
+   "encoding/json"
    "errors"
+   "fmt"
+   "net/http"
    "net/url"
    "winter"
 )
@@ -50,38 +53,6 @@ func newLocalArtist(name, file string) (localArtist, error) {
    return artist, nil
 }
 
-
-func newRemoteArtist(artistId string) (remoteArtist, error) {
-   value := url.Values{}
-   value.Set("fmt", "json")
-   value.Set("inc", "release-groups")
-   value.Set("limit", "100")
-   value.Set("status", "official")
-   value.Set("type", "album")
-   value.Set("artist", artistId)
-   for {
-      get, e := http.Get(
-         "http://musicbrainz.org/ws/2/release?" + value.Encode(),
-      )
-      if e != nil {
-         return remoteArtist{}, e
-      }
-      var album remoteAlbum
-      e = json.NewDecoder(get.Body).Decode(&album)
-      if e != nil {
-         return remoteArtist{}, e
-      }
-      for _, release := range album.Releases {
-         if release.Date == "" {
-            continue
-         }
-         if len(release.Group.SecondaryTypes) > 0 {
-            continue
-         }
-      }
-   }
-}
-
 type localAlbum struct {
    date string
    good int
@@ -109,4 +80,48 @@ type remoteAlbum struct {
 type remoteArtist struct {
    ReleaseCount int `json:"release-count"`
    Releases []remoteAlbum
+}
+
+func remoteAlbums(artistId string) ([]remoteAlbum, error) {
+   value := url.Values{}
+   value.Set("fmt", "json")
+   value.Set("inc", "release-groups")
+   value.Set("limit", "100")
+   value.Set("status", "official")
+   value.Set("type", "album")
+   value.Set("artist", artistId)
+   var (
+      albums []remoteAlbum
+      offset int
+   )
+   for {
+      get, e := http.Get(
+         "http://musicbrainz.org/ws/2/release?" + value.Encode(),
+      )
+      if e != nil {
+         return nil, e
+      }
+      var artist remoteArtist
+      e = json.NewDecoder(get.Body).Decode(&artist)
+      if e != nil {
+         return nil, e
+      }
+      for _, release := range artist.Releases {
+         if release.Date == "" {
+            continue
+         }
+         if len(release.Group.SecondaryTypes) > 0 {
+            continue
+         }
+         albums = append(albums, release)
+      }
+      offset += 100
+      if offset >= artist.ReleaseCount {
+         break
+      }
+      value.Set(
+         "offset", fmt.Sprint(offset),
+      )
+   }
+   return albums, nil
 }
