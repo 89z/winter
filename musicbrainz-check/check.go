@@ -5,6 +5,20 @@ import (
    "winter"
 )
 
+type mbRelease struct {
+   ReleaseCount int `json:"release-count"`
+   Releases []struct {
+      Date string
+      Group struct {
+         FirstRelease string `json:"first-release-date"`
+         Id string
+         SecondaryTypes []string `json:"secondary-types"`
+         Title string
+      } `json:"release-group"`
+      Title string
+   }
+}
+
 type localAlbum struct {
    date string
    good int
