@@ -2,35 +2,10 @@ package main
 
 import (
    "errors"
+   "net/url"
    "winter"
 )
 
-type mbRelease struct {
-   ReleaseCount int `json:"release-count"`
-   Releases []struct {
-      Date string
-      Group struct {
-         FirstRelease string `json:"first-release-date"`
-         Id string
-         SecondaryTypes []string `json:"secondary-types"`
-         Title string
-      } `json:"release-group"`
-      Title string
-   }
-}
-
-type localAlbum struct {
-   date string
-   good int
-   title string
-   unrated int
-   url string
-}
-
-type localArtist struct {
-   artistId string
-   albums []localAlbum
-}
 
 func newLocalArtist(name, file string) (localArtist, error) {
    tx, e := winter.NewTx(file)
@@ -75,3 +50,63 @@ func newLocalArtist(name, file string) (localArtist, error) {
    return artist, nil
 }
 
+
+func newRemoteArtist(artistId string) (remoteArtist, error) {
+   value := url.Values{}
+   value.Set("fmt", "json")
+   value.Set("inc", "release-groups")
+   value.Set("limit", "100")
+   value.Set("status", "official")
+   value.Set("type", "album")
+   value.Set("artist", artistId)
+   for {
+      get, e := http.Get(
+         "http://musicbrainz.org/ws/2/release?" + value.Encode(),
+      )
+      if e != nil {
+         return remoteArtist{}, e
+      }
+      var album remoteAlbum
+      e = json.NewDecoder(get.Body).Decode(&album)
+      if e != nil {
+         return remoteArtist{}, e
+      }
+      for _, release := range album.Releases {
+         if release.Date == "" {
+            continue
+         }
+         if len(release.Group.SecondaryTypes) > 0 {
+            continue
+         }
+      }
+   }
+}
+
+type localAlbum struct {
+   date string
+   good int
+   title string
+   unrated int
+   url string
+}
+
+type localArtist struct {
+   artistId string
+   albums []localAlbum
+}
+
+type remoteAlbum struct {
+   Date string
+   Group struct {
+      FirstRelease string `json:"first-release-date"`
+      Id string
+      SecondaryTypes []string `json:"secondary-types"`
+      Title string
+   } `json:"release-group"`
+   Title string
+}
+
+type remoteArtist struct {
+   ReleaseCount int `json:"release-count"`
+   Releases []remoteAlbum
+}
