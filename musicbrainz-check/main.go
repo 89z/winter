@@ -1,7 +1,6 @@
 package main
 
 import (
-   "fmt"
    "log"
    "os"
 )
@@ -20,7 +19,6 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
-   fmt.Println(local, remote)
    /*
    FIXME local
    local[strings.ToUpper(q.album)] = winterLocal{

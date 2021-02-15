@@ -1,15 +1,16 @@
-package main
+/* Regarding the title and date:
 
-import (
-   "encoding/json"
-   "errors"
-   "fmt"
-   "net/http"
-   "net/url"
-   "sort"
-   "strings"
-   "winter"
-)
+For the title, we will display the remote Group title, but we also need to get
+the remote Release titles to match against the local Release titles.
+
+For the date, if we have a local match, use that date. Otherwise, use use the
+remote Group date */
+type winterRemote struct {
+   color string
+   date string
+   release map[string]bool
+   title string
+}
 
 func color(url string, unrated, good int) string {
    const (
@@ -34,20 +35,6 @@ func color(url string, unrated, good int) string {
    return greenFive
 }
 
-/* Regarding the title and date:
-
-For the title, we will display the remote Group title, but we also need to get
-the remote Release titles to match against the local Release titles.
-
-For the date, if we have a local match, use that date. Otherwise, use use the
-remote Group date */
-type winterRemote struct {
-   color string
-   date string
-   release map[string]bool
-   title string
-}
-
 func main() {
    for n, group := range remotes {
       for release := range group.release {
@@ -65,5 +52,3 @@ func main() {
       fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
    }
 }
-
-
