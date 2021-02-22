@@ -15,16 +15,12 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
-   remote, e := remoteAlbums(local.artistId)
+   remote, e := remoteAlbums(local.id)
    if e != nil {
       log.Fatal(e)
    }
+   log.Print(remote)
    /*
-   FIXME local
-   local[strings.ToUpper(q.album)] = winterLocal{
-      color(q.url, q.unrated, q.good), q.date,
-   }
-   FIXME remote
    index, ok := remote[release.Group.Id]
    if ok {
       // add release to group

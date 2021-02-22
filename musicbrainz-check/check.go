@@ -9,19 +9,6 @@ import (
    "winter"
 )
 
-type localAlbum struct {
-   date string
-   good int
-   title string
-   unrated int
-   url string
-}
-
-type localArtist struct {
-   artistId string
-   albums []localAlbum
-}
-
 type remoteAlbum struct {
    Date string
    Group struct {
@@ -113,14 +100,30 @@ func newLocalArtist(name, file string) (localArtist, error) {
    if e != nil {
       return localArtist{}, e
    }
-   var artist localArtist
+   artist := localArtist{
+      artistId,
+      map[string]localAlbum{},
+   }
    for query.Next() {
       var alb localAlbum
       e = query.Scan(&alb.title, &alb.date, &alb.url, &alb.unrated, &alb.good)
       if e != nil {
          return localArtist{}, e
       }
-      artist.albums = append(artist.albums, alb)
+      artist.albums[alb.date + alb.title] = alb
    }
    return artist, nil
+}
+
+type localAlbum struct {
+   date string
+   good int
+   title string
+   unrated int
+   url string
+}
+
+type localArtist struct {
+   id string
+   albums map[string]localAlbum
 }
