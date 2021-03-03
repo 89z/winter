@@ -25,7 +25,7 @@ func note(r row, songs map[string]int) (string, string) {
 func selectOne(tx winter.Tx, like string) error {
    // ARTIST
    var (
-      artist_n int
+      artistId int
       artist string
       check string
       mb string
@@ -33,7 +33,7 @@ func selectOne(tx winter.Tx, like string) error {
    e := tx.QueryRow(
       "select * from artist_t where artist_s LIKE ?",
       like,
-   ).Scan(&artist_n, &artist, &check, &mb)
+   ).Scan(&artistId, &artist, &check, &mb)
    if e != nil {
       return e
    }
@@ -58,7 +58,7 @@ func selectOne(tx winter.Tx, like string) error {
    if e != nil {
       return e
    }
-   row_a := []row{}
+   var rows []row
    songs := map[string]int{}
    for query.Next() {
       r := row{}
@@ -74,7 +74,7 @@ func selectOne(tx winter.Tx, like string) error {
       if e != nil {
          return e
       }
-      row_a = append(row_a, r)
+      rows = append(rows, r)
       upper := strings.ToUpper(r.songStr)
       if songs[upper] == 0 {
          songs[upper] = 1
@@ -90,7 +90,7 @@ func selectOne(tx winter.Tx, like string) error {
    defer cmd.Wait()
    defer pipe.Close()
    // print artist number
-   fmt.Fprintln(pipe, "artist_n |", artist_n)
+   fmt.Fprintln(pipe, "artist_n |", artistId)
    // print artist name
    fmt.Fprintln(pipe, "artist_s |", artist)
    // print artist check
@@ -105,7 +105,7 @@ func selectOne(tx winter.Tx, like string) error {
    } else {
       fmt.Fprintln(pipe, "mb_s     |", yellow)
    }
-   for _, r := range row_a {
+   for _, r := range rows {
       if r.albumInt != album_prev_n {
          fmt.Fprintln(pipe)
          // print album number
