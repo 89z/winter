@@ -3,6 +3,7 @@ package winter
 import (
    "database/sql"
    "fmt"
+   _ "github.com/mattn/go-sqlite3"
 )
 
 type Rows = sql.Rows
