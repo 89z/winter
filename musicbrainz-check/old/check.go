@@ -53,7 +53,7 @@ func main() {
          }
       }
    }
-   sort.Slice(remotes, func(i, j int) bool {
+   sort.Slice(remotes, func (i, j int) bool {
       return remotes[i].date < remotes[j].date
    })
    for _, group := range remotes {
