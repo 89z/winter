@@ -82,7 +82,7 @@ func selectOne(tx winter.Tx, like string) error {
          songs[upper]++
       }
    }
-   album_prev_n := 0
+   prev := 0
    cmd, pipe, e := less()
    if e != nil {
       return e
@@ -106,7 +106,7 @@ func selectOne(tx winter.Tx, like string) error {
       fmt.Fprintln(pipe, "mb_s     |", yellow)
    }
    for _, r := range rows {
-      if r.albumInt != album_prev_n {
+      if r.albumInt != prev {
          fmt.Fprintln(pipe)
          // print album number
          fmt.Fprintln(pipe, "album_n |", r.albumInt)
@@ -128,7 +128,7 @@ func selectOne(tx winter.Tx, like string) error {
          fmt.Fprint(pipe, "--------+-----------+", dash[:width], "\n")
          fmt.Fprintln(pipe, "song_n  | note_s    | song_s")
          fmt.Fprint(pipe, "--------+-----------+", dash[:width], "\n")
-         album_prev_n = r.albumInt
+         prev = r.albumInt
       }
       // print song number
       fmt.Fprintf(pipe, "%7v | ", r.songInt)
