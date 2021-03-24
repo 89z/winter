@@ -53,8 +53,8 @@ func main() {
          }
       }
    }
-   sort.Slice(remotes, func (i, j int) bool {
-      return remotes[i].date < remotes[j].date
+   sort.Slice(remotes, func (d, e int) bool {
+      return remotes[d].date < remotes[e].date
    })
    for _, group := range remotes {
       fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)

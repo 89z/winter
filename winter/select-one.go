@@ -133,8 +133,8 @@ func selectOne(tx winter.Tx, like string) error {
       // print song number
       fmt.Fprintf(pipe, "%7v | ", r.songInt)
       // print song note
-      fmt_s, note_s := note(r, songs)
-      fmt.Fprintf(pipe, fmt_s + " | ", note_s)
+      format, songNote := note(r, songs)
+      fmt.Fprintf(pipe, format + " | ", songNote)
       // print song title
       fmt.Fprintln(pipe, r.songStr)
    }

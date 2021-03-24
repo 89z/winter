@@ -10,14 +10,14 @@ func selectAll(tx winter.Tx) error {
    then := time.Now().AddDate(-1, 0, 0)
    query, e := tx.Query(`
    select
-      count(1) filter (where note_s = 'good') as count_n,
+      count(1) filter (where note_s = 'good') as good,
       artist_s
    from artist_t
    natural join song_artist_t
    natural join song_t
    where check_s < ?
    group by artist_n
-   order by count_n
+   order by good
    `, then)
    if e != nil {
       return e
