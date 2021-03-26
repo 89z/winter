@@ -3,7 +3,6 @@ package main
 import (
    "encoding/json"
    "fmt"
-   "io/ioutil"
    "log"
    "os"
    "strings"
@@ -43,7 +42,7 @@ func main() {
       table[strings.ToUpper(row)] = true
    }
    // JSON
-   data, e := ioutil.ReadFile(os.Getenv("UMBER"))
+   data, e := os.ReadFile(os.Getenv("UMBER"))
    var songs []song
    e = json.Unmarshal(data, &songs)
    if e != nil {
