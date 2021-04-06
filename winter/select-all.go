@@ -19,25 +19,15 @@ func selectAll(tx winter.Tx) error {
    group by artist_n
    order by good
    `, then)
-   if e != nil {
-      return e
-   }
+   if e != nil { return e }
    var (
       artist string
       count int
    )
-   cmd, pipe, e := less()
-   if e != nil {
-      return e
-   }
-   defer cmd.Wait()
-   defer pipe.Close()
    for query.Next() {
       e = query.Scan(&count, &artist)
-      if e != nil {
-         return e
-      }
-      fmt.Fprintln(pipe, count, "|", artist)
+      if e != nil { return e }
+      fmt.Println(count, "|", artist)
    }
    return nil
 }

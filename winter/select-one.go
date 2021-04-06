@@ -1,65 +1,45 @@
 package main
 
 import (
+   "bytes"
    "fmt"
+   "github.com/noborus/ov/oviewer"
    "strings"
    "winter"
 )
 
-const (
-   dash = "-----------------------------------------------------------------"
-   width = 50
-   yellow = "\x1b[43m   \x1b[m"
-)
-
-func note(r row, songs map[string]int) (string, string) {
-   if r.noteStr != "" || strings.HasPrefix(r.urlStr, "youtube.com/watch?") {
-      return "%-9v", r.noteStr
-   }
-   if songs[strings.ToUpper(r.songStr)] > 1 {
-      return "\x1b[30;43m%v\x1b[m", "duplicate"
-   }
-   return yellow + "%6v", ""
-}
-
 func selectOne(tx winter.Tx, like string) error {
    // ARTIST
    var (
+      artist, check, mb string
       artistId int
-      artist string
-      check string
-      mb string
    )
    e := tx.QueryRow(
-      "select * from artist_t where artist_s LIKE ?",
-      like,
+      "select * from artist_t where artist_s LIKE ?", like,
    ).Scan(&artistId, &artist, &check, &mb)
-   if e != nil {
-      return e
-   }
+   if e != nil { return e }
    // ALBUMS
    query, e := tx.Query(`
-      SELECT
-         album_n,
-         album_s,
-         date_s,
-         note_s,
-         song_n,
-         song_s,
-         url_s
-      FROM album_t
-      NATURAL JOIN song_t
-      NATURAL JOIN song_artist_t
-      NATURAL JOIN artist_t
-      WHERE artist_s LIKE ?
-      ORDER BY date_s
-      `, like,
+   SELECT
+      album_n,
+      album_s,
+      date_s,
+      note_s,
+      song_n,
+      song_s,
+      url_s
+   FROM album_t
+   NATURAL JOIN song_t
+   NATURAL JOIN song_artist_t
+   NATURAL JOIN artist_t
+   WHERE artist_s LIKE ?
+   ORDER BY date_s
+   `, like)
+   if e != nil { return e }
+   var (
+      rows []row
+      songs = map[string]int{}
    )
-   if e != nil {
-      return e
-   }
-   var rows []row
-   songs := map[string]int{}
    for query.Next() {
       r := row{}
       e = query.Scan(
@@ -71,9 +51,7 @@ func selectOne(tx winter.Tx, like string) error {
          &r.songStr,
          &r.urlStr,
       )
-      if e != nil {
-         return e
-      }
+      if e != nil { return e }
       rows = append(rows, r)
       upper := strings.ToUpper(r.songStr)
       if songs[upper] == 0 {
@@ -83,70 +61,86 @@ func selectOne(tx winter.Tx, like string) error {
       }
    }
    prev := 0
+   /*
    cmd, pipe, e := less()
-   if e != nil {
-      return e
-   }
-   defer cmd.Wait()
-   defer pipe.Close()
+   if e != nil { return e }
+   defer func() {
+      pipe.Close()
+      cmd.Wait()
+   }()
+   */
+   b := new(bytes.Buffer)
    // print artist number
-   fmt.Fprintln(pipe, "artist_n |", artistId)
+   fmt.Fprintln(b, "artist_n |", artistId)
    // print artist name
-   fmt.Fprintln(pipe, "artist_s |", artist)
+   fmt.Fprintln(b, "artist_s |", artist)
    // print artist check
    if check != "" {
-      fmt.Fprintln(pipe, "check_s  |", check)
+      fmt.Fprintln(b, "check_s  |", check)
    } else {
-      fmt.Fprintln(pipe, "check_s  |", yellow)
+      fmt.Fprintln(b, "check_s  |", yellow)
    }
    // print musicbrainz id
    if mb != "" {
-      fmt.Fprintln(pipe, "mb_s     |", mb)
+      fmt.Fprintln(b, "mb_s     |", mb)
    } else {
-      fmt.Fprintln(pipe, "mb_s     |", yellow)
+      fmt.Fprintln(b, "mb_s     |", yellow)
    }
    for _, r := range rows {
       if r.albumInt != prev {
-         fmt.Fprintln(pipe)
+         fmt.Fprintln(b)
          // print album number
-         fmt.Fprintln(pipe, "album_n |", r.albumInt)
+         fmt.Fprintln(b, "album_n |", r.albumInt)
          // print album title
-         fmt.Fprintln(pipe, "album_s |", r.albumStr)
+         fmt.Fprintln(b, "album_s |", r.albumStr)
          // print album date
          if r.dateStr != "" {
-            fmt.Fprintln(pipe, "date_s  |", r.dateStr)
+            fmt.Fprintln(b, "date_s  |", r.dateStr)
          } else {
-            fmt.Fprintln(pipe, "date_s  |", yellow)
+            fmt.Fprintln(b, "date_s  |", yellow)
          }
          // print URL
          if r.urlStr != "" {
-            fmt.Fprintln(pipe, "url_s   |", r.urlStr)
+            fmt.Fprintln(b, "url_s   |", r.urlStr)
          } else {
-            fmt.Fprintln(pipe, "url_s   |", yellow)
+            fmt.Fprintln(b, "url_s   |", yellow)
          }
          // print rule
-         fmt.Fprint(pipe, "--------+-----------+", dash[:width], "\n")
-         fmt.Fprintln(pipe, "song_n  | note_s    | song_s")
-         fmt.Fprint(pipe, "--------+-----------+", dash[:width], "\n")
+         dash := strings.Repeat("-", 50)
+         fmt.Fprint(b, "--------+-----------+", dash, "\n")
+         fmt.Fprintln(b, "song_n  | note_s    | song_s")
+         fmt.Fprint(b, "--------+-----------+", dash, "\n")
          prev = r.albumInt
       }
       // print song number
-      fmt.Fprintf(pipe, "%7v | ", r.songInt)
+      fmt.Fprintf(b, "%7v | ", r.songInt)
       // print song note
       format, songNote := note(r, songs)
-      fmt.Fprintf(pipe, format + " | ", songNote)
+      fmt.Fprintf(b, format + " | ", songNote)
       // print song title
-      fmt.Fprintln(pipe, r.songStr)
+      fmt.Fprintln(b, r.songStr)
    }
+   root, e := oviewer.NewRoot(b)
+   if e != nil { return e }
+   root.Run()
+   root.WriteOriginal()
    return nil
 }
 
+func note(r row, songs map[string]int) (string, string) {
+   switch {
+   case r.noteStr != "", strings.HasPrefix(r.urlStr, "youtube.com/watch?"):
+      return "%-9v", r.noteStr
+   case songs[strings.ToUpper(r.songStr)] > 1:
+      return "\x1b[30;43m%v\x1b[m", "duplicate"
+   default:
+      return yellow + "%6v", ""
+   }
+}
+
+const yellow = "\x1b[43m   \x1b[0m"
+
 type row struct {
-   albumInt int
-   albumStr string
-   dateStr string
-   noteStr string
-   songInt int
-   songStr string
-   urlStr string
+   albumInt, songInt int
+   albumStr, dateStr, noteStr, songStr,urlStr string
 }
