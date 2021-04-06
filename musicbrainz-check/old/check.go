@@ -14,19 +14,17 @@ the remote Release titles to match against the local Release title.
 For the date, if we have a local match, use that date. Otherwise, use use the
 remote Group date */
 type winterRemote struct {
-   color string
-   date string
+   color, date, title string
    release map[string]bool
-   title string
 }
 
 func color(url string, unrated, good int) string {
    const (
       block = "\u2587\u2587\u2587\u2587\u2587"
-      greenFive = "\x1b[92m" + block + "\x1b[90m" + block + "\x1b[m"
-      greenTen = "\x1b[92m" + block + block + "\x1b[m"
-      redFive = "\x1b[91m" + block + "\x1b[90m" + block + "\x1b[m"
-      redTen = "\x1b[91m" + block + block + "\x1b[m"
+      greenFive = "\x1b[92m" + block + "\x1b[90m" + block + "\x1b[0m"
+      greenTen = "\x1b[92m" + block + block + "\x1b[0m"
+      redFive = "\x1b[91m" + block + "\x1b[90m" + block + "\x1b[0m"
+      redTen = "\x1b[91m" + block + block + "\x1b[0m"
    )
    if strings.HasPrefix(url, "youtube.com/watch?") {
       return greenTen

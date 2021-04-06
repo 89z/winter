@@ -60,16 +60,10 @@ func selectOne(tx winter.Tx, like string) error {
          songs[upper]++
       }
    }
-   prev := 0
-   /*
-   cmd, pipe, e := less()
-   if e != nil { return e }
-   defer func() {
-      pipe.Close()
-      cmd.Wait()
-   }()
-   */
-   b := new(bytes.Buffer)
+   var (
+      b = new(bytes.Buffer)
+      prev = 0
+   )
    // print artist number
    fmt.Fprintln(b, "artist_n |", artistId)
    // print artist name
@@ -132,7 +126,7 @@ func note(r row, songs map[string]int) (string, string) {
    case r.noteStr != "", strings.HasPrefix(r.urlStr, "youtube.com/watch?"):
       return "%-9v", r.noteStr
    case songs[strings.ToUpper(r.songStr)] > 1:
-      return "\x1b[30;43m%v\x1b[m", "duplicate"
+      return "\x1b[30;43m%v\x1b[0m", "duplicate"
    default:
       return yellow + "%6v", ""
    }
