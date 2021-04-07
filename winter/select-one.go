@@ -126,13 +126,13 @@ func note(r row, songs map[string]int) (string, string) {
    case r.noteStr != "", strings.HasPrefix(r.urlStr, "youtube.com/watch?"):
       return "%-9v", r.noteStr
    case songs[strings.ToUpper(r.songStr)] > 1:
-      return "\x1b[30;43m%v\x1b[0m", "duplicate"
+      return "\x1b[30;43m%v\x1b[m", "duplicate"
    default:
       return yellow + "%6v", ""
    }
 }
 
-const yellow = "\x1b[43m   \x1b[0m"
+const yellow = "\x1b[43m   \x1b[m"
 
 type row struct {
    albumInt, songInt int
