@@ -8,9 +8,7 @@ import (
 
 type Rows = sql.Rows
 
-type Tx struct {
-   *sql.Tx
-}
+type Tx struct { *sql.Tx }
 
 func NewTx(file string) (Tx, error) {
    db, e := sql.Open("sqlite3", file)
