@@ -3,7 +3,7 @@ package main
 import (
    "bytes"
    "fmt"
-   "github.com/noborus/ov/oviewer"
+   "github.com/89z/oviewer"
    "strings"
    "winter"
 )
