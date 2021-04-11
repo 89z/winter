@@ -114,7 +114,7 @@ func selectOne(tx winter.Tx, like string) error {
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
-   read := page.NewReaderFromStream("winter", b)
+   read := page.NewReader("winter", b)
    p := page.NewPager(read)
    p.ShowLineNumbers = false
    return p.StartPaging(false)
