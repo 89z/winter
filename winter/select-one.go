@@ -3,7 +3,7 @@ package main
 import (
    "bytes"
    "fmt"
-   "github.com/89z/page"
+   "github.com/noborus/ov/oviewer"
    "strings"
    "winter"
 )
@@ -114,10 +114,11 @@ func selectOne(tx winter.Tx, like string) error {
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
-   read := page.NewReader("winter", b)
-   p := page.NewPager(read)
-   p.ShowLineNumbers = false
-   return p.StartPaging(false)
+   root, e := oviewer.NewRoot(b)
+   if e != nil { return e }
+   root.Run()
+   root.WriteOriginal()
+   return nil
 }
 
 func note(r row, songs map[string]int) (string, string) {
