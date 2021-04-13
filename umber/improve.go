@@ -43,6 +43,9 @@ func main() {
    }
    // JSON
    data, e := os.ReadFile(os.Getenv("UMBER"))
+   if e != nil {
+      log.Fatal(e)
+   }
    var songs []song
    e = json.Unmarshal(data, &songs)
    if e != nil {
