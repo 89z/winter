@@ -40,9 +40,7 @@ Update song note:
       os.Exit(1)
    }
    key := os.Args[1]
-   tx, e := winter.NewTx(
-      os.Getenv("WINTER"),
-   )
+   tx, e := winter.NewTx(os.Getenv("WINTER"))
    if e != nil {
       log.Fatal(e)
    }
