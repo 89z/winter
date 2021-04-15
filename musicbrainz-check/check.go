@@ -3,8 +3,8 @@ package main
 import (
    "encoding/json"
    "errors"
-   "fmt"
    "net/http"
+   "strconv"
    "winter"
 )
 
@@ -52,7 +52,7 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
       }
       offset += 100
       if offset >= artist.ReleaseCount { break }
-      val.Set("offset", fmt.Sprint(offset))
+      val.Set("offset", strconv.Itoa(offset))
    }
    return albums, nil
 }
