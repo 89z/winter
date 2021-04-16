@@ -1,13 +1,11 @@
 code.rocketnine.space/tslocum/cbind v0.1.5 h1:i6NkeLLNPNMS4NWNi3302Ay3zSU6MrqOT+yJskiodxE=
 code.rocketnine.space/tslocum/cbind v0.1.5/go.mod h1:LtfqJTzM7qhg88nAvNhx+VnTjZ0SXBJtxBObbfBWo/M=
-github.com/89z/page v1.2.1 h1:2S0xGelHmoT1TAAGiBTTnsXn8mKHirkDlMiqMoQsi0c=
-github.com/89z/page v1.2.1/go.mod h1:AAZoAmdN0yEdsDO8JUf/9x4aBF6GGbVwvEsd0XAmvZo=
-github.com/89z/x v1.13.6 h1:Z2XULcJfitUjPlgtH73YCqHS9A4AkUrA1Z8tm/SBsKI=
-github.com/89z/x v1.13.6/go.mod h1:QfaOLBiqZj3Sirjr9C2eMrS0XlGttcRVB+ededggzc0=
+github.com/89z/page v1.2.4 h1:EnY1tgCWUh6u7xYjWh1ImmsmlWU+6BaK3S0mb0yw8as=
+github.com/89z/page v1.2.4/go.mod h1:vZfqK3S358AAamgJ0x81EKsE8CX2qYFCmsAdmT0TziE=
+github.com/89z/x v1.13.7 h1:IjuWrtKyKKCJwgMLNVf0IfC4lx/XIbRkgO0vHO2shcQ=
+github.com/89z/x v1.13.7/go.mod h1:QfaOLBiqZj3Sirjr9C2eMrS0XlGttcRVB+ededggzc0=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
-github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=
-github.com/atotto/clipboard v0.1.4/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=

@@ -40,7 +40,7 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
    val.Set("artist", artistId)
    for {
       req.URL.RawQuery = val.Encode()
-      res, e := http.DefaultClient.Do(req)
+      res, e := new(http.Client).Do(req)
       if e != nil { return nil, e }
       var artist remoteArtist
       e = json.NewDecoder(res.Body).Decode(&artist)
