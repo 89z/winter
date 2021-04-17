@@ -22,7 +22,7 @@ func copyAlbum(tx winter.Tx, source , dest string) error {
    if e != nil {
       return e
    }
-   songs := map[string]string{}
+   songs := make(map[string]string)
    for query.Next() {
       e = query.Scan(&song, &note)
       if e != nil {

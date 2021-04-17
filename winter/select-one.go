@@ -38,10 +38,10 @@ func selectOne(tx winter.Tx, like string) error {
    if e != nil { return e }
    var (
       rows []row
-      songs = map[string]int{}
+      song = make(map[string]int)
    )
    for query.Next() {
-      r := row{}
+      var r row
       e = query.Scan(
          &r.albumInt,
          &r.albumStr,

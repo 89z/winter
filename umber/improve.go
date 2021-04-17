@@ -9,30 +9,22 @@ import (
    "winter"
 )
 
-type song struct {
-   S string
-}
-
 func query(file string) (*winter.Rows, error) {
    // get all artists
    tx, e := winter.NewTx(file)
-   if e != nil {
-      return nil, e
-   }
+   if e != nil { return nil, e }
    return tx.Query("select artist_s from artist_t")
 }
 
 // find where the artist is not in the database
 func main() {
-   rows, e := query(
-      os.Getenv("WINTER"),
-   )
+   rows, e := query(os.Getenv("WINTER"))
    if e != nil {
       log.Fatal(e)
    }
    var (
       row string
-      table = map[string]bool{}
+      table = make(map[string]bool)
    )
    for rows.Next() {
       e = rows.Scan(&row)
@@ -46,7 +38,7 @@ func main() {
    if e != nil {
       log.Fatal(e)
    }
-   var songs []song
+   var songs []struct { S string }
    e = json.Unmarshal(data, &songs)
    if e != nil {
       log.Fatal(e)
