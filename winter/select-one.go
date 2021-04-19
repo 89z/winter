@@ -4,6 +4,7 @@ import (
    "bytes"
    "fmt"
    "github.com/89z/page"
+   "io"
    "strings"
    "winter"
 )
@@ -38,7 +39,7 @@ func selectOne(tx winter.Tx, like string) error {
    if e != nil { return e }
    var (
       rows []row
-      song = make(map[string]int)
+      songs = make(map[string]int)
    )
    for query.Next() {
       var r row
@@ -114,7 +115,10 @@ func selectOne(tx winter.Tx, like string) error {
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
-   root, e := page.NewRoot(b)
+   doc, e := page.NewDocument()
+   if e != nil { return e }
+   doc.ReadAll(io.NopCloser(b))
+   root, e := page.NewOviewer(doc)
    if e != nil { return e }
    root.Run()
    root.WriteOriginal()
