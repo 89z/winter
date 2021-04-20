@@ -3,7 +3,7 @@ package main
 import (
    "bytes"
    "fmt"
-   "github.com/89z/page"
+   "github.com/walles/moar/m"
    "strings"
    "winter"
 )
@@ -114,14 +114,10 @@ func selectOne(tx winter.Tx, like string) error {
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
-   doc, e := page.NewDocument()
-   if e != nil { return e }
-   doc.ReadAll(b)
-   root, e := page.NewOviewer(doc)
-   if e != nil { return e }
-   root.Run()
-   root.WriteOriginal()
-   return nil
+   read := m.NewReaderFromStream("winter", b)
+   page := m.NewPager(read)
+   page.DeInit, page.ShowLineNumbers = false, false
+   return page.Page()
 }
 
 func note(r row, songs map[string]int) (string, string) {
