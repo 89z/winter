@@ -4,7 +4,6 @@ import (
    "bytes"
    "fmt"
    "github.com/89z/page"
-   "io"
    "strings"
    "winter"
 )
@@ -117,7 +116,7 @@ func selectOne(tx winter.Tx, like string) error {
    }
    doc, e := page.NewDocument()
    if e != nil { return e }
-   doc.ReadAll(io.NopCloser(b))
+   doc.ReadAll(b)
    root, e := page.NewOviewer(doc)
    if e != nil { return e }
    root.Run()
