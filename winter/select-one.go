@@ -3,7 +3,7 @@ package main
 import (
    "bytes"
    "fmt"
-   "github.com/walles/moar/m"
+   "github.com/89z/page"
    "strings"
    "winter"
 )
@@ -114,8 +114,8 @@ func selectOne(tx winter.Tx, like string) error {
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
-   read := m.NewReaderFromStream("winter", b)
-   page := m.NewPager(read)
+   read := page.NewReaderFromStream("winter", b)
+   page := page.NewPager(read)
    page.DeInit, page.ShowLineNumbers = false, false
    return page.Page()
 }

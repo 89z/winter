@@ -1,10 +1,5 @@
 package main
-
-import (
-   "fmt"
-   "sort"
-   "strings"
-)
+import "strings"
 
 /* Regarding the title and date:
 
@@ -42,6 +37,7 @@ func color(url string, unrated, good int) string {
 }
 
 func main() {
+   /*
    for n, group := range remotes {
       for release := range group.release {
          local, ok := locals[strings.ToUpper(release)]
@@ -57,4 +53,5 @@ func main() {
    for _, group := range remotes {
       fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
    }
+   */
 }
