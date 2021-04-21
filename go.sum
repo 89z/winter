@@ -1,7 +1,7 @@
 github.com/89z/page v1.3.5 h1:8AtacgwNjFES1TtMbXrfjqcyhwIsEYZjHWy6Q+V/bjM=
 github.com/89z/page v1.3.5/go.mod h1:NFT+1VN3wRaE/Zr/5cxZq1bUjQqeZG5CGrAB4lI8xGg=
-github.com/89z/x v1.13.8 h1:OzuR+Sqxcwn9Eh9wbdE7I5eAbFOIBPoB/1l7KPvtOGE=
-github.com/89z/x v1.13.8/go.mod h1:QfaOLBiqZj3Sirjr9C2eMrS0XlGttcRVB+ededggzc0=
+github.com/89z/x v1.13.9 h1:pSaPp8sGRZkqstB8+dq51qglcL/5GNg/H3wD1sT37us=
+github.com/89z/x v1.13.9/go.mod h1:QfaOLBiqZj3Sirjr9C2eMrS0XlGttcRVB+ededggzc0=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38 h1:smF2tmSOzy2Mm+0dGI2AIUHY+w0BUc+4tn40djz7+6U=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
 github.com/alecthomas/chroma v0.8.2 h1:x3zkuE2lUk/RIekyAJ3XRqSCP4zwWDfcw/YJCuCAACg=
