@@ -1,7 +1,6 @@
 package main
 
 import (
-   "log"
    "os"
    "winter"
 )
@@ -42,7 +41,7 @@ Update song note:
    key := os.Args[1]
    tx, e := winter.NewTx(os.Getenv("WINTER"))
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
    switch key {
    case "album":
@@ -85,10 +84,10 @@ Update song note:
       e = selectOne(tx, key)
    }
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
    e = tx.Commit()
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
 }
