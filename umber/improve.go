@@ -3,7 +3,6 @@ package main
 import (
    "encoding/json"
    "fmt"
-   "log"
    "os"
    "strings"
    "winter"
@@ -20,7 +19,7 @@ func query(file string) (*winter.Rows, error) {
 func main() {
    rows, e := query(os.Getenv("WINTER"))
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
    var (
       row string
@@ -29,19 +28,19 @@ func main() {
    for rows.Next() {
       e = rows.Scan(&row)
       if e != nil {
-         log.Fatal(e)
+         panic(e)
       }
       table[strings.ToUpper(row)] = true
    }
    // JSON
    data, e := os.ReadFile(os.Getenv("UMBER"))
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
    var songs []struct { S string }
    e = json.Unmarshal(data, &songs)
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
    for _, each := range songs {
       artists := strings.Split(each.S, " - ")[0]

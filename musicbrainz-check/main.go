@@ -1,7 +1,7 @@
 package main
 
 import (
-   "log"
+   "fmt"
    "os"
 )
 
@@ -13,13 +13,13 @@ func main() {
    name, file := os.Args[1], os.Getenv("WINTER")
    local, e := newLocalArtist(name, file)
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
    remote, e := remoteAlbums(local.id)
    if e != nil {
-      log.Fatal(e)
+      panic(e)
    }
-   log.Print(remote)
+   fmt.Println(remote)
    /*
    index, ok := remote[release.Group.Id]
    if ok {
