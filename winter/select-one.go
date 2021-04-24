@@ -114,14 +114,10 @@ func selectOne(tx winter.Tx, like string) error {
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
-   model := page.NewModel()
-   model.ReadAll(b)
-   root := page.New()
-   root.Model = model
-   println("Run")
-   root.Run(nil)
-   root.WriteOriginal()
-   return nil
+   read := page.NewReaderFromStream("winter", b)
+   p := page.NewPager(read)
+   p.DeInit, p.ShowLineNumbers = false, false
+   return p.Page()
 }
 
 func note(r row, songs map[string]int) (string, string) {
