@@ -2,7 +2,7 @@ package main
 
 import (
    "fmt"
-   "github.com/89z/x/musicbrainz"
+   "github.com/89z/rosso/musicbrainz"
    "os"
    "winter"
 )
