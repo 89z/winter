@@ -1,5 +1,7 @@
 github.com/89z/page v1.4.8 h1:6EehCg8jzDkvBvWQ9J5/UBBUgROmQRs2aH17ulNffUo=
 github.com/89z/page v1.4.8/go.mod h1:D/Ptznly7DdgRod2fQhbsKp5X3ohGMw/FlBVsHgXRaY=
+github.com/89z/page v1.4.9 h1:QeMbWpowcRd3Y9e6O3PHhRPe/6Hrm5a973cVkxY+LnI=
+github.com/89z/page v1.4.9/go.mod h1:D/Ptznly7DdgRod2fQhbsKp5X3ohGMw/FlBVsHgXRaY=
 github.com/89z/rosso v1.14.8 h1:flui7bcZlskGkaRVucLwfxFrvG10zXviw7oe+H6KHlY=
 github.com/89z/rosso v1.14.8/go.mod h1:DEuYQ3pWVQ5VSFkvCBmKg9NQt+vVsA6lTF/kz7G69LQ=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
