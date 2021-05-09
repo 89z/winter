@@ -8,18 +8,24 @@ import (
    "winter"
 )
 
+const (
+   reset = "\x1b[m"
+   yellow = "\x1b[30;43m"
+)
+
+
 func selectOne(tx winter.Tx, like string) error {
    // ARTIST
    var (
       artist, check, mb string
       artistId int
    )
-   e := tx.QueryRow(
+   err := tx.QueryRow(
       "select * from artist_t where artist_s LIKE ?", like,
    ).Scan(&artistId, &artist, &check, &mb)
-   if e != nil { return e }
+   if err != nil { return err }
    // ALBUMS
-   query, e := tx.Query(`
+   query, err := tx.Query(`
    SELECT
       album_n,
       album_s,
@@ -35,14 +41,14 @@ func selectOne(tx winter.Tx, like string) error {
    WHERE artist_s LIKE ?
    ORDER BY date_s
    `, like)
-   if e != nil { return e }
+   if err != nil { return err }
    var (
       rows []row
       songs = make(map[string]int)
    )
    for query.Next() {
       var r row
-      e = query.Scan(
+      err := query.Scan(
          &r.albumInt,
          &r.albumStr,
          &r.dateStr,
@@ -51,7 +57,7 @@ func selectOne(tx winter.Tx, like string) error {
          &r.songStr,
          &r.urlStr,
       )
-      if e != nil { return e }
+      if err != nil { return err }
       rows = append(rows, r)
       upper := strings.ToUpper(r.songStr)
       if songs[upper] == 0 {
@@ -62,7 +68,7 @@ func selectOne(tx winter.Tx, like string) error {
    }
    var (
       b = new(bytes.Buffer)
-      prev = 0
+      prev int
    )
    // print artist number
    fmt.Fprintln(b, "artist_n |", artistId)
@@ -72,13 +78,13 @@ func selectOne(tx winter.Tx, like string) error {
    if check != "" {
       fmt.Fprintln(b, "check_s  |", check)
    } else {
-      fmt.Fprintln(b, "check_s  |", yellow)
+      fmt.Fprintln(b, "check_s  |", yellow, " ", reset)
    }
    // print musicbrainz id
    if mb != "" {
       fmt.Fprintln(b, "mb_s     |", mb)
    } else {
-      fmt.Fprintln(b, "mb_s     |", yellow)
+      fmt.Fprintln(b, "mb_s     |", yellow, " ", reset)
    }
    for _, r := range rows {
       if r.albumInt != prev {
@@ -91,13 +97,13 @@ func selectOne(tx winter.Tx, like string) error {
          if r.dateStr != "" {
             fmt.Fprintln(b, "date_s  |", r.dateStr)
          } else {
-            fmt.Fprintln(b, "date_s  |", yellow)
+            fmt.Fprintln(b, "date_s  |", yellow, " ", reset)
          }
          // print URL
          if r.urlStr != "" {
             fmt.Fprintln(b, "url_s   |", r.urlStr)
          } else {
-            fmt.Fprintln(b, "url_s   |", yellow)
+            fmt.Fprintln(b, "url_s   |", yellow, " ", reset)
          }
          // print rule
          dash := strings.Repeat("-", 50)
@@ -109,8 +115,7 @@ func selectOne(tx winter.Tx, like string) error {
       // print song number
       fmt.Fprintf(b, "%7v | ", r.songInt)
       // print song note
-      format, songNote := note(r, songs)
-      fmt.Fprintf(b, format + " | ", songNote)
+      fmt.Fprint(b, note(r, songs), " | ")
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
@@ -120,18 +125,16 @@ func selectOne(tx winter.Tx, like string) error {
    return p.Page()
 }
 
-func note(r row, songs map[string]int) (string, string) {
+func note(r row, songs map[string]int) string {
    switch {
    case r.noteStr != "", strings.HasPrefix(r.urlStr, "youtube.com/watch?"):
-      return "%-9v", r.noteStr
+      return fmt.Sprintf("%-9v", r.noteStr)
    case songs[strings.ToUpper(r.songStr)] > 1:
-      return "\x1b[30;43m%v\x1b[m", "duplicate"
+      return yellow + "duplicate" + reset
    default:
-      return yellow + "%6v", ""
+      return yellow + "   " + reset + "      "
    }
 }
-
-const yellow = "\x1b[43m   \x1b[m"
 
 type row struct {
    albumInt, songInt int

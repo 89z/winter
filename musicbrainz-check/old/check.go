@@ -16,24 +16,24 @@ type winterRemote struct {
 func color(url string, unrated, good int) string {
    const (
       block = "\u2587\u2587\u2587\u2587\u2587"
-      greenFive = "\x1b[92m" + block + "\x1b[90m" + block + "\x1b[m"
-      greenTen = "\x1b[92m" + block + block + "\x1b[m"
-      redFive = "\x1b[91m" + block + "\x1b[90m" + block + "\x1b[m"
-      redTen = "\x1b[91m" + block + block + "\x1b[m"
+      gray = "\x1b[90m"
+      green = "\x1b[92m"
+      red = "\x1b[91m"
+      reset = "\x1b[m"
    )
    if strings.HasPrefix(url, "youtube.com/watch?") {
-      return greenTen
+      return green + block + block + reset
    }
    if unrated == 0 && good == 0 {
-      return redTen
+      return red + block + block + reset
    }
    if unrated == 0 {
-      return greenTen
+      return green + block + block + reset
    }
    if good == 0 {
-      return redFive
+      return red + block + gray + block + reset
    }
-   return greenFive
+   return green + block + gray + block + reset
 }
 
 func main() {

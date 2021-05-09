@@ -1,9 +1,7 @@
-github.com/89z/page v1.4.8 h1:6EehCg8jzDkvBvWQ9J5/UBBUgROmQRs2aH17ulNffUo=
-github.com/89z/page v1.4.8/go.mod h1:D/Ptznly7DdgRod2fQhbsKp5X3ohGMw/FlBVsHgXRaY=
 github.com/89z/page v1.4.9 h1:QeMbWpowcRd3Y9e6O3PHhRPe/6Hrm5a973cVkxY+LnI=
 github.com/89z/page v1.4.9/go.mod h1:D/Ptznly7DdgRod2fQhbsKp5X3ohGMw/FlBVsHgXRaY=
-github.com/89z/rosso v1.14.8 h1:flui7bcZlskGkaRVucLwfxFrvG10zXviw7oe+H6KHlY=
-github.com/89z/rosso v1.14.8/go.mod h1:DEuYQ3pWVQ5VSFkvCBmKg9NQt+vVsA6lTF/kz7G69LQ=
+github.com/89z/rosso v1.15.3 h1:xYVys8WIXQLWu3GMnWguSfjUWN3CEPIumEoxQGDv9Dg=
+github.com/89z/rosso v1.15.3/go.mod h1:DEuYQ3pWVQ5VSFkvCBmKg9NQt+vVsA6lTF/kz7G69LQ=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
 github.com/alecthomas/chroma v0.8.2/go.mod h1:sko8vR34/90zvl5QdcUdvzL3J8NKjAUx9va9jPuFNoM=
 github.com/alecthomas/chroma v0.9.1/go.mod h1:eMuEnpA18XbG/WhOWtCzJHS7WqEtDAI+HxdwoW0nVSk=
@@ -16,10 +14,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dlclark/regexp2 v1.2.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
 github.com/dlclark/regexp2 v1.4.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
-github.com/golang/snappy v0.0.3 h1:fHPg5GQYlCeLIPB9BZqMVR5nR9A+IM5zcgeTdjMYmLA=
 github.com/golang/snappy v0.0.3/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
-github.com/klauspost/compress v1.12.2 h1:2KCfW3I9M7nSc5wOqXAlW2v2U6v+w6cbjvbfp+OykW8=
 github.com/klauspost/compress v1.12.2/go.mod h1:8dP1Hq4DHOhN9w426knH3Rhby4rFm6D8eO+e+Dq5Gzg=
 github.com/mattn/go-colorable v0.1.6/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
@@ -38,7 +34,6 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/walles/moar v1.4.0 h1:TmZdl7aVASDcPqO8brlk/CMwh9ABbY4CD634bVatJ/o=
 github.com/walles/moar v1.4.0/go.mod h1:X+ONUpVELLu+E0Y4DPWWHU7GGot0AcjOC2arAcms6i8=
-github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 h1:nIPpBwaJSVYIxUFsDv3M8ofmx9yWTog9BfvIu0q41lo=
 github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8/go.mod h1:HUYIGzjTL3rfEspMxjDjgmT5uz5wzYJKVo23qUhYTos=
 golang.org/x/sys v0.0.0-20191026070338-33540a1f6037/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
