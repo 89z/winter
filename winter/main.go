@@ -36,58 +36,58 @@ Update album URL:
 
 Update song note:
    winter note 999 good`)
-      os.Exit(1)
+      return
    }
    key := os.Args[1]
-   tx, e := winter.NewTx(os.Getenv("WINTER"))
-   if e != nil {
-      panic(e)
+   tx, err := winter.NewTx(os.Getenv("WINTER"))
+   if err != nil {
+      panic(err)
    }
    switch key {
    case "album":
       source := os.Args[2]
       if len(os.Args) == 4 {
          dest := os.Args[3]
-         e = copyAlbum(tx, source, dest)
+         err = copyAlbum(tx, source, dest)
       } else {
-         e = deleteAlbum(tx, source)
+         err = deleteAlbum(tx, source)
       }
    case "artist":
       if len(os.Args) == 2 {
-         e = selectAll(tx)
+         err = selectAll(tx)
       } else {
-         _, e = tx.Insert(
+         _, err = tx.Insert(
             "artist_t (artist_s, check_s, mb_s) values (?, '', '')", os.Args[2],
          )
       }
    case "check":
-      e = tx.Update(
+      err = tx.Update(
          "artist_t set check_s = ? where artist_n = ?", os.Args[3], os.Args[2],
       )
    case "date":
-      e = tx.Update(
+      err = tx.Update(
          "album_t set date_s = ? where album_n = ?", os.Args[3], os.Args[2],
       )
    case "mb":
-      e = tx.Update(
+      err = tx.Update(
          "artist_t set mb_s = ? where artist_n = ?", os.Args[3], os.Args[2],
       )
    case "note":
-      e = tx.Update(
+      err = tx.Update(
          "song_t set note_s = ? where song_n = ?", os.Args[3], os.Args[2],
       )
    case "url":
-      e = tx.Update(
+      err = tx.Update(
          "album_t set url_s = ? where album_n = ?", os.Args[3], os.Args[2],
       )
    default:
-      e = selectOne(tx, key)
+      err = selectOne(tx, key)
    }
-   if e != nil {
-      panic(e)
+   if err != nil {
+      panic(err)
    }
-   e = tx.Commit()
-   if e != nil {
-      panic(e)
+   err = tx.Commit()
+   if err != nil {
+      panic(err)
    }
 }

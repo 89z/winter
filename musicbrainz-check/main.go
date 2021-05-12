@@ -8,16 +8,16 @@ import (
 func main() {
    if len(os.Args) != 2 {
       println("musicbrainz-check <artist>")
-      os.Exit(1)
+      return
    }
    name, file := os.Args[1], os.Getenv("WINTER")
-   local, e := newLocalArtist(name, file)
-   if e != nil {
-      panic(e)
+   local, err := newLocalArtist(name, file)
+   if err != nil {
+      panic(err)
    }
-   remote, e := remoteAlbums(local.id)
-   if e != nil {
-      panic(e)
+   remote, err := remoteAlbums(local.id)
+   if err != nil {
+      panic(err)
    }
    fmt.Println(remote)
    /*
