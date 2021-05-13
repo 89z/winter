@@ -3,7 +3,7 @@ package main
 import (
    "bytes"
    "fmt"
-   "github.com/89z/page"
+   "github.com/walles/moar/m"
    "strings"
    "winter"
 )
@@ -12,7 +12,6 @@ const (
    reset = "\x1b[m"
    yellow = "\x1b[30;43m"
 )
-
 
 func selectOne(tx winter.Tx, like string) error {
    // ARTIST
@@ -119,8 +118,8 @@ func selectOne(tx winter.Tx, like string) error {
       // print song title
       fmt.Fprintln(b, r.songStr)
    }
-   read := page.NewReaderFromStream("winter", b)
-   p := page.NewPager(read)
+   read := m.NewReaderFromStream("winter", b)
+   p := m.NewPager(read)
    p.DeInit, p.ShowLineNumbers = false, false
    return p.Page()
 }
