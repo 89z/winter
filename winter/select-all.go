@@ -8,7 +8,7 @@ import (
 
 func selectAll(tx winter.Tx) error {
    then := time.Now().AddDate(-1, 0, 0)
-   query, e := tx.Query(`
+   query, err := tx.Query(`
    select
       count(1) filter (where note_s = 'good') as good,
       artist_s
@@ -19,14 +19,14 @@ func selectAll(tx winter.Tx) error {
    group by artist_n
    order by good
    `, then)
-   if e != nil { return e }
+   if err != nil { return err }
    var (
       artist string
       count int
    )
    for query.Next() {
-      e = query.Scan(&count, &artist)
-      if e != nil { return e }
+      err = query.Scan(&count, &artist)
+      if err != nil { return err }
       fmt.Println(count, "|", artist)
    }
    return nil
