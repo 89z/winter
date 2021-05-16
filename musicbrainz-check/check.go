@@ -29,8 +29,8 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
       albums []remoteAlbum
       offset int
    )
-   req, e := http.NewRequest("GET", "http://musicbrainz.org/ws/2/release", nil)
-   if e != nil { return nil, e }
+   req, err := http.NewRequest("GET", "http://musicbrainz.org/ws/2/release", nil)
+   if err != nil { return nil, err }
    val := req.URL.Query()
    val.Set("fmt", "json")
    val.Set("inc", "release-groups")
@@ -40,11 +40,11 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
    val.Set("artist", artistId)
    for {
       req.URL.RawQuery = val.Encode()
-      res, e := new(http.Client).Do(req)
-      if e != nil { return nil, e }
+      res, err := new(http.Client).Do(req)
+      if err != nil { return nil, err }
       var artist remoteArtist
-      e = json.NewDecoder(res.Body).Decode(&artist)
-      if e != nil { return nil, e }
+      err = json.NewDecoder(res.Body).Decode(&artist)
+      if err != nil { return nil, err }
       for _, release := range artist.Releases {
          if release.Date == "" { continue }
          if len(release.Group.SecondaryTypes) > 0 { continue }
@@ -58,20 +58,20 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
 }
 
 func newLocalArtist(name, file string) (localArtist, error) {
-   tx, e := winter.NewTx(file)
-   if e != nil {
-      return localArtist{}, e
+   tx, err := winter.NewTx(file)
+   if err != nil {
+      return localArtist{}, err
    }
    var artistId string
-   e = tx.QueryRow(
+   err = tx.QueryRow(
       "select mb_s from artist_t where artist_s LIKE ?", name,
    ).Scan(&artistId)
-   if e != nil {
-      return localArtist{}, e
+   if err != nil {
+      return localArtist{}, err
    } else if artistId == "" {
       return localArtist{}, errors.New("artistId missing")
    }
-   query, e := tx.Query(`
+   query, err := tx.Query(`
    select
       album_s,
       date_s,
@@ -85,17 +85,17 @@ func newLocalArtist(name, file string) (localArtist, error) {
    where mb_s = ?
    group by album_n
    `, artistId)
-   if e != nil {
-      return localArtist{}, e
+   if err != nil {
+      return localArtist{}, err
    }
    artist := localArtist{
       artistId, map[string]localAlbum{},
    }
    for query.Next() {
       var alb localAlbum
-      e = query.Scan(&alb.title, &alb.date, &alb.url, &alb.unrated, &alb.good)
-      if e != nil {
-         return localArtist{}, e
+      err = query.Scan(&alb.title, &alb.date, &alb.url, &alb.unrated, &alb.good)
+      if err != nil {
+         return localArtist{}, err
       }
       artist.albums[alb.date + alb.title] = alb
    }

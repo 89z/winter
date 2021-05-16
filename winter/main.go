@@ -39,16 +39,21 @@ Update song note:
       return
    }
    key := os.Args[1]
-   tx, err := winter.NewTx(os.Getenv("WINTER"))
+   db, err := sql.Open("sqlite3", os.Getenv("WINTER"))
    if err != nil {
       panic(err)
    }
+   defer db.Close()
+   tx, err := db.Begin()
+   if err != nil {
+      panic(err)
+   }
+   defer tx.Commit()
    switch key {
    case "album":
       source := os.Args[2]
       if len(os.Args) == 4 {
-         dest := os.Args[3]
-         err = copyAlbum(tx, source, dest)
+         err = copyAlbum(tx, source, os.Args[3])
       } else {
          err = deleteAlbum(tx, source)
       }
@@ -56,37 +61,33 @@ Update song note:
       if len(os.Args) == 2 {
          err = selectAll(tx)
       } else {
-         _, err = tx.Insert(
-            "artist_t (artist_s, check_s, mb_s) values (?, '', '')", os.Args[2],
-         )
+         _, err = tx.Exec(`
+         INSERT INTO artist_t (artist_s, check_s, mb_s) VALUES (?, '', '')
+         `, os.Args[2])
       }
    case "check":
-      err = tx.Update(
-         "artist_t set check_s = ? where artist_n = ?", os.Args[3], os.Args[2],
-      )
+      err = tx.Exec(`
+      UPDATE artist_t SET check_s = ? WHERE artist_n = ?
+      `, os.Args[3], os.Args[2])
    case "date":
-      err = tx.Update(
-         "album_t set date_s = ? where album_n = ?", os.Args[3], os.Args[2],
-      )
+      err = tx.Exec(`
+      UPDATE album_t SET date_s = ? WHERE album_n = ?
+      `, os.Args[3], os.Args[2])
    case "mb":
-      err = tx.Update(
-         "artist_t set mb_s = ? where artist_n = ?", os.Args[3], os.Args[2],
-      )
+      err = tx.Exec(`
+      UPDATE artist_t SET mb_s = ? WHERE artist_n = ?
+      `, os.Args[3], os.Args[2])
    case "note":
-      err = tx.Update(
-         "song_t set note_s = ? where song_n = ?", os.Args[3], os.Args[2],
-      )
+      err = tx.Exec(`
+      UPDATE song_t SET note_s = ? WHERE song_n = ?
+      `, os.Args[3], os.Args[3])
    case "url":
-      err = tx.Update(
-         "album_t set url_s = ? where album_n = ?", os.Args[3], os.Args[2],
-      )
+      err = tx.Exec(`
+      UPDATE album_t SET url_s = ? WHERE album_n = ?
+      `, os.Args[3], os.Args[2])
    default:
       err = selectOne(tx, key)
    }
-   if err != nil {
-      panic(err)
-   }
-   err = tx.Commit()
    if err != nil {
       panic(err)
    }

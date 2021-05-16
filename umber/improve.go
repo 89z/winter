@@ -1,46 +1,42 @@
 package main
 
 import (
+   "database/sql"
    "encoding/json"
    "fmt"
    "os"
    "strings"
-   "winter"
+   _ "github.com/mattn/go-sqlite3"
 )
 
-func query(file string) (*winter.Rows, error) {
-   // get all artists
-   tx, e := winter.NewTx(file)
-   if e != nil { return nil, e }
-   return tx.Query("select artist_s from artist_t")
-}
-
-// find where the artist is not in the database
 func main() {
-   rows, e := query(os.Getenv("WINTER"))
-   if e != nil {
-      panic(e)
+   db, err := sql.Open("sqlite3", os.Getenv("WINTER"))
+   if err != nil {
+      panic(err)
    }
-   var (
-      row string
-      table = make(map[string]bool)
-   )
+   defer db.Close()
+   rows, err := db.Query("SELECT artist_s FROM artist_t")
+   if err != nil {
+      panic(err)
+   }
+   defer rows.Close()
+   table := make(map[string]bool)
    for rows.Next() {
-      e = rows.Scan(&row)
-      if e != nil {
-         panic(e)
+      var row string
+      err := rows.Scan(&row)
+      if err != nil {
+         panic(err)
       }
       table[strings.ToUpper(row)] = true
    }
-   // JSON
-   data, e := os.ReadFile(os.Getenv("UMBER"))
-   if e != nil {
-      panic(e)
+   data, err := os.ReadFile(os.Getenv("UMBER"))
+   if err != nil {
+      panic(err)
    }
    var songs []struct { S string }
-   e = json.Unmarshal(data, &songs)
-   if e != nil {
-      panic(e)
+   err = json.Unmarshal(data, &songs)
+   if err != nil {
+      panic(err)
    }
    for _, each := range songs {
       artists := strings.Split(each.S, " - ")[0]
