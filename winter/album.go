@@ -1,77 +1,59 @@
 package main
-import "winter"
+import "database/sql"
 
-func copyAlbum(tx winter.Tx, source , dest string) error {
-   var note, song, url string
+func copyAlbum(tx *sql.Tx, source, dest string) error {
+   var url string
    // COPY URL
-   e := tx.QueryRow(
-      "select url_s from album_t where album_n = ?", source,
-   ).Scan(&url)
-   if e != nil {
-      return e
-   }
+   err := tx.QueryRow(`
+   SELECT url_s FROM album_t WHERE album_n = ?
+   `, source).Scan(&url)
+   if err != nil { return err }
    // PASTE URL
-   e = tx.Update("album_t set url_s = ? where album_n = ?", url, dest)
-   if e != nil {
-      return e
-   }
+   err = tx.Exec(`
+   UPDATE album_t SET url_s = ? WHERE album_n = ?
+   `, url, dest)
+   if err != nil { return err }
    // COPY NOTES
-   query, e := tx.Query(
-      "select song_s, note_s from song_t where album_n = ?", source,
-   )
-   if e != nil {
-      return e
-   }
+   rows, err := tx.Query(`
+   SELECT song_s, note_s FROM song_t WHERE album_n = ?
+   `, source)
+   if err != nil { return err }
+   defer rows.Close()
    songs := make(map[string]string)
-   for query.Next() {
-      e = query.Scan(&song, &note)
-      if e != nil {
-         return e
-      }
+   for rows.Next() {
+      var note, song string
+      err := rows.Scan(&song, &note)
+      if err != nil { return err }
       songs[song] = note
    }
    // PASTE NOTES
    for song, note := range songs {
-      e = tx.Update(`
-      song_t set note_s = ?
-      where album_n = ? and song_s = ? COLLATE NOCASE
+      err := tx.Exec(`
+      UPDATE song_t SET note_s = ?
+      WHERE album_n = ? AND song_s = ? COLLATE NOCASE
       `, note, dest, song)
-      if e != nil {
-         return e
-      }
+      if err != nil { return err }
    }
    return nil
 }
 
-func deleteAlbum(tx winter.Tx, album string) error {
-   query, e := tx.Query("select song_n from song_t where album_n = ?", album)
-   if e != nil {
-      return e
-   }
-   var (
-      song int
-      songs []int
-   )
-   for query.Next() {
-      e = query.Scan(&song)
-      if e != nil {
-         return e
-      }
+func deleteAlbum(tx *sql.Tx, album string) error {
+   rows, err := tx.Query("SELECT song_n FROM song_t WHERE album_n = ?", album)
+   if err != nil { return err }
+   defer rows.Close()
+   var songs []int
+   for rows.Next() {
+      var song int
+      err := rows.Scan(&song)
+      if err != nil { return err }
       songs = append(songs, song)
    }
    for _, song := range songs {
-      e = tx.Delete("song_t where song_n = ?", song)
-      if e != nil {
-         return e
-      }
-      e = tx.Delete("song_artist_t where song_n = ?", song)
-      if e != nil {
-         return e
-      }
+      _, err := tx.Exec("DELETE FROM song_t WHERE song_n = ?", song)
+      if err != nil { return err }
+      _, err = tx.Exec("DELETE FROM song_artist_t WHERE song_n = ?", song)
+      if err != nil { return err }
    }
-   e = tx.Delete("album_t where album_n = ?", album)
-   if e != nil {
-      return e
-   }
-   return nil
+   _, err = tx.Exec("DELETE FROM album_t WHERE album_n = ?", album)
+   return err
 }

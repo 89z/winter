@@ -1,31 +1,32 @@
 package main
 
 import (
+   "database/sql"
    "fmt"
    "time"
-   "winter"
 )
 
-func selectAll(tx winter.Tx) error {
+func selectAll(tx *sql.Tx) error {
    then := time.Now().AddDate(-1, 0, 0)
-   query, err := tx.Query(`
-   select
-      count(1) filter (where note_s = 'good') as good,
+   rows, err := tx.Query(`
+   SELECT
+      count(1) filter (WHERE note_s = 'good') AS good,
       artist_s
-   from artist_t
-   natural join song_artist_t
-   natural join song_t
-   where check_s < ?
-   group by artist_n
-   order by good
+   FROM artist_t
+   NATURAL JOIN song_artist_t
+   NATURAL JOIN song_t
+   WHERE check_s < ?
+   GROUP BY artist_n
+   ORDER BY good
    `, then)
    if err != nil { return err }
-   var (
-      artist string
-      count int
-   )
-   for query.Next() {
-      err = query.Scan(&count, &artist)
+   defer rows.Close()
+   for rows.Next() {
+      var (
+         artist string
+         count int
+      )
+      err := rows.Scan(&count, &artist)
       if err != nil { return err }
       fmt.Println(count, "|", artist)
    }
