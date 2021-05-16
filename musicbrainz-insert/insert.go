@@ -3,8 +3,10 @@ package main
 import (
    "fmt"
    "github.com/89z/rosso/musicbrainz"
+   "os"
    "time"
-   "winter"
+   "database/sql"
+   _ "github.com/mattn/go-sqlite3"
 )
 
 func note(length int) string {
@@ -21,50 +23,79 @@ func note(length int) string {
    return ""
 }
 
-type titleNote struct { title, note string }
+type titleNote struct {
+   title string
+   note string
+}
 
-func insert(album musicbrainz.Release, tx winter.Tx) error {
+func main() {
+   if len(os.Args) != 2 {
+      fmt.Println(`musicbrainz-insert <URL>
+
+URL:
+https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
+https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
+      return
+   }
+   db, err := sql.Open("sqlite3", os.Getenv("WINTER"))
+   if err != nil {
+      panic(err)
+   }
+   defer db.Close()
+   tx, err := db.Begin()
+   if err != nil {
+      panic(err)
+   }
+   defer tx.Commit()
+   album, err := musicbrainz.NewRelease(os.Args[1])
+   if err != nil {
+      panic(err)
+   }
+   err = insert(album, tx)
+   if err != nil {
+      panic(err)
+   }
+}
+
+func insert(album musicbrainz.Release, tx *sql.Tx) error {
    // ALBUM
-   albumId, e := tx.Insert(
-      "album_t (album_s, date_s, url_s) values (?, ?, '')",
-      album.Title,
-      album.Date,
-   )
-   if e != nil { return e }
+   albumId, err := tx.Exec(`
+   INSERT INTO album_t (album_s, date_s, url_s) VALUES (?, ?, '')
+   `, album.Title, album.Date)
+   if err != nil { return err }
    // CREATE ARTIST ARRAY
    var artists []int
-   for _, each := range album.ArtistCredit {
+   for _, credit := range album.ArtistCredit {
       var artist int
-      e = tx.QueryRow(
-         "select artist_n from artist_t where mb_s = ?", each.Artist.Id,
-      ).Scan(&artist)
-      if e != nil {
-         return fmt.Errorf("%v %v", each.Name, e)
+      err := tx.QueryRow(`
+      SELECT artist_n FROM artist_t WHERE mb_s = ?
+      `, credit.Artist.Id).Scan(&artist)
+      if err != nil {
+         return fmt.Errorf("%v %v", credit.Name, err)
       }
       artists = append(artists, artist)
    }
    // CREATE SONG ARRAY
-   var songs []titleNote
+   var tns []titleNote
    for _, media := range album.Media {
       for _, track := range media.Tracks {
-         songs = append(songs, titleNote{
+         tns = append(tns, titleNote{
             track.Title, note(track.Length),
          })
       }
    }
    // ITERATE SONG ARRAY
-   for _, each := range songs {
-      song, e := tx.Insert(
-         "song_t (song_s, note_s, album_n) values (?, ?, ?)",
-         each.title,
-         each.note,
-         albumId,
-      )
-      if e != nil { return e }
+   for _, tn := range tns {
+      song, err := tx.Exec(`
+      INSERT INTO song_t (song_s, note_s, album_n) VALUES (?, ?, ?)
+      `, tn.title, tn.note, albumId)
+      if err != nil { return err }
       // ITERATE ARTIST ARRAY
       for _, artist := range artists {
-         _, e = tx.Insert("song_artist_t values (?, ?)", song, artist)
-         if e != nil { return e }
+         _, err := tx.Exec(`
+         INSERT INTO song_artist_t VALUES (?, ?)
+         `, song, artist)
+         if err != nil { return err }
       }
    }
    return nil
