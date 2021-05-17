@@ -31,37 +31,38 @@ func newLocalArtist(name, file string) (localArtist, error) {
    }
    defer db.Close()
    var artistId string
-   err = tx.QueryRow(
-      "select mb_s from artist_t where artist_s LIKE ?", name,
-   ).Scan(&artistId)
+   err = db.QueryRow(`
+   SELECT mb_s FROM artist_t WHERE artist_s LIKE ?
+   `, name).Scan(&artistId)
    if err != nil {
       return localArtist{}, err
    } else if artistId == "" {
       return localArtist{}, errors.New("artistId missing")
    }
-   query, err := tx.Query(`
-   select
+   rows, err := db.Query(`
+   SELECT
       album_s,
       date_s,
       url_s,
       count(1) filter (where note_s = '') as unrated,
       count(1) filter (where note_s = 'good') as good
-   from album_t
-   natural join song_t
-   natural join song_artist_t
-   natural join artist_t
-   where mb_s = ?
-   group by album_n
+   FROM album_t
+   NATURAL JOIN song_t
+   NATURAL JOIN song_artist_t
+   NATURAL JOIN artist_t
+   WHERE mb_s = ?
+   GROUP BY album_n
    `, artistId)
    if err != nil {
       return localArtist{}, err
    }
+   defer rows.Close()
    artist := localArtist{
-      artistId, map[string]localAlbum{},
+      artistId, make(map[string]localAlbum),
    }
-   for query.Next() {
+   for rows.Next() {
       var alb localAlbum
-      err = query.Scan(&alb.title, &alb.date, &alb.url, &alb.unrated, &alb.good)
+      err := rows.Scan(&alb.title, &alb.date, &alb.url, &alb.unrated, &alb.good)
       if err != nil {
          return localArtist{}, err
       }

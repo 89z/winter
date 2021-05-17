@@ -2,10 +2,10 @@ package main
 
 import (
    "bytes"
+   "database/sql"
    "fmt"
    "github.com/walles/moar/m"
    "strings"
-   "winter"
 )
 
 const (
@@ -13,18 +13,18 @@ const (
    yellow = "\x1b[30;43m"
 )
 
-func selectOne(tx winter.Tx, like string) error {
+func selectOne(tx *sql.Tx, like string) error {
    // ARTIST
    var (
       artist, check, mb string
       artistId int
    )
-   err := tx.QueryRow(
-      "select * from artist_t where artist_s LIKE ?", like,
-   ).Scan(&artistId, &artist, &check, &mb)
+   err := tx.QueryRow(`
+   SELECT * FROM artist_t WHERE artist_s LIKE ?
+   `, like).Scan(&artistId, &artist, &check, &mb)
    if err != nil { return err }
    // ALBUMS
-   query, err := tx.Query(`
+   rows, err := tx.Query(`
    SELECT
       album_n,
       album_s,
@@ -41,13 +41,14 @@ func selectOne(tx winter.Tx, like string) error {
    ORDER BY date_s
    `, like)
    if err != nil { return err }
+   defer rows.Close()
    var (
-      rows []row
+      records []record
       songs = make(map[string]int)
    )
-   for query.Next() {
-      var r row
-      err := query.Scan(
+   for rows.Next() {
+      var r record
+      err := rows.Scan(
          &r.albumInt,
          &r.albumStr,
          &r.dateStr,
@@ -57,7 +58,7 @@ func selectOne(tx winter.Tx, like string) error {
          &r.urlStr,
       )
       if err != nil { return err }
-      rows = append(rows, r)
+      records = append(records, r)
       upper := strings.ToUpper(r.songStr)
       if songs[upper] == 0 {
          songs[upper] = 1
@@ -65,10 +66,7 @@ func selectOne(tx winter.Tx, like string) error {
          songs[upper]++
       }
    }
-   var (
-      b = new(bytes.Buffer)
-      prev int
-   )
+   b := new(bytes.Buffer)
    // print artist number
    fmt.Fprintln(b, "artist_n |", artistId)
    // print artist name
@@ -85,7 +83,8 @@ func selectOne(tx winter.Tx, like string) error {
    } else {
       fmt.Fprintln(b, "mb_s     |", yellow, " ", reset)
    }
-   for _, r := range rows {
+   var prev int
+   for _, r := range records {
       if r.albumInt != prev {
          fmt.Fprintln(b)
          // print album number
@@ -124,7 +123,7 @@ func selectOne(tx winter.Tx, like string) error {
    return p.Page()
 }
 
-func note(r row, songs map[string]int) string {
+func note(r record, songs map[string]int) string {
    switch {
    case r.noteStr != "", strings.HasPrefix(r.urlStr, "youtube.com/watch?"):
       return fmt.Sprintf("%-9v", r.noteStr)
@@ -135,7 +134,12 @@ func note(r row, songs map[string]int) string {
    }
 }
 
-type row struct {
-   albumInt, songInt int
-   albumStr, dateStr, noteStr, songStr,urlStr string
+type record struct {
+   albumInt int
+   albumStr string
+   dateStr string
+   noteStr string
+   songInt int
+   songStr string
+   urlStr string
 }

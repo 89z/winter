@@ -1,5 +1,10 @@
 package main
-import "os"
+
+import (
+   "database/sql"
+   "os"
+   _ "github.com/mattn/go-sqlite3"
+)
 
 func main() {
    if len(os.Args) == 1 {
@@ -62,23 +67,23 @@ Update song note:
          `, os.Args[2])
       }
    case "check":
-      err = tx.Exec(`
+      _, err = tx.Exec(`
       UPDATE artist_t SET check_s = ? WHERE artist_n = ?
       `, os.Args[3], os.Args[2])
    case "date":
-      err = tx.Exec(`
+      _, err = tx.Exec(`
       UPDATE album_t SET date_s = ? WHERE album_n = ?
       `, os.Args[3], os.Args[2])
    case "mb":
-      err = tx.Exec(`
+      _, err = tx.Exec(`
       UPDATE artist_t SET mb_s = ? WHERE artist_n = ?
       `, os.Args[3], os.Args[2])
    case "note":
-      err = tx.Exec(`
+      _, err = tx.Exec(`
       UPDATE song_t SET note_s = ? WHERE song_n = ?
       `, os.Args[3], os.Args[3])
    case "url":
-      err = tx.Exec(`
+      _, err = tx.Exec(`
       UPDATE album_t SET url_s = ? WHERE album_n = ?
       `, os.Args[3], os.Args[2])
    default:

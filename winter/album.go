@@ -9,7 +9,7 @@ func copyAlbum(tx *sql.Tx, source, dest string) error {
    `, source).Scan(&url)
    if err != nil { return err }
    // PASTE URL
-   err = tx.Exec(`
+   _, err = tx.Exec(`
    UPDATE album_t SET url_s = ? WHERE album_n = ?
    `, url, dest)
    if err != nil { return err }
@@ -28,7 +28,7 @@ func copyAlbum(tx *sql.Tx, source, dest string) error {
    }
    // PASTE NOTES
    for song, note := range songs {
-      err := tx.Exec(`
+      _, err := tx.Exec(`
       UPDATE song_t SET note_s = ?
       WHERE album_n = ? AND song_s = ? COLLATE NOCASE
       `, note, dest, song)
