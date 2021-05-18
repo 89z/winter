@@ -2,7 +2,7 @@ package main
 
 import (
    "fmt"
-   "github.com/89z/rosso/musicbrainz"
+   "github.com/89z/musicbrainz"
    "os"
    "time"
    "database/sql"
@@ -69,7 +69,7 @@ func insert(album musicbrainz.Release, tx *sql.Tx) error {
       var artist int
       err := tx.QueryRow(`
       SELECT artist_n FROM artist_t WHERE mb_s = ?
-      `, credit.Artist.Id).Scan(&artist)
+      `, credit.Artist.ID).Scan(&artist)
       if err != nil {
          return fmt.Errorf("%v %v", credit.Name, err)
       }
