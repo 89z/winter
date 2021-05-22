@@ -59,12 +59,12 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
 
 func insert(album musicbrainz.Release, tx *sql.Tx) error {
    // ALBUM
-   albumId, err := tx.Exec(`
+   result, err := tx.Exec(`
    INSERT INTO album_t (album_s, date_s, url_s) VALUES (?, ?, '')
    `, album.Title, album.Date)
-   if err != nil {
-      return fmt.Errorf("INSERT INTO album_t %v", err)
-   }
+   if err != nil { return err }
+   albumId, err := result.LastInsertId()
+   if err != nil { return err }
    // CREATE ARTIST ARRAY
    var artists []int
    for _, credit := range album.ArtistCredit {
@@ -88,20 +88,18 @@ func insert(album musicbrainz.Release, tx *sql.Tx) error {
    }
    // ITERATE SONG ARRAY
    for _, tn := range tns {
-      song, err := tx.Exec(`
+      result, err := tx.Exec(`
       INSERT INTO song_t (song_s, note_s, album_n) VALUES (?, ?, ?)
       `, tn.title, tn.note, albumId)
-      if err != nil {
-         return fmt.Errorf("INSERT INTO song_t %v", err)
-      }
+      if err != nil { return err }
+      song, err := result.LastInsertId()
+      if err != nil { return err }
       // ITERATE ARTIST ARRAY
       for _, artist := range artists {
          _, err := tx.Exec(`
          INSERT INTO song_artist_t VALUES (?, ?)
          `, song, artist)
-         if err != nil {
-            return fmt.Errorf("INSERT INTO song_artist_t %v", err)
-         }
+         if err != nil { return err }
       }
    }
    return nil
