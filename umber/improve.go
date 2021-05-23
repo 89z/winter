@@ -34,8 +34,7 @@ func main() {
       panic(err)
    }
    var songs []struct { S string }
-   err = json.Unmarshal(data, &songs)
-   if err != nil {
+   if err := json.Unmarshal(data, &songs); err != nil {
       panic(err)
    }
    for _, each := range songs {

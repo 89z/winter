@@ -39,7 +39,6 @@ Update song note:
    winter note 999 good`)
       return
    }
-   key := os.Args[1]
    db, err := sql.Open("sqlite3", os.Getenv("WINTER"))
    if err != nil {
       panic(err)
@@ -50,46 +49,7 @@ Update song note:
       panic(err)
    }
    defer tx.Commit()
-   switch key {
-   case "album":
-      source := os.Args[2]
-      if len(os.Args) == 4 {
-         err = copyAlbum(tx, source, os.Args[3])
-      } else {
-         err = deleteAlbum(tx, source)
-      }
-   case "artist":
-      if len(os.Args) == 2 {
-         err = selectAll(tx)
-      } else {
-         _, err = tx.Exec(`
-         INSERT INTO artist_t (artist_s, check_s, mb_s) VALUES (?, '', '')
-         `, os.Args[2])
-      }
-   case "check":
-      _, err = tx.Exec(`
-      UPDATE artist_t SET check_s = ? WHERE artist_n = ?
-      `, os.Args[3], os.Args[2])
-   case "date":
-      _, err = tx.Exec(`
-      UPDATE album_t SET date_s = ? WHERE album_n = ?
-      `, os.Args[3], os.Args[2])
-   case "mb":
-      _, err = tx.Exec(`
-      UPDATE artist_t SET mb_s = ? WHERE artist_n = ?
-      `, os.Args[3], os.Args[2])
-   case "note":
-      _, err = tx.Exec(`
-      UPDATE song_t SET note_s = ? WHERE song_n = ?
-      `, os.Args[3], os.Args[2])
-   case "url":
-      _, err = tx.Exec(`
-      UPDATE album_t SET url_s = ? WHERE album_n = ?
-      `, os.Args[3], os.Args[2])
-   default:
-      err = selectOne(tx, key)
-   }
-   if err != nil {
+   if err := transact(tx, os.Args[1], os.Args[2:]); err != nil {
       panic(err)
    }
 }

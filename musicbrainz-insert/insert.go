@@ -51,8 +51,7 @@ https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
    if err != nil {
       panic(err)
    }
-   err = insert(album, tx)
-   if err != nil {
+   if err := insert(album, tx); err != nil {
       panic(err)
    }
 }

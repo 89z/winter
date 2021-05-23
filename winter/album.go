@@ -9,10 +9,9 @@ func copyAlbum(tx *sql.Tx, source, dest string) error {
    `, source).Scan(&url)
    if err != nil { return err }
    // PASTE URL
-   _, err = tx.Exec(`
+   if _, err := tx.Exec(`
    UPDATE album_t SET url_s = ? WHERE album_n = ?
-   `, url, dest)
-   if err != nil { return err }
+   `, url, dest); err != nil { return err }
    // COPY NOTES
    rows, err := tx.Query(`
    SELECT song_s, note_s FROM song_t WHERE album_n = ?
@@ -51,9 +50,11 @@ func deleteAlbum(tx *sql.Tx, album string) error {
    for _, song := range songs {
       _, err := tx.Exec("DELETE FROM song_t WHERE song_n = ?", song)
       if err != nil { return err }
-      _, err = tx.Exec("DELETE FROM song_artist_t WHERE song_n = ?", song)
-      if err != nil { return err }
+      if _, err := tx.Exec("DELETE FROM song_artist_t WHERE song_n = ?", song)
+      err != nil { return err }
    }
-   _, err = tx.Exec("DELETE FROM album_t WHERE album_n = ?", album)
-   return err
+   {
+      _, err := tx.Exec("DELETE FROM album_t WHERE album_n = ?", album)
+      return err
+   }
 }

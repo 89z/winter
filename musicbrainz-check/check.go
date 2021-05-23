@@ -31,10 +31,9 @@ func newLocalArtist(name, file string) (localArtist, error) {
    }
    defer db.Close()
    var artistId string
-   err = db.QueryRow(`
+   if err := db.QueryRow(`
    SELECT mb_s FROM artist_t WHERE artist_s LIKE ?
-   `, name).Scan(&artistId)
-   if err != nil {
+   `, name).Scan(&artistId); err != nil {
       return localArtist{}, err
    } else if artistId == "" {
       return localArtist{}, errors.New("artistId missing")
@@ -101,8 +100,7 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
       res, err := new(http.Client).Do(req)
       if err != nil { return nil, err }
       var artist remoteArtist
-      err = json.NewDecoder(res.Body).Decode(&artist)
-      if err != nil { return nil, err }
+      json.NewDecoder(res.Body).Decode(&artist)
       for _, release := range artist.Releases {
          if release.Date == "" { continue }
          if len(release.Group.SecondaryTypes) > 0 { continue }
