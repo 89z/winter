@@ -81,7 +81,7 @@ Update song note:
    case "note":
       _, err = tx.Exec(`
       UPDATE song_t SET note_s = ? WHERE song_n = ?
-      `, os.Args[3], os.Args[3])
+      `, os.Args[3], os.Args[2])
    case "url":
       _, err = tx.Exec(`
       UPDATE album_t SET url_s = ? WHERE album_n = ?
