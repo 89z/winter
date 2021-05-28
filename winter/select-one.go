@@ -124,14 +124,13 @@ func selectOne(tx *sql.Tx, like string) error {
 }
 
 func note(r record, songs map[string]int) string {
-   switch {
-   case r.noteStr != "", strings.HasPrefix(r.urlStr, "youtube.com/watch?"):
+   if r.noteStr != "" || strings.HasPrefix(r.urlStr, "youtube.com/watch?") {
       return fmt.Sprintf("%-9v", r.noteStr)
-   case songs[strings.ToUpper(r.songStr)] > 1:
-      return yellow + "duplicate" + reset
-   default:
-      return yellow + "   " + reset + "      "
    }
+   if songs[strings.ToUpper(r.songStr)] > 1 {
+      return yellow + "duplicate" + reset
+   }
+   return yellow + "   " + reset + "      "
 }
 
 type record struct {

@@ -43,15 +43,13 @@ func transact(tx *sql.Tx, name string, arg []string) error {
          return copyAlbum(tx, arg[0], arg[1])
       }
    case "artist":
-      switch len(arg) {
-      case 0:
+      if len(arg) == 0 {
          return selectAll(tx)
-      case 1:
-         _, err := tx.Exec(`
-         INSERT INTO artist_t (artist_s, check_s, mb_s) VALUES (?, '', '')
-         `, arg[0])
-         return err
       }
+      _, err := tx.Exec(`
+      INSERT INTO artist_t (artist_s, check_s, mb_s) VALUES (?, '', '')
+      `, arg[0])
+      return err
    case "check":
       _, err := tx.Exec(`
       UPDATE artist_t SET check_s = ? WHERE artist_n = ?
