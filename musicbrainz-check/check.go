@@ -100,7 +100,9 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
       res, err := new(http.Client).Do(req)
       if err != nil { return nil, err }
       var artist remoteArtist
-      json.NewDecoder(res.Body).Decode(&artist)
+      if err := json.NewDecoder(res.Body).Decode(&artist); err != nil {
+         return nil, err
+      }
       for _, release := range artist.Releases {
          if release.Date == "" { continue }
          if len(release.Group.SecondaryTypes) > 0 { continue }
