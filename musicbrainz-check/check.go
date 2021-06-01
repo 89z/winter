@@ -5,6 +5,7 @@ import (
    "encoding/json"
    "errors"
    "fmt"
+   "github.com/89z/musicbrainz"
    "net/http"
    "os"
    "strconv"
@@ -70,20 +71,9 @@ func newLocalArtist(name, file string) (localArtist, error) {
    return artist, nil
 }
 
-type remoteAlbum struct {
-   Date string
-   Group struct {
-      FirstRelease string `json:"first-release-date"`
-      Id string
-      SecondaryTypes []string `json:"secondary-types"`
-      Title string
-   } `json:"release-group"`
-   Title string
-}
-
-func remoteAlbums(artistId string) ([]remoteAlbum, error) {
+func remoteAlbums(artistId string) ([]musicbrainz.Release, error) {
    var (
-      albums []remoteAlbum
+      albums []musicbrainz.Release
       offset int
    )
    req, err := http.NewRequest("GET", "http://musicbrainz.org/ws/2/release", nil)
@@ -105,7 +95,7 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
       }
       for _, release := range artist.Releases {
          if release.Date == "" { continue }
-         if len(release.Group.SecondaryTypes) > 0 { continue }
+         if len(release.ReleaseGroup.SecondaryTypes) > 0 { continue }
          albums = append(albums, release)
       }
       offset += 100
@@ -117,7 +107,7 @@ func remoteAlbums(artistId string) ([]remoteAlbum, error) {
 
 type remoteArtist struct {
    ReleaseCount int `json:"release-count"`
-   Releases []remoteAlbum
+   Releases []musicbrainz.Release
 }
 
 func main() {
@@ -136,18 +126,18 @@ func main() {
    }
    fmt.Println(remote)
    /*
-   index, ok := remote[release.Group.Id]
+   index, ok := remote[release.ReleaseGroup.Id]
    if ok {
       // add release to group
       remotes[index].release[release.Title] = true
    } else {
       // add group
       remotes = append(remotes, winterRemote{
-         date: release.Group.FirstRelease,
+         date: release.ReleaseGroup.FirstRelease,
          release: map[string]bool{release.Title: true},
-         title: release.Group.Title,
+         title: release.ReleaseGroup.Title,
       })
-      remote[release.Group.Id] = len(remotes) - 1
+      remote[release.ReleaseGroup.Id] = len(remotes) - 1
    }
    */
 }
