@@ -81,7 +81,7 @@ func release(addr string) (musicbrainz.Release, error) {
    if strings.Contains(addr, "musicbrainz.org/release/") {
       return musicbrainz.NewRelease(id)
    }
-   g, err := musicbrainz.NewGroup(id)
+   g, err := musicbrainz.NewReleaseGroup(id)
    if err != nil {
       return musicbrainz.Release{}, err
    }
