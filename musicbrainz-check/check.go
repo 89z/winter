@@ -89,7 +89,7 @@ func remoteAlbums(artistId string) ([]musicbrainz.Release, error) {
       req.URL.RawQuery = val.Encode()
       res, err := new(http.Client).Do(req)
       if err != nil { return nil, err }
-      var artist remoteArtist
+      var artist musicbrainz.ReleaseGroup
       if err := json.NewDecoder(res.Body).Decode(&artist); err != nil {
          return nil, err
       }
@@ -103,11 +103,6 @@ func remoteAlbums(artistId string) ([]musicbrainz.Release, error) {
       val.Set("offset", strconv.Itoa(offset))
    }
    return albums, nil
-}
-
-type remoteArtist struct {
-   ReleaseCount int `json:"release-count"`
-   Releases []musicbrainz.Release
 }
 
 func main() {
