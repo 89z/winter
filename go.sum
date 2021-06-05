@@ -1,5 +1,5 @@
-github.com/89z/musicbrainz v1.16.8 h1:i/fnWOgeT4HUDvw/cV06D6TWRVv4UNRvoJ6xvWqm9xI=
-github.com/89z/musicbrainz v1.16.8/go.mod h1:TjZeGUqn7uQv+ijr4v4QkJT7TPMI0uMvH6uj1z6PBKM=
+github.com/89z/musicbrainz v1.16.9 h1:53KdtpHiE7qaXGEDkdw9VD/joeMDa3vQ5R6e5pJeCYA=
+github.com/89z/musicbrainz v1.16.9/go.mod h1:TjZeGUqn7uQv+ijr4v4QkJT7TPMI0uMvH6uj1z6PBKM=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38 h1:smF2tmSOzy2Mm+0dGI2AIUHY+w0BUc+4tn40djz7+6U=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
 github.com/alecthomas/chroma v0.9.1 h1:cBmvQqRImzR5aWqdMxYZByND4S7BCS/g0svZb28h0Dc=

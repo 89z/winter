@@ -89,7 +89,7 @@ func remoteAlbums(artistId string) ([]musicbrainz.Release, error) {
       req.URL.RawQuery = val.Encode()
       res, err := new(http.Client).Do(req)
       if err != nil { return nil, err }
-      var artist musicbrainz.ReleaseGroup
+      var artist musicbrainz.Group
       if err := json.NewDecoder(res.Body).Decode(&artist); err != nil {
          return nil, err
       }
