@@ -31,13 +31,13 @@ func newLocalArtist(name, file string) (localArtist, error) {
       return localArtist{}, err
    }
    defer db.Close()
-   var artistId string
+   var artistID string
    if err := db.QueryRow(`
    SELECT mb_s FROM artist_t WHERE artist_s LIKE ?
-   `, name).Scan(&artistId); err != nil {
+   `, name).Scan(&artistID); err != nil {
       return localArtist{}, err
-   } else if artistId == "" {
-      return localArtist{}, errors.New("artistId missing")
+   } else if artistID == "" {
+      return localArtist{}, errors.New("artistID missing")
    }
    rows, err := db.Query(`
    SELECT
@@ -52,13 +52,13 @@ func newLocalArtist(name, file string) (localArtist, error) {
    NATURAL JOIN artist_t
    WHERE mb_s = ?
    GROUP BY album_n
-   `, artistId)
+   `, artistID)
    if err != nil {
       return localArtist{}, err
    }
    defer rows.Close()
    artist := localArtist{
-      artistId, make(map[string]localAlbum),
+      artistID, make(map[string]localAlbum),
    }
    for rows.Next() {
       var alb localAlbum
@@ -71,20 +71,11 @@ func newLocalArtist(name, file string) (localArtist, error) {
    return artist, nil
 }
 
-func remoteAlbums(artistId string) ([]musicbrainz.Release, error) {
+func remoteAlbums(artistID string) ([]musicbrainz.Release, error) {
    var (
       albums []musicbrainz.Release
       offset int
    )
-   req, err := http.NewRequest("GET", "http://musicbrainz.org/ws/2/release", nil)
-   if err != nil { return nil, err }
-   val := req.URL.Query()
-   val.Set("fmt", "json")
-   val.Set("inc", "release-groups")
-   val.Set("limit", "100")
-   val.Set("status", "official")
-   val.Set("type", "album")
-   val.Set("artist", artistId)
    for {
       req.URL.RawQuery = val.Encode()
       res, err := new(http.Client).Do(req)
@@ -121,7 +112,7 @@ func main() {
    }
    fmt.Println(remote)
    /*
-   index, ok := remote[release.ReleaseGroup.Id]
+   index, ok := remote[release.ReleaseGroup.ID]
    if ok {
       // add release to group
       remotes[index].release[release.Title] = true
@@ -132,7 +123,7 @@ func main() {
          release: map[string]bool{release.Title: true},
          title: release.ReleaseGroup.Title,
       })
-      remote[release.ReleaseGroup.Id] = len(remotes) - 1
+      remote[release.ReleaseGroup.ID] = len(remotes) - 1
    }
    */
 }
