@@ -2,13 +2,10 @@ package main
 
 import (
    "database/sql"
-   "encoding/json"
    "errors"
    "fmt"
    "github.com/89z/musicbrainz"
-   "net/http"
    "os"
-   "strconv"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -77,28 +74,22 @@ func remoteAlbums(artistID string) ([]musicbrainz.Release, error) {
       offset int
    )
    for {
-      req.URL.RawQuery = val.Encode()
-      res, err := new(http.Client).Do(req)
+      group, err := musicbrainz.GroupFromArtist(artistID, offset)
       if err != nil { return nil, err }
-      var artist musicbrainz.Group
-      if err := json.NewDecoder(res.Body).Decode(&artist); err != nil {
-         return nil, err
-      }
-      for _, release := range artist.Releases {
+      for _, release := range group.Releases {
          if release.Date == "" { continue }
          if len(release.ReleaseGroup.SecondaryTypes) > 0 { continue }
          albums = append(albums, release)
       }
       offset += 100
-      if offset >= artist.ReleaseCount { break }
-      val.Set("offset", strconv.Itoa(offset))
+      if offset >= group.ReleaseCount { break }
    }
    return albums, nil
 }
 
 func main() {
    if len(os.Args) != 2 {
-      println("musicbrainz-check <artist>")
+      fmt.Println("musicbrainz-check <artist>")
       return
    }
    name, file := os.Args[1], os.Getenv("WINTER")
