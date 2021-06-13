@@ -1,15 +1,17 @@
 package main
 
 import (
-   "fmt"
-   "github.com/89z/musicbrainz"
    "database/sql"
+   "fmt"
+   "github.com/89z/mech/musicbrainz"
+   "os"
    "path"
    "strings"
    "time"
+   _ "github.com/mattn/go-sqlite3"
 )
 
-func insert(album musicbrainz.Release, tx *sql.Tx) error {
+func insert(album *musicbrainz.Release, tx *sql.Tx) error {
    // ALBUM
    result, err := tx.Exec(`
    INSERT INTO album_t (album_s, date_s, url_s) VALUES (?, ?, '')
@@ -76,15 +78,41 @@ type titleNote struct {
    note string
 }
 
-func release(addr string) (musicbrainz.Release, error) {
+func release(addr string) (*musicbrainz.Release, error) {
    id := path.Base(addr)
    if strings.Contains(addr, "musicbrainz.org/release/") {
       return musicbrainz.NewRelease(id)
    }
    g, err := musicbrainz.NewGroup(id)
-   if err != nil {
-      return musicbrainz.Release{}, err
-   }
+   if err != nil { return nil, err }
    g.Sort()
-   return g.Releases[0], nil
+   return &g.Releases[0], nil
+}
+
+
+func main() {
+   if len(os.Args) != 2 {
+      fmt.Println(`musicbrainz-insert <URL>
+
+https://musicbrainz.org/release/7cc21f46-16b4-4479-844c-e779572ca834
+https://musicbrainz.org/release-group/67898886-90bd-3c37-a407-432e3680e872`)
+      return
+   }
+   db, err := sql.Open("sqlite3", os.Getenv("WINTER"))
+   if err != nil {
+      panic(err)
+   }
+   defer db.Close()
+   tx, err := db.Begin()
+   if err != nil {
+      panic(err)
+   }
+   defer tx.Commit()
+   r, err := release(os.Args[1])
+   if err != nil {
+      panic(err)
+   }
+   if err := insert(r, tx); err != nil {
+      panic(err)
+   }
 }
