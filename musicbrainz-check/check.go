@@ -58,12 +58,12 @@ func newLocalArtist(name, file string) (localArtist, error) {
       artistID, make(map[string]localAlbum),
    }
    for rows.Next() {
-      var alb localAlbum
-      err := rows.Scan(&alb.title, &alb.date, &alb.url, &alb.unrated, &alb.good)
+      var a localAlbum
+      err := rows.Scan(&a.title, &a.date, &a.url, &a.unrated, &a.good)
       if err != nil {
          return localArtist{}, err
       }
-      artist.albums[alb.date + alb.title] = alb
+      artist.albums[a.date + a.title] = a
    }
    return artist, nil
 }
@@ -75,14 +75,22 @@ func remoteAlbums(artistID string) ([]musicbrainz.Release, error) {
    )
    for {
       group, err := musicbrainz.GroupFromArtist(artistID, offset)
-      if err != nil { return nil, err }
+      if err != nil {
+         return nil, err
+      }
       for _, release := range group.Releases {
-         if release.Date == "" { continue }
-         if len(release.ReleaseGroup.SecondaryTypes) > 0 { continue }
+         if release.Date == "" {
+            continue
+         }
+         if len(release.ReleaseGroup.SecondaryTypes) > 0 {
+            continue
+         }
          albums = append(albums, release)
       }
       offset += 100
-      if offset >= group.ReleaseCount { break }
+      if offset >= group.ReleaseCount {
+         break
+      }
    }
    return albums, nil
 }
