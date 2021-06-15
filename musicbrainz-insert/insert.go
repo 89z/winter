@@ -11,7 +11,7 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
-func insert(album *musicbrainz.Release, tx *sql.Tx) error {
+func insert(album musicbrainz.Release, tx *sql.Tx) error {
    // ALBUM
    result, err := tx.Exec(`
    INSERT INTO album_t (album_s, date_s, url_s) VALUES (?, ?, '')
@@ -78,15 +78,17 @@ type titleNote struct {
    note string
 }
 
-func release(addr string) (*musicbrainz.Release, error) {
+func release(addr string) (musicbrainz.Release, error) {
    id := path.Base(addr)
    if strings.Contains(addr, "musicbrainz.org/release/") {
       return musicbrainz.NewRelease(id)
    }
    g, err := musicbrainz.NewGroup(id)
-   if err != nil { return nil, err }
+   if err != nil {
+      return musicbrainz.Release{}, err
+   }
    g.Sort()
-   return &g.Releases[0], nil
+   return g.Releases[0], nil
 }
 
 
