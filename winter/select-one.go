@@ -22,7 +22,9 @@ func selectOne(tx *sql.Tx, like string) error {
    err := tx.QueryRow(`
    SELECT * FROM artist_t WHERE artist_s LIKE ?
    `, like).Scan(&artistId, &artist, &check, &mb)
-   if err != nil { return err }
+   if err != nil {
+      return err
+   }
    // ALBUMS
    rows, err := tx.Query(`
    SELECT
@@ -40,7 +42,9 @@ func selectOne(tx *sql.Tx, like string) error {
    WHERE artist_s LIKE ?
    ORDER BY date_s
    `, like)
-   if err != nil { return err }
+   if err != nil {
+      return err
+   }
    defer rows.Close()
    var (
       records []record
@@ -57,7 +61,9 @@ func selectOne(tx *sql.Tx, like string) error {
          &r.songStr,
          &r.urlStr,
       )
-      if err != nil { return err }
+      if err != nil {
+         return err
+      }
       records = append(records, r)
       upper := strings.ToUpper(r.songStr)
       if songs[upper] == 0 {

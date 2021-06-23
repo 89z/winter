@@ -22,19 +22,19 @@ type localArtist struct {
    albums map[string]localAlbum
 }
 
-func newLocalArtist(name, file string) (localArtist, error) {
+func newLocalArtist(name, file string) (*localArtist, error) {
    db, err := sql.Open("sqlite3", file)
    if err != nil {
-      return localArtist{}, err
+      return nil, err
    }
    defer db.Close()
    var artistID string
    if err := db.QueryRow(`
    SELECT mb_s FROM artist_t WHERE artist_s LIKE ?
    `, name).Scan(&artistID); err != nil {
-      return localArtist{}, err
+      return nil, err
    } else if artistID == "" {
-      return localArtist{}, errors.New("artistID missing")
+      return nil, errors.New("artistID missing")
    }
    rows, err := db.Query(`
    SELECT
@@ -51,26 +51,26 @@ func newLocalArtist(name, file string) (localArtist, error) {
    GROUP BY album_n
    `, artistID)
    if err != nil {
-      return localArtist{}, err
+      return nil, err
    }
    defer rows.Close()
-   artist := localArtist{
+   artist := &localArtist{
       artistID, make(map[string]localAlbum),
    }
    for rows.Next() {
       var a localAlbum
       err := rows.Scan(&a.title, &a.date, &a.url, &a.unrated, &a.good)
       if err != nil {
-         return localArtist{}, err
+         return nil, err
       }
       artist.albums[a.date + a.title] = a
    }
    return artist, nil
 }
 
-func remoteAlbums(artistID string) ([]musicbrainz.Release, error) {
+func remoteAlbums(artistID string) ([]*musicbrainz.Release, error) {
    var (
-      albums []musicbrainz.Release
+      albums []*musicbrainz.Release
       offset int
    )
    for {

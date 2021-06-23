@@ -33,7 +33,9 @@ func main() {
    if err != nil {
       panic(err)
    }
-   var songs []struct { S string }
+   var songs []struct {
+      S string
+   }
    if err := json.Unmarshal(data, &songs); err != nil {
       panic(err)
    }

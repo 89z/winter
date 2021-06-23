@@ -11,14 +11,18 @@ import (
    _ "github.com/mattn/go-sqlite3"
 )
 
-func insert(album musicbrainz.Release, tx *sql.Tx) error {
+func insert(album *musicbrainz.Release, tx *sql.Tx) error {
    // ALBUM
    result, err := tx.Exec(`
    INSERT INTO album_t (album_s, date_s, url_s) VALUES (?, ?, '')
    `, album.Title, album.Date)
-   if err != nil { return err }
+   if err != nil {
+      return err
+   }
    albumId, err := result.LastInsertId()
-   if err != nil { return err }
+   if err != nil {
+      return err
+   }
    // CREATE ARTIST ARRAY
    var artists []int
    for _, credit := range album.ArtistCredit {
@@ -45,15 +49,21 @@ func insert(album musicbrainz.Release, tx *sql.Tx) error {
       result, err := tx.Exec(`
       INSERT INTO song_t (song_s, note_s, album_n) VALUES (?, ?, ?)
       `, tn.title, tn.note, albumId)
-      if err != nil { return err }
+      if err != nil {
+         return err
+      }
       song, err := result.LastInsertId()
-      if err != nil { return err }
+      if err != nil {
+         return err
+      }
       // ITERATE ARTIST ARRAY
       for _, artist := range artists {
          _, err := tx.Exec(`
          INSERT INTO song_artist_t VALUES (?, ?)
          `, song, artist)
-         if err != nil { return err }
+         if err != nil {
+            return err
+         }
       }
    }
    return nil
@@ -78,14 +88,14 @@ type titleNote struct {
    note string
 }
 
-func release(addr string) (musicbrainz.Release, error) {
+func release(addr string) (*musicbrainz.Release, error) {
    id := path.Base(addr)
    if strings.Contains(addr, "musicbrainz.org/release/") {
       return musicbrainz.NewRelease(id)
    }
    g, err := musicbrainz.NewGroup(id)
    if err != nil {
-      return musicbrainz.Release{}, err
+      return nil, err
    }
    g.Sort()
    return g.Releases[0], nil
