@@ -1,5 +1,5 @@
-github.com/89z/mech v1.16.9 h1:Haq9IBSx2iBdoFjO79RYVO04F2WUJO5LeI/FHzEozXM=
-github.com/89z/mech v1.16.9/go.mod h1:GFcIOiNculm8+EkkonCYFSyucZLx1/GWNxBFXRsvXN8=
+github.com/89z/mech v1.17.1 h1:7VfaGWLzKkz0ljTmG2LUYlg/MmElJWwpq9/18cEi83g=
+github.com/89z/mech v1.17.1/go.mod h1:GFcIOiNculm8+EkkonCYFSyucZLx1/GWNxBFXRsvXN8=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38 h1:smF2tmSOzy2Mm+0dGI2AIUHY+w0BUc+4tn40djz7+6U=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
 github.com/alecthomas/chroma v0.9.1 h1:cBmvQqRImzR5aWqdMxYZByND4S7BCS/g0svZb28h0Dc=
