@@ -6,6 +6,7 @@ import (
    "fmt"
    "github.com/89z/mech/musicbrainz"
    "os"
+   "strings"
    _ "github.com/mattn/go-sqlite3"
 )
 
@@ -95,6 +96,43 @@ func remoteAlbums(artistID string) ([]*musicbrainz.Release, error) {
    return albums, nil
 }
 
+
+
+/* Regarding the title and date:
+
+For the title, we will display the remote Group title, but we also need to get
+the remote Release titles to match against the local Release title.
+
+For the date, if we have a local match, use that date. Otherwise, use use the
+remote Group date */
+type winterRemote struct {
+   color, date, title string
+   release map[string]bool
+}
+
+func color(url string, unrated, good int) string {
+   const (
+      block = "\u2587\u2587\u2587\u2587\u2587"
+      gray = "\x1b[90m"
+      green = "\x1b[92m"
+      red = "\x1b[91m"
+      reset = "\x1b[m"
+   )
+   if strings.HasPrefix(url, "youtube.com/watch?") {
+      return green + block + block + reset
+   }
+   if unrated == 0 && good == 0 {
+      return red + block + block + reset
+   }
+   if unrated == 0 {
+      return green + block + block + reset
+   }
+   if good == 0 {
+      return red + block + gray + block + reset
+   }
+   return green + block + gray + block + reset
+}
+
 func main() {
    if len(os.Args) != 2 {
       fmt.Println("musicbrainz-check <artist>")
@@ -111,6 +149,21 @@ func main() {
    }
    fmt.Println(remote)
    /*
+   for n, group := range remotes {
+      for release := range group.release {
+         local, ok := locals[strings.ToUpper(release)]
+         if ok {
+            remotes[n].date = local.date
+            remotes[n].color = local.color
+         }
+      }
+   }
+   sort.Slice(remotes, func(a, b int) bool {
+      return remotes[a].date < remotes[b].date
+   })
+   for _, group := range remotes {
+      fmt.Printf("%-10v | %10v | %v\n", group.date, group.color, group.title)
+   }
    index, ok := remote[release.ReleaseGroup.ID]
    if ok {
       // add release to group
