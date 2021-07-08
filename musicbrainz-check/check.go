@@ -96,8 +96,6 @@ func remoteAlbums(artistID string) ([]*musicbrainz.Release, error) {
    return albums, nil
 }
 
-
-
 /* Regarding the title and date:
 
 For the title, we will display the remote Group title, but we also need to get
