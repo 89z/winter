@@ -11,5 +11,6 @@ Music SQL database
 
 ## Links
 
+- <https://pkg.go.dev/modernc.org/ql#hdr-Building_non_CGO_QL>
 - https://dolthub.com
 - https://github.com/mattn/go-sqlite3
